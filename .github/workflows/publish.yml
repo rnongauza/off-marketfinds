@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: "0 13 * * 1"   # every Monday morning: refresh RentCast estimate and comps
 permissions:
   contents: read
   pages: write
@@ -22,7 +24,14 @@ jobs:
         run: |
           mkdir -p _site
           unzip -o off-marketfinds-website.zip -d _site
+          if [ -d overrides ]; then cp -r overrides/. _site/; fi
           cp CNAME _site/ || true
+      - name: Refresh RentCast estimate and comparables
+        env:
+          RENTCAST_API_KEY: ${{ secrets.RENTCAST_API_KEY }}
+        run: |
+          if [ -f _site/_tools/rentcast.py ]; then python3 _site/_tools/rentcast.py _site; fi
+          rm -rf _site/_tools
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
