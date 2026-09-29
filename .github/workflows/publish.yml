@@ -29,6 +29,7 @@ jobs:
       - name: Refresh RentCast estimate and comparables
         env:
           RENTCAST_API_KEY: ${{ secrets.RENTCAST_API_KEY }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
           if [ -f _site/_tools/rentcast.py ]; then python3 _site/_tools/rentcast.py _site; fi
           rm -rf _site/_tools
