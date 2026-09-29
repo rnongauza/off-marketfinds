@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Off-Market Finds</title>
+<meta name="description" content="Off-market investor properties in the East Bay from Robert Nongauza, Nongauza Real Estate Group by Kendrick Realty Inc.">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#fbfaf7; --stone:#f3f1eb; --white:#ffffff;
+  --ink:#333333; --muted:#6b7378; --faint:#9aa1a5; --line:#dcdcd6; --line-2:#e6e5df;
+  --navy:#12303c; --blue:#2785b8; --sky:#6ab8e2;
+  --serif:Georgia,"Times New Roman",Times,serif; --sans:Arial,"Helvetica Neue",Helvetica,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+h1,h2,h3{margin:0;font-family:var(--serif);font-weight:400;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:40px}
+@media (max-width:700px){.wrap{padding-inline:16px}}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--blue)}
+header.site{background:var(--white);border-bottom:1px solid var(--line-2);position:sticky;top:0;z-index:30}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:78px}
+.logo{display:grid;justify-items:center;text-decoration:none;line-height:1;color:#555;padding:4px 6px}
+.logo svg{width:34px;height:14px;display:block;margin-bottom:1px}
+.logo .nm{font-size:21px;font-weight:700;letter-spacing:-.01em;color:#4a4a4a}
+.logo .gp{white-space:nowrap;font-size:7.5px;letter-spacing:.24em;margin-top:3px;color:#666}
+.logo .by{font-style:italic;font-size:10.5px;color:#444;margin-top:4px}
+nav.links{display:flex;gap:30px;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+nav.links a{white-space:nowrap;text-decoration:none}
+nav.links a:hover{color:var(--blue)}
+
+.intro{background:var(--navy);color:#fff}
+.intro .wrap{padding-block:80px 72px;display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:end}
+.intro .eyebrow{color:#5fb0e0}
+.intro h1{font-size:clamp(40px,6vw,68px);line-height:1.02;letter-spacing:-.035em;margin-top:18px}
+.intro h1 em{color:var(--sky)}
+.intro p{color:#d5dde1;font-size:16px;max-width:46ch}
+@media (max-width:820px){.intro .wrap{grid-template-columns:1fr;padding-block:56px}}
+
+.list{padding-block:80px}
+.list-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.list-head h2{font-size:clamp(36px,5vw,52px);letter-spacing:-.035em;line-height:1.05;margin-top:16px}
+.count{font-size:13px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+.card{background:var(--white);border:1px solid var(--line-2);text-decoration:none;display:grid;transition:box-shadow .2s ease}
+.card:hover{box-shadow:0 10px 30px rgba(18,48,60,.12)}
+.card .ph{position:relative;aspect-ratio:4/3;overflow:hidden;background:#e4e3dd}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .tag{position:absolute;left:12px;top:12px;background:var(--navy);color:#fff;font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:6px 10px}
+.card .ai{position:absolute;right:12px;bottom:12px;background:rgba(18,48,60,.86);color:#fff;font-size:10.5px;padding:5px 9px}
+.card .body{padding:20px 22px 22px;display:grid;gap:14px}
+.card h3{font-size:24px;letter-spacing:-.01em;line-height:1.15}
+.card .city{font-family:var(--serif);color:var(--muted);font-size:16px;margin-top:4px}
+.card .nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);padding-top:12px;gap:8px}
+.card .nums span{display:block;font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card .nums b{font-family:var(--serif);font-weight:400;font-size:18px;font-variant-numeric:tabular-nums}
+.card .go{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:700}
+
+.contact{background:var(--stone);padding-block:72px}
+.contact .wrap{display:grid;grid-template-columns:1fr 1.2fr;gap:32px 60px;align-items:start}
+.contact h2{font-size:clamp(34px,4.5vw,48px);letter-spacing:-.03em;margin-top:16px}
+.contact .who b{display:block;font-family:var(--serif);font-weight:400;font-size:22px}
+.contact .who span{display:block;font-size:13px;color:#555;margin-top:4px}
+.lines{display:grid;gap:10px;margin-top:22px}
+.lines div{display:flex;gap:14px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;flex-wrap:wrap}
+.lines span{font-size:10px;letter-spacing:.14em;font-weight:700;text-transform:uppercase;color:var(--muted);min-width:70px}
+.lines a{font-family:var(--serif);font-size:18px;text-decoration:none}
+@media (max-width:820px){.contact .wrap{grid-template-columns:1fr}}
+footer{background:var(--white);border-top:1px solid var(--line-2);padding-block:36px 44px;font-size:11px;color:var(--faint);line-height:1.6}
+
+@media (max-width:700px){
+  .eyebrow{font-size:11.5px}
+  .logo .gp{font-size:8.5px}.logo .by{font-size:11.5px}
+  nav.links{font-size:12px;gap:18px}
+  .intro p{font-size:16.5px}
+  .card .tag{font-size:11px}.card .ai{font-size:12px}
+  .card .nums span{font-size:11px;letter-spacing:.08em}
+  .card .nums b{font-size:17px}
+  .card .go{font-size:12.5px}
+  .lines span{font-size:11.5px}
+  .contact .who span{font-size:14px}
+  footer{font-size:12.5px}
+  .cards{grid-template-columns:1fr}
+}
+@media (max-width:480px){nav.links a:first-child{display:none}}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="logo" href="/" aria-label="Off-Market Finds home">
+    <svg viewBox="0 0 34 14" aria-hidden="true"><path d="M3 8 17 1l14 7" fill="none" stroke="#2785b8" stroke-width="2.2"/><rect x="14" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="14" y="10.4" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="10.4" width="2.4" height="2.4" fill="#2785b8"/></svg>
+    <span class="nm">Nongauza</span><span class="gp">REAL ESTATE GROUP</span><span class="by">By Kendrick Realty Inc.</span>
+  </a>
+  <nav class="links" aria-label="Sections"><a href="#properties">Properties</a><a href="#contact">Contact Robert</a></nav>
+</div></header>
+
+<main>
+  <section class="intro"><div class="wrap">
+    <div>
+      <div class="eyebrow">Off-Market Finds</div>
+      <h1>Investor properties,<br><em>before they hit the market.</em></h1>
+    </div>
+    <p>Each listing shows the home as it is today, AI design concepts of what it could become, and a calculator to run your own numbers.</p>
+  </div></section>
+
+  <section class="list" id="properties" aria-labelledby="pl-title"><div class="wrap">
+    <div class="list-head">
+      <div><div class="eyebrow">Current opportunities</div><h2 id="pl-title">Properties</h2></div>
+      <p class="count" id="count"></p>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div></section>
+
+  <section class="contact" id="contact" aria-labelledby="ct-title"><div class="wrap">
+    <div><div class="eyebrow">Get the full package</div><h2 id="ct-title">Talk to Robert</h2></div>
+    <div>
+      <div class="who"><b>Robert Nongauza</b><span>Broker Associate · Certified Probate &amp; Trust Specialist · GRI · REALTOR® · Notary</span></div>
+      <div class="lines">
+        <div><span>Call</span><a href="tel:+15104593029">510-459-3029</a></div>
+        <div><span>Email</span><a href="mailto:robert@kendrickrealtyinc.com">robert@kendrickrealtyinc.com</a></div>
+      </div>
+    </div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  DRE #00991571 · Kendrick Realty Inc. · Brokerage DRE #01996808 · Equal Housing Opportunity<br>
+  Information is believed reliable but is not guaranteed. Design concepts are AI-generated illustrations, not existing conditions. Buyers must independently verify all information.
+</div></footer>
+
+<script>
+/* Add one entry per property. "url" is the property's own subdomain. */
+const PROPERTIES = [
+  {
+    street: "68 Greenfield Ave",
+    city: "Vallejo, CA 94590",
+    url: "/68-greenfield-ave-vallejo-ca-94590",
+    image: "/img/68-greenfield-ave.jpg",
+    aiImage: true,
+    label: "Off-market",
+    price: 370697,
+    arv: 580000,
+    beds: 3, baths: 2
+  }
+];
+const money = n => "$" + Math.round(n).toLocaleString("en-US");
+const box = document.getElementById("cards");
+PROPERTIES.forEach(p => {
+  const a = document.createElement("a"); a.className = "card"; a.href = p.url;
+  const ph = document.createElement("div"); ph.className = "ph";
+  const im = new Image(); im.src = p.image; im.alt = p.street + (p.aiImage ? ", Modern design concept" : "");
+  const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = p.label;
+  ph.append(im, tag);
+  if (p.aiImage) { const ai = document.createElement("span"); ai.className = "ai"; ai.textContent = "AI design concept"; ph.appendChild(ai); }
+  const body = document.createElement("div"); body.className = "body";
+  const t = document.createElement("div");
+  const h = document.createElement("h3"); h.textContent = p.street;
+  const c = document.createElement("p"); c.className = "city"; c.textContent = p.city;
+  t.append(h, c);
+  const nums = document.createElement("div"); nums.className = "nums";
+  [["Asking price", money(p.price)], ["ARV", money(p.arv)], ["Beds / baths", p.beds + " / " + p.baths]].forEach(([k, v]) => {
+    const d = document.createElement("div"); const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; d.append(s, b); nums.appendChild(d);
+  });
+  const go = document.createElement("span"); go.className = "go"; go.textContent = "View property →";
+  body.append(t, nums, go);
+  a.append(ph, body); box.appendChild(a);
+});
+document.getElementById("count").textContent = PROPERTIES.length + (PROPERTIES.length === 1 ? " property" : " properties");
+</script>
+</body>
+</html>
