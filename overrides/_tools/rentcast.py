@@ -16,7 +16,24 @@ def get(path, params):
 
 STATUS = {"Active": "Active listing", "Inactive": "Off market"}
 props = json.loads((pathlib.Path(__file__).parent / "properties.json").read_text())
+# Only spend RentCast requests on the weekly refresh or a manual "Run workflow".
+# Ordinary site updates reuse the numbers already live on off-marketfinds.com.
+event = os.environ.get("GITHUB_EVENT_NAME", "")
+refresh = event in ("schedule", "workflow_dispatch") or os.environ.get("FORCE_REFRESH") == "1"
+SITE = os.environ.get("SITE_URL", "https://off-marketfinds.com")
 for p in props:
+    out_file = site / p["slug"] / "rentcast.json"
+    if not refresh:
+        try:
+            with urllib.request.urlopen(SITE + "/" + p["slug"] + "/rentcast.json", timeout=20) as r:
+                data = r.read()
+            json.loads(data)
+            out_file.parent.mkdir(parents=True, exist_ok=True)
+            out_file.write_bytes(data)
+            print(p["slug"], "reused live RentCast data (no API request)")
+            continue
+        except Exception as e:
+            print(p["slug"], "no live RentCast data yet, fetching once:", e)
     q = {"address": p["address"], "propertyType": p["propertyType"], "compCount": 20}
     for k in ("bedrooms", "bathrooms", "squareFootage"):
         if p.get(k): q[k] = p[k]
