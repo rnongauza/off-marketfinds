@@ -202,6 +202,33 @@ a.logo{text-decoration:none}
   .chip{width:100%}
   .chip code{flex:1}
 }
+
+/* property list as rows */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.plist-panel{gap:12px}
+.plist-head{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.plist-head .psearch{margin-left:auto;min-width:0;flex:0 1 300px}
+.plist-head input[type=search]{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:4px;padding:9px 11px;font-size:14px}
+.ptable-wrap{overflow-x:auto;margin-inline:-6px}
+.ptable{width:100%;border-collapse:collapse;font-size:14px}
+.ptable th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ptable td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ptable tbody tr:hover{background:var(--mist)}
+.ptable .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.propcell{display:flex;align-items:center;gap:12px;min-width:220px}
+.pthumb{flex:none;width:72px;height:54px;border-radius:4px;overflow:hidden;background:var(--mist-2);display:grid;place-items:center;color:var(--muted);font-size:10.5px;text-decoration:none}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ptext{display:grid;gap:2px;min-width:0}
+.pname{font-family:var(--serif);font-size:18px;color:var(--ink);text-decoration:none;line-height:1.2}
+.pname:hover{text-decoration:underline}
+.ptext small{color:var(--muted);font-size:12.5px}
+.ptext .pill{justify-self:start}
+.slink{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.slink code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--muted)}
+.ptable td.act{text-align:right;width:1%}
+.status.empty{padding:18px 4px}
+@media (max-width:900px){.ptable .hide-md{display:none}}
+@media (max-width:640px){.ptable .hide-sm{display:none}.propcell{min-width:0}.pthumb{width:56px;height:42px}.pname{font-size:16px}.plist-head .psearch{flex-basis:100%;margin-left:0}}
 </style>
 
 </head>
@@ -239,7 +266,11 @@ a.logo{text-decoration:none}
       </div>
       <span class="status" id="new-status"></span>
     </form>
-    <div class="plist" id="plist"><p class="status">Loading…</p></div>
+    <section class="panel plist-panel" aria-labelledby="pl-title">
+      <div class="plist-head"><h2 id="pl-title">All properties</h2><span class="status" id="p-count"></span>
+        <div class="fld psearch"><label for="p-search" class="sr">Search properties</label><input type="search" id="p-search" placeholder="Search by address or short link"></div></div>
+      <div id="plist"><p class="status">Loading…</p></div>
+    </section>
   </section>
 
   <!-- short links -->
@@ -450,27 +481,51 @@ function logout(expired){token=null;me=null;store.set('omf_token',null);dirty=fa
 $('logout').addEventListener('click',()=>{if(dirty&&!confirm('You have unsaved changes. Log out anyway?'))return;logout(false);});
 
 /* ---------------- property list ---------------- */
+let allProps=[];
 async function loadList(){
   const box=$('plist');
   $('sms-hint').textContent=me&&me.sms?('Or text an address to '+fmtPhone(me.phone)+' and reply with the price.'):'Add a property below. Texting turns on once the Twilio number is approved.';
   try{
     const {properties}=await api('/api/properties');
-    box.replaceChildren();
-    if(!properties.length){const p=document.createElement('p');p.className='status';p.textContent='No properties yet.';box.appendChild(p);return;}
-    properties.forEach(p=>{
-      const a=document.createElement('a');a.className='pitem';a.href='#'+p.slug;
-      const th=document.createElement('div');th.className='thumb';
-      if(p.image){const im=new Image();im.src=imgUrl(p.slug,p.image);im.alt='';im.loading='lazy';th.appendChild(im);}else{const n=document.createElement('div');n.className='none';n.textContent='No photos yet';th.appendChild(n);}
-      const b=document.createElement('div');b.className='body';
-      const t=document.createElement('b');t.textContent=p.street;
-      const c=document.createElement('small');c.textContent=[p.cityLine,p.price?money(p.price):'',p.photos+' photo'+(p.photos===1?'':'s')].filter(Boolean).join(' · ');
-      b.append(t,c);
-      if(!p.listed){const s=document.createElement('span');s.className='pill hidden-home';s.textContent='Hidden from home page';b.appendChild(s);}
-      if(p.short){const s=document.createElement('small');s.textContent=SITE_SHORT+'/go/'+p.short;b.appendChild(s);}
-      a.append(th,b);box.appendChild(a);
-    });
+    allProps=properties; renderList();
   }catch(e){if(e.code!=='login'){box.replaceChildren();const p=document.createElement('p');p.className='status err';p.textContent=e.message;box.appendChild(p);}}
 }
+function renderList(){
+  const box=$('plist'), q=($('p-search').value||'').trim().toLowerCase();
+  const list=allProps.filter(p=>!q||(p.street+' '+p.cityLine+' '+(p.short||'')).toLowerCase().includes(q));
+  $('p-count').textContent=allProps.length+' propert'+(allProps.length===1?'y':'ies')+(q?' · '+list.length+' shown':'');
+  box.replaceChildren();
+  if(!allProps.length){const p=document.createElement('p');p.className='status empty';p.textContent='No properties yet. Add one above or text an address.';box.appendChild(p);return;}
+  if(!list.length){const p=document.createElement('p');p.className='status empty';p.textContent='No property matches “'+q+'”.';box.appendChild(p);return;}
+  const tbl=document.createElement('table');tbl.className='ptable';
+  const thead=document.createElement('thead');const hr=document.createElement('tr');
+  [['Property',''],['Asking','n'],['ARV','n hide-sm'],['Bd / Ba','n hide-md'],['Photos','n hide-md'],['Short link','hide-sm'],['','']].forEach(([t,c])=>{const th=document.createElement('th');th.textContent=t;if(c)th.className=c;th.scope='col';hr.appendChild(th);});
+  thead.appendChild(hr);tbl.appendChild(thead);
+  const tb=document.createElement('tbody');
+  list.forEach(p=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td');td0.className='prop';
+    const th=document.createElement('a');th.className='pthumb';th.href='#'+p.slug;th.tabIndex=-1;th.setAttribute('aria-hidden','true');
+    if(p.image){const im=new Image();im.src=imgUrl(p.slug,p.image);im.alt='';im.loading='lazy';th.appendChild(im);}else{th.classList.add('none');th.textContent='No photo';}
+    const tx=document.createElement('div');tx.className='ptext';
+    const a=document.createElement('a');a.href='#'+p.slug;a.className='pname';a.textContent=p.street;
+    const c=document.createElement('small');c.textContent=p.cityLine||'';
+    tx.append(a,c);
+    if(!p.listed){const s=document.createElement('span');s.className='pill hidden-home';s.textContent='Hidden';tx.appendChild(s);}
+    const pc=document.createElement('div');pc.className='propcell';pc.append(th,tx);td0.appendChild(pc);
+    const td=(v,c)=>{const d=document.createElement('td');d.className=c;d.textContent=v;return d;};
+    const bb=(p.beds!==''&&p.beds!=null?p.beds:'—')+' / '+(p.baths!==''&&p.baths!=null?p.baths:'—');
+    const tdS=document.createElement('td');tdS.className='hide-sm';
+    if(p.short){const sp=document.createElement('span');sp.className='slink';const code=document.createElement('code');code.textContent='/go/'+p.short;
+      const cb=document.createElement('button');cb.type='button';cb.className='btn ghost small';cb.textContent='Copy';cb.setAttribute('aria-label','Copy short link for '+p.street);
+      cb.addEventListener('click',()=>copy(SITE+'/go/'+p.short,cb));sp.append(code,cb);tdS.appendChild(sp);}
+    const tdE=document.createElement('td');tdE.className='act';const ed=document.createElement('a');ed.className='btn small';ed.href='#'+p.slug;ed.textContent='Edit';ed.setAttribute('aria-label','Edit '+p.street);tdE.appendChild(ed);
+    tr.append(td0,td(p.price?money(p.price):'—','n'),td(p.arv?money(p.arv):'—','n hide-sm'),td(bb,'n hide-md'),td(String(p.photos),'n hide-md'),tdS,tdE);
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);const wrap=document.createElement('div');wrap.className='ptable-wrap';wrap.appendChild(tbl);box.appendChild(wrap);
+}
+$('p-search').addEventListener('input',renderList);
 function fmtPhone(p){const d=String(p||'').replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'');return d.length===10?'('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6):p;}
 $('new-form').addEventListener('submit',async e=>{e.preventDefault();
   const address=$('n-address').value.trim(),price=$('n-price').value.trim();
@@ -518,7 +573,7 @@ $('link-form').addEventListener('submit',async e=>{e.preventDefault();
 const PF=['eyebrow','headline','street','cityLine','price','arv','beds','baths','sqft','lot','yearBuilt','occupancy','propertyType'];
 const NUMF=['price','arv','beds','baths','sqft','lot'];
 const CF=['light','moderate','closingPct','months','holdingMonthly','sellingPct','targetPct'];
-function imgUrl(slug,src){if(!src)return '';if(/^https?:|^\//.test(src))return src.startsWith('/')&&!location.hostname.endsWith('off-marketfinds.com')?SITE+src:src;
+function imgUrl(slug,src){if(!src)return '';if(/^(data|blob):/.test(src))return src;if(CONFIG.imgBase)return CONFIG.imgBase+(src.startsWith('/')?src:'/'+slug+'/'+src);if(/^https?:|^\//.test(src))return src.startsWith('/')&&!location.hostname.endsWith('off-marketfinds.com')?SITE+src:src;
   return me&&me.repo?'https://raw.githubusercontent.com/'+me.repo+'/main/properties/'+slug+'/'+src:SITE+'/'+slug+'/'+src;}
 
 async function openProperty(slug){
