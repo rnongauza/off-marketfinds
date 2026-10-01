@@ -484,7 +484,7 @@ $('logout').addEventListener('click',()=>{if(dirty&&!confirm('You have unsaved c
 let allProps=[];
 async function loadList(){
   const box=$('plist');
-  $('sms-hint').textContent=me&&me.sms?('Or text an address to '+fmtPhone(me.phone)+' and reply with the price.'):'Add a property below. Texting turns on once the Twilio number is approved.';
+  $('sms-hint').textContent=me&&me.sms?('Or text an address to '+fmtPhone(me.phone)+' and reply with the price.'):'Add a property below, then click Edit to change anything. Saving updates off-marketfinds.com in about a minute.';
   try{
     const {properties}=await api('/api/properties');
     allProps=properties; renderList();
