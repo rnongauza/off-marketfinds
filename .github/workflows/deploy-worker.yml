@@ -38,11 +38,17 @@ jobs:
           api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
           auth="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
           title="off-marketfinds-bot-STATE"
-          id=$(curl -s -H "$auth" "$api/storage/kv/namespaces?per_page=100" | jq -r --arg t "$title" '.result[]? | select(.title==$t) | .id' | head -1)
+          v=$(curl -s -H "$auth" "https://api.cloudflare.com/client/v4/user/tokens/verify")
+          echo "Token check: $(echo "$v" | jq -c '{success, status: .result.status, errors: [.errors[]?.message]}')"
+          list=$(curl -s -H "$auth" "$api/storage/kv/namespaces?per_page=100")
+          echo "KV list: $(echo "$list" | jq -c '{success, errors: [.errors[]? | {code, message}]}')"
+          id=$(echo "$list" | jq -r --arg t "$title" '.result[]? | select(.title==$t) | .id' | head -1)
           if [ -z "$id" ]; then
-            id=$(curl -s -X POST -H "$auth" -H "Content-Type: application/json" -d "{\"title\":\"$title\"}" "$api/storage/kv/namespaces" | jq -r '.result.id')
+            made=$(curl -s -X POST -H "$auth" -H "Content-Type: application/json" -d "{\"title\":\"$title\"}" "$api/storage/kv/namespaces")
+            echo "KV create: $(echo "$made" | jq -c '{success, errors: [.errors[]? | {code, message}]}')"
+            id=$(echo "$made" | jq -r '.result.id // empty')
           fi
-          [ -n "$id" ] && [ "$id" != "null" ] || { echo "::error::Couldn't create Cloudflare KV storage. Check the API token permissions."; exit 1; }
+          [ -n "$id" ] || { echo "::error::Couldn't create Cloudflare KV storage. See the Token check / KV lines above."; exit 1; }
           sed -i "s/__KV_ID__/$id/" worker/wrangler.toml
           sub=$(curl -s -H "$auth" "$api/workers/subdomain" | jq -r '.result.subdomain // empty')
           if [ -z "$sub" ]; then
