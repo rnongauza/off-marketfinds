@@ -134,26 +134,13 @@ footer{background:var(--white);border-top:1px solid var(--line-2);padding-block:
 </div></footer>
 
 <script>
-/* Add one entry per property. "url" is the property's own subdomain. */
-const PROPERTIES = [
-  {
-    street: "68 Greenfield Ave",
-    city: "Vallejo, CA 94590",
-    url: "/68-greenfield-ave-vallejo-ca-94590",
-    image: "/img/68-greenfield-ave.jpg",
-    aiImage: true,
-    label: "Off-market",
-    price: 350000,
-    arv: 580000,
-    beds: 3, baths: 2
-  }
-];
+const PROPERTIES = /*PROPERTIES*/[];
 const money = n => "$" + Math.round(n).toLocaleString("en-US");
 const box = document.getElementById("cards");
 PROPERTIES.forEach(p => {
   const a = document.createElement("a"); a.className = "card"; a.href = p.url;
   const ph = document.createElement("div"); ph.className = "ph";
-  const im = new Image(); im.src = p.image; im.alt = p.street + (p.aiImage ? ", Modern design concept" : "");
+  const im = new Image(); if (p.image) im.src = p.image; im.alt = p.street + (p.aiImage ? ", Modern design concept" : "");
   const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = p.label;
   ph.append(im, tag);
   if (p.aiImage) { const ai = document.createElement("span"); ai.className = "ai"; ai.textContent = "AI design concept"; ph.appendChild(ai); }
@@ -163,13 +150,14 @@ PROPERTIES.forEach(p => {
   const c = document.createElement("p"); c.className = "city"; c.textContent = p.city;
   t.append(h, c);
   const nums = document.createElement("div"); nums.className = "nums";
-  [["Asking price", money(p.price)], ["ARV", money(p.arv)], ["Beds / baths", p.beds + " / " + p.baths]].forEach(([k, v]) => {
+  [["Asking price", p.price ? money(p.price) : "—"], ["ARV", p.arv ? money(p.arv) : "—"], ["Beds / baths", (p.beds ?? "—") + " / " + (p.baths ?? "—")]].forEach(([k, v]) => {
     const d = document.createElement("div"); const s = document.createElement("span"); s.textContent = k; const b = document.createElement("b"); b.textContent = v; d.append(s, b); nums.appendChild(d);
   });
   const go = document.createElement("span"); go.className = "go"; go.textContent = "View property →";
   body.append(t, nums, go);
   a.append(ph, body); box.appendChild(a);
 });
+if (!PROPERTIES.length) { const e = document.createElement("p"); e.className = "count"; e.textContent = "New opportunities are coming soon."; box.appendChild(e); }
 document.getElementById("count").textContent = PROPERTIES.length + (PROPERTIES.length === 1 ? " property" : " properties");
 </script>
 </body>

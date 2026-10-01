@@ -1,0 +1,102 @@
+name: Deploy text bot
+on:
+  push:
+    branches: [main]
+    paths: ["worker/**", ".github/workflows/deploy-worker.yml"]
+  workflow_dispatch:          # run this again after adding or changing a secret
+permissions:
+  contents: write
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check setup
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          missing=""
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$GH_PAT" ] || missing="$missing GH_PAT"
+          [ -n "$ADMIN_PASSWORD" ] || missing="$missing ADMIN_PASSWORD"
+          if [ -n "$missing" ]; then echo "::error::Add these repository secrets first:$missing"; exit 1; fi
+      - name: Storage for the bot (Cloudflare KV)
+        run: |
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          auth="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          title="off-marketfinds-bot-STATE"
+          id=$(curl -s -H "$auth" "$api/storage/kv/namespaces?per_page=100" | jq -r --arg t "$title" '.result[]? | select(.title==$t) | .id' | head -1)
+          if [ -z "$id" ]; then
+            id=$(curl -s -X POST -H "$auth" -H "Content-Type: application/json" -d "{\"title\":\"$title\"}" "$api/storage/kv/namespaces" | jq -r '.result.id')
+          fi
+          [ -n "$id" ] && [ "$id" != "null" ] || { echo "::error::Couldn't create Cloudflare KV storage. Check the API token permissions."; exit 1; }
+          sed -i "s/__KV_ID__/$id/" worker/wrangler.toml
+          sub=$(curl -s -H "$auth" "$api/workers/subdomain" | jq -r '.result.subdomain // empty')
+          if [ -z "$sub" ]; then
+            for name in off-marketfinds offmarketfinds off-marketfinds-$RANDOM; do
+              sub=$(curl -s -X PUT -H "$auth" -H "Content-Type: application/json" -d "{\"subdomain\":\"$name\"}" "$api/workers/subdomain" | jq -r '.result.subdomain // empty')
+              [ -n "$sub" ] && break
+            done
+          fi
+          [ -n "$sub" ] || { echo "::error::Couldn't set up a workers.dev address. Open Workers & Pages in Cloudflare once, then re-run."; exit 1; }
+          echo "BOT_URL=https://off-marketfinds-bot.$sub.workers.dev" >> "$GITHUB_ENV"
+      - name: Deploy
+        working-directory: worker
+        run: npx --yes wrangler@4 deploy
+      - name: Secrets
+        working-directory: worker
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+          OWNER_PHONES: ${{ secrets.OWNER_PHONES }}
+        run: |
+          umask 077
+          jq -n --arg gh "$GH_PAT" --arg pw "$ADMIN_PASSWORD" --arg sid "$TWILIO_ACCOUNT_SID" \
+                --arg tok "$TWILIO_AUTH_TOKEN" --arg from "$TWILIO_PHONE_NUMBER" --arg own "$OWNER_PHONES" \
+            '{GH_TOKEN:$gh, ADMIN_PASSWORD:$pw, TWILIO_SID:$sid, TWILIO_TOKEN:$tok, TWILIO_FROM:$from, OWNER_PHONES:$own}
+             | with_entries(select(.value != ""))' > /tmp/secrets.json
+          npx --yes wrangler@4 secret bulk /tmp/secrets.json
+          rm -f /tmp/secrets.json
+      - name: Tell the admin page where the bot lives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          want=$(jq -n --arg u "$BOT_URL" '{api:$u}')
+          if [ "$(jq -c . site/config.json 2>/dev/null)" != "$(echo "$want" | jq -c .)" ]; then
+            echo "$want" > site/config.json
+            git config user.name "off-marketfinds-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add site/config.json && git commit -q -m "Point the admin page at the text bot"
+            for i in 1 2 3; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
+            gh api "repos/${{ github.repository }}/dispatches" -f event_type=publish
+          fi
+          echo "Bot address: $BOT_URL"
+      - name: Point the Twilio number at the bot
+        env:
+          SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+        run: |
+          [ -n "$SID" ] && [ -n "$TOKEN" ] && [ -n "$NUMBER" ] || { echo "Twilio secrets not added yet; skipping"; exit 0; }
+          pn=$(curl -s -u "$SID:$TOKEN" -G "https://api.twilio.com/2010-04-01/Accounts/$SID/IncomingPhoneNumbers.json" \
+               --data-urlencode "PhoneNumber=$NUMBER" | jq -r '.incoming_phone_numbers[0].sid // empty')
+          [ -n "$pn" ] || { echo "::warning::Couldn't find $NUMBER in this Twilio account"; exit 0; }
+          curl -s -o /dev/null -w "Twilio webhook update: %{http_code}\n" -u "$SID:$TOKEN" -X POST \
+            "https://api.twilio.com/2010-04-01/Accounts/$SID/IncomingPhoneNumbers/$pn.json" \
+            --data-urlencode "SmsUrl=$BOT_URL/sms" --data-urlencode "SmsMethod=POST"

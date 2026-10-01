@@ -1,0 +1,76 @@
+name: Import photos
+on:
+  repository_dispatch:
+    types: [import_photos]    # sent by the text bot and the admin page
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: Property folder name (for example 68-greenfield-ave-vallejo-ca-94590)
+        required: true
+      url:
+        description: Google Drive / Dropbox / iCloud shared album / Google Photos link (leave empty to just re-sort)
+        required: false
+      mode:
+        description: replace, add or sort
+        required: false
+        default: replace
+permissions:
+  contents: write
+concurrency:
+  group: import-photos
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q requests pillow pillow-heif
+      - id: run
+        name: Download, sort with Gemini, keep the best
+        env:
+          SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
+          MODE: ${{ github.event.client_payload.mode || inputs.mode || 'replace' }}
+          URLS: ${{ toJSON(github.event.client_payload.urls) }}
+          URL_ONE: ${{ inputs.url }}
+          MEDIA: ${{ toJSON(github.event.client_payload.media) }}
+          MAX: ${{ github.event.client_payload.max || 10 }}
+          AI: ${{ github.event.client_payload.ai == false && 'false' || 'true' }}
+          SET_MORE: ${{ (github.event.client_payload.setMore || github.event_name == 'workflow_dispatch') && 'true' || 'false' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+        run: python3 tools/photos.py
+      - name: Save to the repo
+        env:
+          SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
+        run: |
+          git config user.name "off-marketfinds-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A properties links.json
+          if git diff --cached --quiet; then echo "nothing to save"; exit 0; fi
+          git commit -q -m "Photos for $SLUG: ${{ steps.run.outputs.summary }}"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
+      - name: Publish the site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api "repos/${{ github.repository }}/dispatches" -f event_type=publish
+      - name: Text the result
+        if: github.event.client_payload.notify != ''  && github.event.client_payload.notify != null
+        env:
+          SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          FROM: ${{ secrets.TWILIO_PHONE_NUMBER }}
+          TO: ${{ github.event.client_payload.notify }}
+          BODY: ${{ steps.run.outputs.message }}
+        run: |
+          [ -n "$SID" ] && [ -n "$FROM" ] || { echo "Twilio not set up; skipping text"; exit 0; }
+          curl -s -o /dev/null -w "Twilio %{http_code}\n" -X POST "https://api.twilio.com/2010-04-01/Accounts/$SID/Messages.json" \
+            -u "$SID:$TOKEN" --data-urlencode "To=$TO" --data-urlencode "From=$FROM" --data-urlencode "Body=$BODY"

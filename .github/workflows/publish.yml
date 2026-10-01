@@ -2,11 +2,13 @@ name: Publish site
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:          # "Run workflow" also refreshes RentCast numbers
   schedule:
-    - cron: "0 13 * * 1"   # every Monday morning: refresh RentCast estimate and comps
+    - cron: "0 13 * * 1"     # every Monday morning: refresh RentCast estimate and comparables
+  repository_dispatch:
+    types: [publish]          # sent by the photo importer and the bot deploy
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 concurrency:
@@ -20,19 +22,27 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Unpack the website zip
+        with:
+          ref: main
+      - name: Fill in facts for new properties (RentCast)
+        env:
+          RENTCAST_API_KEY: ${{ secrets.RENTCAST_API_KEY }}
         run: |
-          mkdir -p _site
-          unzip -o off-marketfinds-website.zip -d _site
-          if [ -d overrides ]; then cp -r overrides/. _site/; fi
-          cp CNAME _site/ || true
-      - name: Refresh RentCast estimate and comparables
+          python3 tools/rentcast.py enrich
+          if [ -n "$(git status --porcelain properties)" ]; then
+            git config user.name "off-marketfinds-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add properties
+            git commit -q -m "Fill in property facts from RentCast"
+            for i in 1 2 3 4; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
+          fi
+      - name: Build the site
+        run: python3 tools/build.py _site
+      - name: RentCast estimate and comparables
         env:
           RENTCAST_API_KEY: ${{ secrets.RENTCAST_API_KEY }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}
-        run: |
-          if [ -f _site/_tools/rentcast.py ]; then python3 _site/_tools/rentcast.py _site; fi
-          rm -rf _site/_tools
+        run: python3 tools/rentcast.py market _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

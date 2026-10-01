@@ -1,0 +1,180 @@
+{
+  "property": {
+    "eyebrow": "Investor opportunity",
+    "headline": "OFF-MARKET OPPORTUNITY",
+    "street": "68 Greenfield Ave",
+    "cityLine": "Vallejo, CA 94590",
+    "price": 350000,
+    "arv": 580000,
+    "beds": 3,
+    "baths": 2,
+    "sqft": 1648,
+    "lot": 7840,
+    "yearBuilt": "1955",
+    "propertyType": "Single Family",
+    "occupancy": "Tenant",
+    "overview": [
+      "A classic single-family house, 3 Bedrooms, 2 Baths, 1,648 Sqft, with hardwood floors, a fireplace and a 2-car attached garage.",
+      "The Furnace, Plumbing, Electrical panel and Water heater are in good condition.\nWill be delivered with non-paying tenants."
+    ],
+    "offer": {
+      "deadline": "Contact Robert for details.",
+      "access": "Call Robert at 510-459-3029",
+      "closing": "Please do your due diligence"
+    },
+    "deal": {
+      "emd": "Contact Robert for details.",
+      "closing": "Confirm with dispositions",
+      "openHouse": "Often times 1 hour on a specific day - Contact Robert"
+    }
+  },
+  "photos": [
+    {
+      "id": "p1",
+      "caption": "Driveway and garage",
+      "original": {
+        "src": "img/p1-original.jpg"
+      },
+      "modern": {
+        "src": "img/p1-concept.jpg"
+      },
+      "room": "exterior_other"
+    },
+    {
+      "id": "p2",
+      "caption": "Living room",
+      "original": {
+        "src": "img/p2-original.jpg"
+      },
+      "modern": {
+        "src": "img/p2-concept.jpg"
+      },
+      "room": "living"
+    },
+    {
+      "id": "p3",
+      "caption": "Kitchen",
+      "original": {
+        "src": "img/p3-original.jpg"
+      },
+      "modern": {
+        "src": "img/p3-concept.jpg"
+      },
+      "room": "kitchen"
+    },
+    {
+      "id": "p4",
+      "caption": "Bedroom",
+      "original": {
+        "src": "img/p4-original.jpg"
+      },
+      "modern": {
+        "src": "img/p4-concept.jpg"
+      },
+      "room": "bedroom"
+    },
+    {
+      "id": "p5",
+      "caption": "Front yard",
+      "original": {
+        "src": "img/p5-original.jpg"
+      },
+      "modern": {
+        "src": "img/p5-concept.jpg"
+      },
+      "room": "exterior_front"
+    },
+    {
+      "id": "p6",
+      "caption": "Backyard and pool",
+      "original": {
+        "src": "img/p6-original.jpg"
+      },
+      "modern": {
+        "src": "img/p6-concept.jpg"
+      },
+      "room": "backyard"
+    }
+  ],
+  "calc": {
+    "level": "light",
+    "light": 40,
+    "moderate": 80,
+    "closingPct": 2,
+    "months": 3,
+    "holdingMonthly": 2200,
+    "sellingPct": 8,
+    "targetPct": 12,
+    "loanPct": 80,
+    "ratePct": 10,
+    "pointsPct": 2
+  },
+  "slug": "68-greenfield-ave-vallejo-ca-94590",
+  "short": "68g",
+  "listed": true,
+  "links": {
+    "more": "",
+    "moreShort": "",
+    "showMore": false
+  },
+  "market": {
+    "source": "RentCast",
+    "asOf": "2026-09-29T10:14:11.341361+00:00",
+    "value": 560000,
+    "low": 502000,
+    "high": 618000,
+    "rent": 2750,
+    "rentLow": 2080,
+    "rentHigh": 3430,
+    "comps": [
+      {
+        "address": "621 La Cadena St, Vallejo, CA 94590",
+        "price": 519000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1676,
+        "yearBuilt": 1940,
+        "type": "Single Family",
+        "distance": 0.1177,
+        "status": "Off market",
+        "date": "2026-09-23T00:00:00.000Z"
+      },
+      {
+        "address": "107 Palomar Ln, Vallejo, CA 94591",
+        "price": 624900,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1668,
+        "yearBuilt": 1968,
+        "type": "Single Family",
+        "distance": 0.6297,
+        "status": "Active listing",
+        "date": "2026-08-01T00:00:00.000Z"
+      },
+      {
+        "address": "638 Fleming Ave E, Vallejo, CA 94591",
+        "price": 539000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1653,
+        "yearBuilt": 1967,
+        "type": "Single Family",
+        "distance": 0.6881,
+        "status": "Off market",
+        "date": "2026-04-08T00:00:00.000Z"
+      },
+      {
+        "address": "411 Valle Vista Ave, Vallejo, CA 94590",
+        "price": 599900,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1744,
+        "yearBuilt": 1962,
+        "type": "Single Family",
+        "distance": 0.3882,
+        "status": "Active listing",
+        "date": "2026-06-19T00:00:00.000Z"
+      }
+    ]
+  }
+}

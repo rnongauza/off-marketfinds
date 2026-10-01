@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Off-market investor opportunity at 68 Greenfield Ave, Vallejo, CA. See every room as a Modern design concept, RentCast comps, and run your own flip numbers.">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:image" content="{{OG_IMAGE}}">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>68 Greenfield Ave</title>
 <style>
 :root{
   color-scheme:light;
@@ -164,6 +167,11 @@ nav.links a:hover{color:var(--blue)}
 .shot .cap{font-family:var(--serif);font-size:16px;color:#333}
 .shot .cap small{font-family:var(--sans);font-size:10.5px;letter-spacing:.14em;color:var(--faint);margin-right:10px}
 .phnote{font-size:11px;color:var(--faint);margin-top:20px}
+.more-photos{margin-top:26px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;border-top:1px solid var(--line);padding-top:18px}
+.more-photos a{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);text-decoration:none}
+.more-photos a:hover{text-decoration:underline}
+.more-photos span{font-size:13px;color:var(--muted)}
+.hero.nophoto .hero-photo,.hero.nophoto .hero-style{display:none}
 @media (prefers-reduced-motion:reduce){.frame img{transition:none}}
 
 /* market data */
@@ -268,9 +276,9 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   .metrics{grid-row:4}
 }
 </style>
-
 </head>
 <body>
+
 <header class="site"><div class="wrap">
   <a class="logo" href="/" aria-label="Off-Market Finds home">
     <svg viewBox="0 0 34 14" aria-hidden="true"><path d="M3 8 17 1l14 7" fill="none" stroke="#2785b8" stroke-width="2.2"/><rect x="14" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="14" y="10.4" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="10.4" width="2.4" height="2.4" fill="#2785b8"/></svg>
@@ -321,6 +329,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
       <div class="setall"><span class="lbl" id="setall-label">See what it can become</span><div id="setall"></div></div>
     </div>
     <div class="grid" id="grid"></div>
+    <p class="more-photos" id="more-photos" hidden><a id="more-link" href="#" target="_blank" rel="noopener">See all photos <span aria-hidden="true">→</span></a><span id="more-short"></span></p>
     <p class="phnote">Modern images are AI design concepts, not existing conditions, construction plans or estimates.</p>
   </div></section>
 
@@ -454,7 +463,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   <p class="legal">Information is believed reliable but is not guaranteed. Market value, projections, and property details are estimates only. Buyer must independently verify all information. This is not an appraisal, inspection, or promise of future performance.</p>
 </div></footer>
 
-<script id="site-data" type="application/json">{"property": {"eyebrow": "Investor opportunity", "headline": "OFF-MARKET OPPORTUNITY", "street": "68 Greenfield Ave", "cityLine": "Vallejo, CA 94590", "price": 350000, "arv": 580000, "beds": 3, "baths": 2, "sqft": 1648, "lot": 7840, "yearBuilt": "1955", "propertyType": "Single Family", "occupancy": "Tenant", "overview": ["A classic single-family house, 3 Bedrooms, 2 Baths, 1,648 Sqft, with hardwood floors, a fireplace and a 2-car attached garage.", "The Furnace, Plumbing, Electrical panel and Water heater are in good condition.\nWill be delivered with non-paying tenants."], "offer": {"deadline": "Contact Robert for details.", "access": "Call Robert at 510-459-3029", "closing": "Please do your due diligence"}, "deal": {"emd": "Contact Robert for details.", "closing": "Confirm with dispositions", "openHouse": "Often times 1 hour on a specific day - Contact Robert"}}, "photos": [{"id": "p1", "caption": "Driveway and garage", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p1-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p1-concept.jpg"}}, {"id": "p2", "caption": "Living room", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p2-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p2-concept.jpg"}}, {"id": "p3", "caption": "Kitchen", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p3-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p3-concept.jpg"}}, {"id": "p4", "caption": "Bedroom", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p4-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p4-concept.jpg"}}, {"id": "p5", "caption": "Front yard", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p5-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p5-concept.jpg"}}, {"id": "p6", "caption": "Backyard and pool", "original": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p6-original.jpg"}, "modern": {"src": "/68-greenfield-ave-vallejo-ca-94590/img/p6-concept.jpg"}}], "calc": {"level": "light", "light": 40, "moderate": 80, "closingPct": 2, "months": 3, "holdingMonthly": 2200, "sellingPct": 8, "targetPct": 12, "loanPct": 80, "ratePct": 10, "pointsPct": 2}, "contact": {"name": "Robert Nongauza", "credentials": "Broker Associate · Certified Probate & Trust Specialist · GRI · REALTOR® · Notary", "phone": "510-459-3029", "email": "robert@kendrickrealtyinc.com", "license": "DRE #00991571 · Kendrick Realty Inc. · Brokerage DRE #01996808"}, "market": {"source": "RentCast", "asOf": "2026-09-29T10:14:11.341361+00:00", "value": 560000, "low": 502000, "high": 618000, "rent": 2750, "rentLow": 2080, "rentHigh": 3430, "comps": [{"address": "621 La Cadena St, Vallejo, CA 94590", "price": 519000, "beds": 3, "baths": 2, "sqft": 1676, "yearBuilt": 1940, "type": "Single Family", "distance": 0.1177, "status": "Off market", "date": "2026-09-23T00:00:00.000Z"}, {"address": "107 Palomar Ln, Vallejo, CA 94591", "price": 624900, "beds": 3, "baths": 2, "sqft": 1668, "yearBuilt": 1968, "type": "Single Family", "distance": 0.6297, "status": "Active listing", "date": "2026-08-01T00:00:00.000Z"}, {"address": "638 Fleming Ave E, Vallejo, CA 94591", "price": 539000, "beds": 3, "baths": 2, "sqft": 1653, "yearBuilt": 1967, "type": "Single Family", "distance": 0.6881, "status": "Off market", "date": "2026-04-08T00:00:00.000Z"}, {"address": "411 Valle Vista Ave, Vallejo, CA 94590", "price": 599900, "beds": 3, "baths": 2, "sqft": 1744, "yearBuilt": 1962, "type": "Single Family", "distance": 0.3882, "status": "Active listing", "date": "2026-06-19T00:00:00.000Z"}]}}</script>
+<script id="site-data" type="application/json">/*DATA*/</script>
 <script>
 (function(){
 const D=JSON.parse(document.getElementById('site-data').textContent);
@@ -470,10 +479,11 @@ txt('h-headline',P.headline); txt('h-street',P.street||''); txt('h-city',P.cityL
 document.title=P.street||document.title;
 const cover=D.photos[0];
 /* hero style switch is wired after seg() is defined */
-txt('m-price',money(P.price)); txt('m-arv',money(P.arv)); txt('m-prop',P.beds+' BD · '+P.baths+' BA');
+const dash=n=>n?money(n):'—';
+txt('m-price',dash(P.price)); txt('m-arv',dash(P.arv)); txt('m-prop',(P.beds!==''&&P.beds!=null?P.beds:'—')+' BD · '+(P.baths!==''&&P.baths!=null?P.baths:'—')+' BA');
 txt('s-sqft',plain(P.sqft)); txt('s-lot',plain(P.lot)); txt('s-year',plain(P.yearBuilt)); txt('s-type',plain(P.propertyType));
 (P.overview||[]).forEach(t=>{const p=document.createElement('p');p.textContent=t;$('prose').appendChild(p);});
-txt('d-price',money(P.price)); txt('d-arv',money(P.arv)); txt('d-spread',money(P.arv-P.price));
+txt('d-price',dash(P.price)); txt('d-arv',dash(P.arv)); txt('d-spread',P.arv&&P.price?money(P.arv-P.price):'—');
 txt('o-deadline',O.deadline||'Contact Robert for details.'); txt('o-access',O.access||''); txt('o-closing',O.closing||'');
 txt('o-email',C.email); txt('o-phone',C.phone);
 $('req-btn').href='mailto:'+C.email+'?subject='+encodeURIComponent('Complete package: '+(P.street||'property'));
@@ -557,9 +567,18 @@ const all=seg(k=>{cards.forEach(c=>c.set(k));mark(all,k);});
 all.setAttribute('aria-labelledby','setall-label');$('setall').replaceWith(all);
 cards.forEach(c=>c.set('modern'));mark(all,'modern');
 
+/* "See all photos" link under the grid */
+(function(){
+  const L=D.links||{}; if(!L.showMore||!L.more) return;
+  const href=L.moreShortUrl||L.more; $('more-link').href=href;
+  if(L.moreShortUrl) txt('more-short',L.moreShortUrl.replace(/^https?:\/\//,''));
+  $('more-photos').hidden=false;
+})();
+if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); $('photos').hidden=true; document.querySelectorAll('a[href="#photos"]').forEach(a=>a.remove()); }
+
 /* hero: primary photo, AI concept first */
 (function(){
-  const c=D.photos[0]; if(!c) return;
+  const c=D.photos[0]; if(!c){ $('hero-original').remove(); $('hero-modern').remove(); return; }
   const imgs={};
   STY.forEach(([k,label])=>{const el=$('hero-'+k);if(c[k]&&c[k].src){el.src=c[k].src;el.alt=(c.caption||'Primary photo')+', '+label.toLowerCase();imgs[k]=el;}else el.remove();});
   let start=imgs.modern?'modern':'original';
@@ -605,6 +624,5 @@ function render(){
 render();
 })();
 </script>
-
 </body>
 </html>

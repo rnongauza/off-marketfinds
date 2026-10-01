@@ -1,0 +1,14 @@
+# The deploy workflow (.github/workflows/deploy-worker.yml) fills in the KV id.
+name = "off-marketfinds-bot"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[[kv_namespaces]]
+binding = "STATE"
+id = "__KV_ID__"
+
+[vars]
+GH_REPO = "rnongauza/off-marketfinds"
+GH_BRANCH = "main"
+SITE_URL = "https://off-marketfinds.com"
