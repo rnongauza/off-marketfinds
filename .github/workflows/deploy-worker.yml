@@ -22,6 +22,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Clean up pasted values
+        run: |
+          t=$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]"')
+          a=$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]"')
+          echo "::add-mask::$t"
+          echo "Cloudflare token length: ${#t} (should be about 40-53), starts with github_pat: $([[ $t == github_pat* ]] && echo yes || echo no)"
+          echo "CLOUDFLARE_API_TOKEN=$t" >> "$GITHUB_ENV"
+          echo "CLOUDFLARE_ACCOUNT_ID=$a" >> "$GITHUB_ENV"
       - name: Check setup
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
