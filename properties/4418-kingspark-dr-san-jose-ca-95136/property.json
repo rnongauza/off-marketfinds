@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790900554073,
+  "updatedAt": 1790901406589,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -36,74 +36,20 @@
   },
   "photos": [
     {
-      "id": "ph34163247f9",
-      "original": {
-        "src": "img/34163247f9.jpg"
-      },
-      "caption": ""
-    },
-    {
       "id": "ph42218ab4fa",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/42218ab4fa.jpg"
-      },
-      "caption": ""
+      }
     },
     {
-      "id": "ph8794900d6a",
+      "id": "ph34163247f9",
+      "caption": "",
+      "room": "",
       "original": {
-        "src": "img/8794900d6a.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "pha4f6a847e4",
-      "original": {
-        "src": "img/a4f6a847e4.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "phf11d141950",
-      "original": {
-        "src": "img/f11d141950.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "ph5d453f67aa",
-      "original": {
-        "src": "img/5d453f67aa.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "ph6ab93c7d80",
-      "original": {
-        "src": "img/6ab93c7d80.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "phf0e7f2547d",
-      "original": {
-        "src": "img/f0e7f2547d.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "ph1e105e9856",
-      "original": {
-        "src": "img/1e105e9856.jpg"
-      },
-      "caption": ""
-    },
-    {
-      "id": "phfe29149a3b",
-      "original": {
-        "src": "img/fe29149a3b.jpg"
-      },
-      "caption": ""
+        "src": "img/34163247f9.jpg"
+      }
     }
   ],
   "calc": {
@@ -116,9 +62,9 @@
     "targetPct": 12
   },
   "links": {
-    "more": "",
-    "moreShort": "",
-    "showMore": false
+    "more": "https://drive.google.com/drive/folders/1z5ksMAJZFfj-jdjQauuvIAGTrXV7jupk?usp=sharing",
+    "moreShort": "4418kpic",
+    "showMore": true
   },
   "market": {
     "source": "RentCast",
