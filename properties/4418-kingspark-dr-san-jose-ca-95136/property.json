@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790917103794,
+  "updatedAt": 1790917129776,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -92,10 +92,13 @@
     },
     {
       "id": "umuqhsxbm0",
-      "caption": "",
+      "caption": "umuqhsxbm0",
       "room": "",
       "original": {
         "src": "img/umuqhsxbm0.jpg"
+      },
+      "modern": {
+        "src": "img/umuqhsxbm0-modern-78acac43.jpg"
       }
     }
   ],
