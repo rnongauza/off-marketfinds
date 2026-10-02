@@ -5,20 +5,22 @@
   "createdAt": 1790900110922,
   "updatedAt": 1790900110922,
   "createdVia": "admin",
-  "needsEnrich": true,
   "property": {
     "street": "4418 Kingspark Dr",
     "cityLine": "San Jose, CA 95136",
     "price": 1047900,
-    "arv": 0,
-    "beds": "",
-    "baths": "",
-    "sqft": 0,
-    "lot": "",
-    "yearBuilt": "",
+    "arv": 1340000,
+    "beds": 4,
+    "baths": 2,
+    "sqft": 1581,
+    "lot": 5500,
+    "yearBuilt": "1971",
     "propertyType": "Single Family",
     "occupancy": "",
-    "overview": []
+    "overview": [
+      "A single-family home, 4 bedrooms, 2 baths, 1,581 sq ft, built in 1971.",
+      "Contact Robert for access, disclosures and the full investor package."
+    ]
   },
   "photos": [],
   "calc": {},
@@ -26,5 +28,65 @@
     "more": "",
     "moreShort": "",
     "showMore": true
+  },
+  "market": {
+    "source": "RentCast",
+    "asOf": "2026-10-02T00:15:25.524028+00:00",
+    "value": 1340000,
+    "low": 1122000,
+    "high": 1557000,
+    "rent": 4860,
+    "rentLow": 4280,
+    "rentHigh": 5430,
+    "comps": [
+      {
+        "address": "268 Clearpark Cir, San Jose, CA 95136",
+        "price": 1488000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 1581,
+        "yearBuilt": 1971,
+        "type": "Single Family",
+        "distance": 0.0581,
+        "status": "Off market",
+        "date": "2026-08-27T00:00:00.000Z"
+      },
+      {
+        "address": "305 Lassenpark Cir, San Jose, CA 95136",
+        "price": 1439000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 1581,
+        "yearBuilt": 1971,
+        "type": "Single Family",
+        "distance": 0.0829,
+        "status": "Active listing",
+        "date": "2026-05-28T00:00:00.000Z"
+      },
+      {
+        "address": "4428 Adragna Ct, San Jose, CA 95136",
+        "price": 1425000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 1581,
+        "yearBuilt": 1974,
+        "type": "Single Family",
+        "distance": 0.2709,
+        "status": "Active listing",
+        "date": "2026-09-10T00:00:00.000Z"
+      },
+      {
+        "address": "Adragna Ct, San Jose, CA 95136",
+        "price": 1425000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 1581,
+        "yearBuilt": 1974,
+        "type": "Single Family",
+        "distance": 0.2709,
+        "status": "Off market",
+        "date": "2026-09-21T00:00:00.000Z"
+      }
+    ]
   }
 }
