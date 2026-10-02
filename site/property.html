@@ -368,7 +368,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
     <div class="calc">
       <div class="inputs">
         <h3>Project assumptions</h3>
-        <p class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Every number in a box is editable. Click one to change it and the results update.</span><button type="button" id="calc-reset">Reset</button></p>
+        <p class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Every number in a box is editable. Click one to change it and the results update. Broker commissions are 2.5% listing + 2.5% buyer broker.</span><button type="button" id="calc-reset">Reset</button></p>
         <div class="fields">
           <div class="fld"><label for="purchase">Asking price</label><div class="box"><span class="pre">$</span><input id="purchase" inputmode="decimal"></div></div>
           <div class="fld" data-show="quick flip"><label for="arv">After-repair value</label><div class="box"><span class="pre">$</span><input id="arv" inputmode="decimal"></div></div>
@@ -387,8 +387,6 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
           <div class="fld"><label for="closingPct">Purchase closing costs</label><div class="box"><input id="closingPct" inputmode="decimal"><span class="suf">%</span></div></div>
           <div class="fld" data-show="quick flip"><label for="months">Holding period</label><div class="box"><input id="months" inputmode="decimal"><span class="suf">months</span></div></div>
           <div class="fld" data-show="quick flip"><label for="holdingMonthly">Holding cost monthly</label><div class="box"><span class="pre">$</span><input id="holdingMonthly" inputmode="decimal"></div></div>
-          <div class="fld" data-show="quick flip"><label for="listingPct">Listing broker commission</label><div class="box"><input id="listingPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
-          <div class="fld" data-show="quick flip"><label for="buyerBrokerPct">Buyer broker commission</label><div class="box"><input id="buyerBrokerPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
           <div class="fld" data-show="quick flip"><label for="sellerClosingPct" title="Escrow, title, county and city transfer taxes and other closing costs. These vary by county.">Seller closing costs</label><div class="box"><input id="sellerClosingPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
           <div class="fld" data-show="quick flip"><label for="targetPct">Target profit</label><div class="box"><input id="targetPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
 
@@ -599,7 +597,7 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
 
 /* analyzer */
 const S=Object.assign({},D.calc,{purchase:P.price,arv:P.arv,sqft:P.sqft});let mode='quick';
-const ids=['purchase','arv','sqft','light','moderate','closingPct','months','holdingMonthly','listingPct','buyerBrokerPct','sellerClosingPct','targetPct','loanPct','ratePct','pointsPct'];
+const ids=['purchase','arv','sqft','light','moderate','closingPct','months','holdingMonthly','sellerClosingPct','targetPct','loanPct','ratePct','pointsPct'];
 ids.forEach(id=>{const el=$(id);el.value=S[id];el.addEventListener('input',()=>{const v=parseFloat(el.value.replace(/[^0-9.\-]/g,''));S[id]=isFinite(v)?v:0;render();});});
 document.querySelectorAll('#lvl button').forEach(b=>b.addEventListener('click',()=>{S.level=b.dataset.level;render();}));
 const S0=JSON.parse(JSON.stringify(S));
