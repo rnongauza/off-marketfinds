@@ -395,16 +395,14 @@ a.logo{text-decoration:none}
           <form class="panel" id="calc-form" novalidate>
             <h2>Calculator defaults</h2>
             <p class="sub">Buyers start from these numbers and can change them on the public page. Asking price, ARV and square feet come from Property details.</p>
-            <p class="edit-hint"><span class="pen" aria-hidden="true"></span>Every box is editable. The preview below updates as you type; click Save changes to publish.</p>
+            <p class="edit-hint"><span class="pen" aria-hidden="true"></span>Every box is editable. The preview below updates as you type; click Save changes to publish. Broker commissions are set at 2.5% listing + 2.5% buyer broker. Seller closing covers escrow, title and transfer taxes, which vary by county.</p>
             <div class="fields three editable">
               <div class="fld"><label for="c-light">Light ($/sf)</label><input type="number" id="c-light"></div>
               <div class="fld"><label for="c-moderate">Moderate ($/sf)</label><input type="number" id="c-moderate"></div>
               <div class="fld"><label for="c-closingPct">Closing costs (%)</label><input type="number" id="c-closingPct" step="0.1"></div>
               <div class="fld"><label for="c-months">Holding (months)</label><input type="number" id="c-months"></div>
               <div class="fld"><label for="c-holdingMonthly">Holding $/month</label><input type="number" id="c-holdingMonthly"></div>
-              <div class="fld"><label for="c-listingPct">Listing broker (% ARV)</label><input type="number" id="c-listingPct" step="0.25"></div>
-              <div class="fld"><label for="c-buyerBrokerPct">Buyer broker (% ARV)</label><input type="number" id="c-buyerBrokerPct" step="0.25"></div>
-              <div class="fld"><label for="c-sellerClosingPct">Seller closing (% ARV)</label><input type="number" id="c-sellerClosingPct" step="0.1"><small>Escrow, title, transfer taxes; varies by county</small></div>
+              <div class="fld"><label for="c-sellerClosingPct">Seller closing (% ARV)</label><input type="number" id="c-sellerClosingPct" step="0.1"></div>
               <div class="fld"><label for="c-targetPct">Target profit (% ARV)</label><input type="number" id="c-targetPct" step="0.5"></div>
             </div>
             <div class="preview" aria-live="polite">
@@ -606,7 +604,7 @@ $('link-form').addEventListener('submit',async e=>{e.preventDefault();
 /* ---------------- editor ---------------- */
 const PF=['eyebrow','headline','street','cityLine','price','arv','beds','baths','sqft','lot','yearBuilt','occupancy','propertyType'];
 const NUMF=['price','arv','beds','baths','sqft','lot'];
-const CF=['light','moderate','closingPct','months','holdingMonthly','listingPct','buyerBrokerPct','sellerClosingPct','targetPct'];
+const CF=['light','moderate','closingPct','months','holdingMonthly','sellerClosingPct','targetPct'];
 function imgUrl(slug,src){if(!src)return '';if(/^(data|blob):/.test(src))return src;if(CONFIG.imgBase)return CONFIG.imgBase+(src.startsWith('/')?src:'/'+slug+'/'+src);if(/^https?:|^\//.test(src))return src.startsWith('/')&&!location.hostname.endsWith('off-marketfinds.com')?SITE+src:src;
   return me&&me.repo?'https://raw.githubusercontent.com/'+me.repo+'/main/properties/'+slug+'/'+src:SITE+'/'+slug+'/'+src;}
 
@@ -628,7 +626,7 @@ function fillAll(){
   const ov=P.overview||[];$('f-ov1').value=ov[0]||'';$('f-ov2').value=ov[1]||'';
   const of=P.offer||{};$('f-deadline').value=of.deadline||'';$('f-access').value=of.access||'';$('f-closing').value=of.closing||'';
   const dd=P.deal||{};$('f-emd').value=dd.emd||'';$('f-dclosing').value=dd.closing||'';$('f-openHouse').value=dd.openHouse||'';
-  const c=d.calc||{};const defs={light:40,moderate:80,closingPct:2,months:3,holdingMonthly:2200,listingPct:2.5,buyerBrokerPct:2.5,sellerClosingPct:1,targetPct:12};
+  const c=d.calc||{};const defs={light:40,moderate:80,closingPct:2,months:3,holdingMonthly:2200,sellerClosingPct:1,targetPct:10};
   CF.forEach(k=>$('c-'+k).value=c[k]??defs[k]);
   $('listed').checked=W.listed;
   $('more-url').value=W.links.more||'';$('more-show').checked=!!W.links.showMore;showMoreShort();
@@ -644,7 +642,7 @@ function readForms(){
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
   P.deal={emd:$('f-emd').value.trim(),closing:$('f-dclosing').value.trim(),openHouse:$('f-openHouse').value.trim()};
-  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
+  const calc=Object.assign({listingPct:2.5,buyerBrokerPct:2.5},cur.data.calc||{});delete calc.sellingPct;CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
   const links=Object.assign({},W.links,{more:$('more-url').value.trim(),showMore:$('more-show').checked&&!!$('more-url').value.trim()});
   return{property:P,calc,photos:clone(W.photos),links,listed:$('listed').checked};
 }
@@ -655,10 +653,11 @@ function preview(){
   const v=id=>{const n=parseFloat($(id).value);return isFinite(n)?n:0;};
   const price=v('f-price'),arv=v('f-arv'),sqft=v('f-sqft');
   const reno=v('c-light')*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
-  const lb=arv*v('c-listingPct')/100,bb=arv*v('c-buyerBrokerPct')/100,sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
+  const cc=(cur&&cur.data.calc)||{},lbP=cc.listingPct??2.5,bbP=cc.buyerBrokerPct??2.5;
+  const lb=arv*lbP/100,bb=arv*bbP/100,sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
   const total=price+reno+close+hold+lb+bb+sc,profit=arv-total,roi=total?profit/total*100:0,max=(arv-reno-hold-lb-bb-sc-tgt)/(1+v('c-closingPct')/100);
   const pc=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
-  const rows=[['Renovation budget (light)',reno],['Purchase closing costs',close],['Holding costs',hold],['Listing broker ('+pc(v('c-listingPct'))+')',lb],['Buyer broker ('+pc(v('c-buyerBrokerPct'))+')',bb],['Seller closing costs ('+pc(v('c-sellerClosingPct'))+')',sc],['Total project cost',total]];
+  const rows=[['Renovation budget (light)',reno],['Purchase closing costs',close],['Holding costs',hold],['Listing broker ('+pc(lbP)+')',lb],['Buyer broker ('+pc(bbP)+')',bb],['Seller closing costs ('+pc(v('c-sellerClosingPct'))+')',sc],['Total project cost',total]];
   const box=$('pv-rows');box.replaceChildren();
   rows.forEach(([k,n])=>{const d=document.createElement('div');const a=document.createElement('span');a.textContent=k;const b=document.createElement('b');b.textContent=money(n);d.append(a,b);box.appendChild(d);});
   $('pv-profit').textContent=(profit<0?'-':'')+money(Math.abs(profit));$('pv-profit').classList.toggle('neg',profit<0);

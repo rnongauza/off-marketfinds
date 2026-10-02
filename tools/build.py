@@ -19,7 +19,7 @@ SITE_URL = os.environ.get("SITE_URL", "https://off-marketfinds.com").rstrip("/")
 
 DEFAULT_CALC = {"level": "light", "light": 40, "moderate": 80, "closingPct": 2, "months": 3,
                 "holdingMonthly": 2200, "listingPct": 2.5, "buyerBrokerPct": 2.5,
-                "sellerClosingPct": 1, "targetPct": 12, "loanPct": 80,
+                "sellerClosingPct": 1, "targetPct": 10, "loanPct": 80,
                 "ratePct": 10, "pointsPct": 2}
 DEFAULT_PROPERTY = {"eyebrow": "Investor opportunity", "headline": "OFF-MARKET OPPORTUNITY",
                     "propertyType": "Single Family", "overview": [],
