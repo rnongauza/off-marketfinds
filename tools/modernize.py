@@ -24,6 +24,8 @@ API = "https://generativelanguage.googleapis.com/v1beta"
 
 
 def prompt_for(room):
+    if not room:
+        return CFG["prefix"] + " " + CFG["prompts"]["auto"]
     for key, rooms in CFG["rooms"].items():
         if (room or "") in rooms:
             return CFG["prefix"] + " " + CFG["prompts"][key]
@@ -87,11 +89,57 @@ def generate(key, model, src_jpg, prompt):
     raise RuntimeError("Gemini kept refusing requests (rate limit). Try again in a few minutes.")
 
 
+def replicate_generate(token, model, src_jpg, prompt):
+    """Run the edit on Replicate (default google/nano-banana). Returns image bytes."""
+    H = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    uri = "data:image/jpeg;base64," + base64.b64encode(src_jpg).decode()
+    props = {}
+    try:
+        m = requests.get(f"https://api.replicate.com/v1/models/{model}", headers=H, timeout=30).json()
+        props = (((m.get("latest_version") or {}).get("openapi_schema") or {}).get("components", {})
+                 .get("schemas", {}).get("Input", {}).get("properties", {}))
+    except Exception as e:
+        print("schema lookup failed:", e)
+    inp = {"prompt": prompt}
+    if "image_input" in props or not props:
+        inp["image_input"] = [uri]
+    for k in ("input_image", "image"):
+        if k in props:
+            inp[k] = uri; break
+    if "aspect_ratio" in props:
+        inp["aspect_ratio"] = "match_input_image"
+    if "output_format" in props or not props:
+        inp["output_format"] = "jpg"
+    for attempt in range(4):
+        r = requests.post(f"https://api.replicate.com/v1/models/{model}/predictions",
+                          headers={**H, "Prefer": "wait=60"}, json={"input": inp}, timeout=120)
+        if r.status_code == 429:
+            time.sleep(15 * (attempt + 1)); continue
+        if r.status_code == 402:
+            raise RuntimeError("Replicate says the account needs credit. Add credit at replicate.com/account/billing.")
+        if r.status_code >= 400:
+            raise RuntimeError(f"Replicate error {r.status_code}: {r.json().get('detail', r.text[:200])}")
+        pred = r.json()
+        for _ in range(60):
+            if pred.get("status") in ("succeeded", "failed", "canceled"):
+                break
+            time.sleep(3)
+            pred = requests.get(pred["urls"]["get"], headers=H, timeout=30).json()
+        if pred.get("status") != "succeeded":
+            raise RuntimeError(f"Replicate didn't finish: {pred.get('error') or pred.get('status')}")
+        out = pred.get("output")
+        url = out[0] if isinstance(out, list) else out
+        return requests.get(url, timeout=120).content
+    raise RuntimeError("Replicate kept refusing requests (rate limit). Try again in a few minutes.")
+
+
 def main():
     slug = os.environ["SLUG"].strip()
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,90}", slug):
         sys.exit("bad slug")
     key = os.environ.get("GEMINI_API_KEY", "").strip()
+    rep = os.environ.get("REPLICATE_API_TOKEN", "").strip()
+    rep_model = os.environ.get("REPLICATE_MODEL", "").strip() or "google/nano-banana"
     pdir = ROOT / "properties" / slug
     pfile = pdir / "property.json"
     d = json.loads(pfile.read_text())
@@ -102,33 +150,35 @@ def main():
     notes, made, failed = [], 0, 0
     if not todo:
         notes.append("Every photo already has a Modern version.")
-    elif not key:
-        notes.append("Modern versions weren't made: add the GEMINI_API_KEY secret (a paid Gemini API plan is needed for images).")
+    elif not key and not rep:
+        notes.append("Modern versions weren't made: add the REPLICATE_API_TOKEN secret (or a paid GEMINI_API_KEY).")
     else:
         # rooms decide which house-style prompt to use; ask Gemini for any that are unknown
         need = [p for p in todo if not p.get("room")]
         imgs = {p["id"]: ImageOps.exif_transpose(Image.open(pdir / p["original"]["src"])).convert("RGB") for p in todo}
-        if need:
+        if need and key:
             try:
                 res = P.classify([imgs[p["id"]] for p in need], key)
                 for i, p in enumerate(need):
                     if i in res: p["room"] = res[i]["room"]
             except Exception as e:
                 print("room check failed:", e)
-        model = image_model(key)
-        print("Gemini image model:", model)
+        model = rep_model if rep else image_model(key)
+        print("Image model:", ("replicate " if rep else "gemini ") + model)
         for p in todo:
             im = imgs[p["id"]]
-            src = im.copy(); src.thumbnail((1600, 1600))
+            src = im.copy(); src.thumbnail((1280, 1280) if rep else (1600, 1600))
             buf = io.BytesIO(); src.save(buf, "JPEG", quality=90)
             try:
-                out = to_jpeg(generate(key, model, buf.getvalue(), prompt_for(p.get("room"))), im.size)
+                gen = replicate_generate(rep, model, buf.getvalue(), prompt_for(p.get("room"))) if rep \
+                    else generate(key, model, buf.getvalue(), prompt_for(p.get("room")))
+                out = to_jpeg(gen, im.size)
             except Exception as e:
                 failed += 1; print("photo", p["id"], "failed:", e)
                 if not notes or str(e) not in notes[-1]:
                     notes.append(f"Photo {p.get('caption') or p['id']}: {e}")
-                if "billing" in str(e).lower() or "quota" in str(e).lower() or "free tier" in str(e).lower():
-                    notes.append("Image generation needs billing turned on for the Gemini API key.")
+                if any(w in str(e).lower() for w in ("billing", "quota", "free tier", "credit")):
+                    if not rep: notes.append("Image generation needs billing turned on for the Gemini API key.")
                     break
                 continue
             old = (p.get("modern") or {}).get("src")

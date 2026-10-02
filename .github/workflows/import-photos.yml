@@ -64,6 +64,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           GEMINI_IMAGE_MODEL: ${{ vars.GEMINI_IMAGE_MODEL }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          REPLICATE_MODEL: ${{ vars.REPLICATE_MODEL }}
         run: python3 tools/modernize.py
       - name: Save to the repo
         env:
