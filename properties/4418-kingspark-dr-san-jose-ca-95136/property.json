@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790917171995,
+  "updatedAt": 1790917315318,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -37,8 +37,8 @@
   "photos": [
     {
       "id": "ph42218ab4fa",
-      "caption": "42218ab4fa",
-      "room": "",
+      "caption": "",
+      "room": "exterior_front",
       "original": {
         "src": "img/42218ab4fa.jpg"
       },
@@ -48,8 +48,8 @@
     },
     {
       "id": "ph34163247f9",
-      "caption": "34163247f9",
-      "room": "",
+      "caption": "",
+      "room": "exterior_front",
       "original": {
         "src": "img/34163247f9.jpg"
       },
@@ -58,8 +58,19 @@
       }
     },
     {
+      "id": "umuqhsxbm0",
+      "caption": "",
+      "room": "living",
+      "original": {
+        "src": "img/umuqhsxbm0.jpg"
+      },
+      "modern": {
+        "src": "img/umuqhsxbm0-modern-78acac43.jpg"
+      }
+    },
+    {
       "id": "umuqhqjws0",
-      "caption": "umuqhqjws0",
+      "caption": "",
       "room": "",
       "original": {
         "src": "img/umuqhqjws0.jpg"
@@ -69,20 +80,9 @@
       }
     },
     {
-      "id": "umuqhrft90",
-      "caption": "umuqhrft90",
-      "room": "",
-      "original": {
-        "src": "img/umuqhrft90.jpg"
-      },
-      "modern": {
-        "src": "img/umuqhrft90-modern-51eb9cb9.jpg"
-      }
-    },
-    {
       "id": "umuqhs17n0",
-      "caption": "umuqhs17n0",
-      "room": "",
+      "caption": "",
+      "room": "kitchen",
       "original": {
         "src": "img/umuqhs17n0.jpg"
       },
@@ -91,25 +91,22 @@
       }
     },
     {
-      "id": "umuqhsxbm0",
-      "caption": "umuqhsxbm0",
-      "room": "",
+      "id": "umuqhrft90",
+      "caption": "",
+      "room": "bedroom",
       "original": {
-        "src": "img/umuqhsxbm0.jpg"
+        "src": "img/umuqhrft90.jpg"
       },
       "modern": {
-        "src": "img/umuqhsxbm0-modern-78acac43.jpg"
+        "src": "img/umuqhrft90-modern-51eb9cb9.jpg"
       }
     },
     {
       "id": "umuqhtvpw0",
-      "caption": "umuqhtvpw0",
-      "room": "",
+      "caption": "",
+      "room": "bathroom",
       "original": {
         "src": "img/umuqhtvpw0.jpg"
-      },
-      "modern": {
-        "src": "img/umuqhtvpw0-modern-cd9bb315.jpg"
       }
     }
   ],
