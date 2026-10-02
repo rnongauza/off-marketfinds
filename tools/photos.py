@@ -487,7 +487,8 @@ def main():
     if use_ai and photos:
         summary += f". Cover: {photos[0]['caption'] or 'photo 1'}"
     if dropped > 0:
-        summary += f". Left out {dropped} (duplicates, people, blurry or extra)"
+        summary += (f". Left out {dropped} (duplicates, people, blurry or extra)" if use_ai
+                    else f". Kept the first {len(photos)} of {len(cands)} because AI sorting is off")
     result = {"state": "done", "at": int(time.time() * 1000), "mode": mode, "found": found, "kept": len(photos),
               "order": order, "notes": notes, "summary": summary}
     (pdir / "import.json").write_text(json.dumps(result, indent=2) + "\n")

@@ -313,7 +313,8 @@ a.logo{text-decoration:none}
             <label class="check"><input type="radio" name="imp-mode" value="add" id="imp-add"><span>Add to the current photos</span></label>
           </div>
           <label class="check"><input type="checkbox" id="imp-more" checked><span>Also show this folder as “See all photos” on the public page</span></label>
-          <div class="row-actions"><button class="btn" type="button" id="imp-go">Import photos</button><button class="btn ghost" type="button" id="imp-sort">Re-sort current photos with AI</button></div>
+          <label class="check"><input type="checkbox" id="imp-modern" checked><span>Also create the Modern design concept for each photo with AI (house Modern style)</span></label>
+          <div class="row-actions"><button class="btn" type="button" id="imp-go">Import photos</button><button class="btn ghost" type="button" id="imp-sort">Re-sort current photos with AI</button><button class="btn ghost" type="button" id="imp-modernall">Create missing Modern versions</button></div>
           <details class="howto"><summary>How to get a share link</summary><ol class="steps">
             <li><b>Google Drive:</b> right-click the folder › Share › General access › “Anyone with the link” › Copy link.</li>
             <li><b>Dropbox:</b> hover the folder › Share › Copy link.</li>
@@ -327,6 +328,7 @@ a.logo{text-decoration:none}
             <span class="btn ghost small file-btn">Choose photos<input type="file" id="add-photos" accept="image/*" multiple></span>
           </label>
           <label class="check"><input type="checkbox" id="up-ai" checked><span>After uploading, let AI pick the cover and order everything (keeps the best 10)</span></label>
+          <label class="check"><input type="checkbox" id="up-modern" checked><span>Also create the Modern design concept for each new photo with AI</span></label>
           <span class="status" id="upload-status"></span>
         </div>
         <div class="importbox" id="imp-box" hidden></div>
@@ -705,6 +707,7 @@ function photoCard(ph,i){
   const fb=document.createElement('span');fb.className='btn ghost small file-btn';fb.textContent=has('modern')?'Replace Modern version':'Add Modern version';
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('aria-label',fb.textContent+' for photo '+(i+1));
   inp.addEventListener('change',()=>{const f=inp.files[0];if(f)uploadFiles([f],{photoId:ph.id,kind:'modern'});});fb.appendChild(inp);acts.appendChild(fb);
+  if(has('original')){const ai=mini(has('modern')?'Redo Modern with AI':'Create Modern with AI',(has('modern')?'Redo':'Create')+' the Modern version of photo '+(i+1)+' with AI',false,()=>startModern([ph.id],true));acts.appendChild(ai);}
   if(has('modern')){const rm=mini('Remove Modern','Remove the Modern version',false,()=>{delete ph.modern;ph._view='original';setDirty(true);renderPhotos();});acts.appendChild(rm);}
   const del=document.createElement('button');del.type='button';del.className='btn danger small';del.textContent='Remove photo';
   del.addEventListener('click',()=>{W.photos.splice(i,1);setDirty(true);renderPhotos();toast('Photo removed. Save to update the public page.');});
@@ -740,7 +743,8 @@ async function uploadFiles(files,opts={}){
       setCurrent(cur.slug,j.data,j.sha);
     }
     fillAll();watchLive(cur.data.updatedAt);
-    if(!opts.photoId&&$('up-ai').checked){setStatus(st,'Uploaded. AI is choosing the cover and order…','ok');startImport('sort');}
+    if(!opts.photoId&&$('up-ai').checked){setStatus(st,'Uploaded. AI is choosing the cover and order…','ok');startImport('sort',{modern:$('up-modern').checked});}
+    else if(!opts.photoId&&$('up-modern').checked){setStatus(st,'Uploaded. AI is creating the Modern versions…','ok');startModern([],false);}
     else{setStatus(st,'Uploaded '+list.length+' photo'+(list.length>1?'s':'')+'.','ok');toast('Uploaded. Publishing…');}
   }catch(e){if(e.code!=='login')setStatus(st,e.message,'err');}
 }
@@ -753,10 +757,16 @@ drop.addEventListener('drop',e=>uploadFiles(e.dataTransfer.files));
 /* import from link / AI sort */
 $('imp-go').addEventListener('click',()=>{const u=$('imp-url').value.trim();if(!/^https:\/\/\S+$/.test(u)){toast('Paste the full share link, starting with https://');$('imp-url').focus();return;}startImport('link');});
 $('imp-sort').addEventListener('click',()=>{if(!W.photos.length){toast('There are no photos to sort yet.');return;}startImport('sort');});
-async function startImport(kind){
+$('imp-modernall').addEventListener('click',()=>{if(!W.photos.length){toast('There are no photos yet.');return;}if(W.photos.every(p=>p.modern&&p.modern.src)){toast('Every photo already has a Modern version. Use “Redo Modern with AI” on a photo to replace one.');return;}startModern([],false);});
+async function startModern(ids,redo){
+  if(dirty&&!(await save(true)))return;
+  try{const j=await api('/api/properties/'+cur.slug+'/modern',{method:'POST',body:{ids,redo}});watchImport({queued:j.queued,import:null});}
+  catch(e){if(e.code!=='login')toast(e.message);}
+}
+async function startImport(kind,extra){
   if(dirty&&!(await save(true)))return;
   try{
-    const body=kind==='sort'?{ai:true}:{url:$('imp-url').value.trim(),mode:$('imp-add').checked?'add':'replace',ai:$('imp-ai').checked,setMore:$('imp-more').checked};
+    const body=kind==='sort'?Object.assign({ai:true,modern:false},extra||{}):{url:$('imp-url').value.trim(),mode:$('imp-add').checked?'add':'replace',ai:$('imp-ai').checked,setMore:$('imp-more').checked,modern:$('imp-modern').checked};
     const j=await api('/api/properties/'+cur.slug+'/'+(kind==='sort'?'sort':'import'),{method:'POST',body});
     if(kind!=='sort')$('imp-url').value='';
     watchImport({queued:j.queued,import:null});
@@ -774,7 +784,7 @@ function watchImport(j){
     else if(Date.now()-imp.at<3600e3)impBox('ok','Photos done: '+imp.summary+'.'+(imp.notes&&imp.notes.length?' '+imp.notes.join(' '):''));
     return;
   }
-  impBox('run',(q.mode==='sort'?'AI is sorting the photos':'Downloading the photos and letting AI pick the best')+'. This usually takes 1–3 minutes. You can keep editing.');
+  impBox('run',q.mode==='modern'?'AI is creating the Modern versions in the house style. This takes about 20–40 seconds per photo. You can keep editing.':(q.mode==='sort'?'AI is sorting the photos':'Downloading the photos and letting AI pick the best')+'. This usually takes 1–3 minutes, longer when Modern versions are being made. You can keep editing.');
   const start=Date.now();
   const tick=async()=>{
     try{const r=await api('/api/properties/'+cur.slug);

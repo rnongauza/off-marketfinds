@@ -373,11 +373,21 @@ async function handleApi(req, env, url) {
       const nf = await readJson(env, path, null);
       return json({ data: nf.data, sha: nf.sha });
     }
+    // create Modern versions with Gemini for some or all photos
+    if (parts[2] === "modern" && req.method === "POST") {
+      const f = await readJson(env, path, null);
+      if (!f.data) throw fail(404, "not_found");
+      const ids = (Array.isArray(body.ids) ? body.ids : []).map(String).filter(x => /^[A-Za-z0-9_-]{1,40}$/.test(x)).slice(0, 20);
+      const queued = { state: "queued", mode: "modern", at: Date.now(), source: "modern" };
+      await env.STATE.put("import:" + slug, JSON.stringify(queued), { expirationTtl: 86400 });
+      await dispatch(env, "import_photos", { slug, mode: "modern", only: ids.join(","), redo: body.redo === true });
+      return json({ queued });
+    }
     // AI import from a folder link, or re-sort what's there
     if ((parts[2] === "import" || parts[2] === "sort") && req.method === "POST") {
       const f = await readJson(env, path, null);
       if (!f.data) throw fail(404, "not_found");
-      const payload = { slug, mode: parts[2] === "sort" ? "sort" : (body.mode === "add" ? "add" : "replace"), ai: body.ai !== false, max: MAX_PHOTOS };
+      const payload = { slug, mode: parts[2] === "sort" ? "sort" : (body.mode === "add" ? "add" : "replace"), ai: body.ai !== false, max: MAX_PHOTOS, modern: body.modern === true };
       if (parts[2] === "import") {
         const link = String(body.url || "").trim();
         if (!/^https:\/\/\S+$/.test(link)) throw fail(400, "bad_url", "Paste the full share link, starting with https://");
@@ -549,7 +559,7 @@ async function streetOf(env, slug) {
   return f.data ? f.data.property.street : slug;
 }
 async function queueImport(env, slug, opts) {
-  const payload = { slug, mode: opts.mode || "add", ai: true, max: MAX_PHOTOS, notify: opts.notify || "", setMore: !!opts.setMore };
+  const payload = { slug, mode: opts.mode || "add", ai: true, max: MAX_PHOTOS, notify: opts.notify || "", setMore: !!opts.setMore, modern: true };
   if (opts.urls) payload.urls = opts.urls;
   if (opts.media) payload.media = opts.media;
   await env.STATE.put("import:" + slug, JSON.stringify({ state: "queued", mode: payload.mode, at: Date.now(), source: (opts.urls || ["text message photos"])[0] }), { expirationTtl: 86400 });

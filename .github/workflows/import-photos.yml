@@ -11,9 +11,13 @@ on:
         description: Google Drive / Dropbox / iCloud shared album / Google Photos link (leave empty to just re-sort)
         required: false
       mode:
-        description: replace, add or sort
+        description: replace, add, sort or modern (only create Modern versions)
         required: false
         default: replace
+      modern:
+        description: Also create Modern versions with AI
+        type: boolean
+        default: true
 permissions:
   contents: write
 concurrency:
@@ -33,6 +37,7 @@ jobs:
       - run: pip install -q requests pillow pillow-heif
       - id: run
         name: Download, sort with Gemini, keep the best
+        if: (github.event.client_payload.mode || inputs.mode) != 'modern'
         env:
           SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
           MODE: ${{ github.event.client_payload.mode || inputs.mode || 'replace' }}
@@ -48,6 +53,18 @@ jobs:
           TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
         run: python3 tools/photos.py
+      - id: modern
+        name: Create Modern versions (Gemini / Nano Banana)
+        if: (github.event.client_payload.mode || inputs.mode) == 'modern' || github.event.client_payload.modern == true || inputs.modern == true
+        env:
+          SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
+          ONLY: ${{ github.event.client_payload.only }}
+          REDO: ${{ github.event.client_payload.redo == true && 'true' || 'false' }}
+          APPEND: ${{ (github.event.client_payload.mode || inputs.mode) != 'modern' && 'true' || 'false' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          GEMINI_IMAGE_MODEL: ${{ vars.GEMINI_IMAGE_MODEL }}
+        run: python3 tools/modernize.py
       - name: Save to the repo
         env:
           SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
@@ -56,7 +73,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A properties links.json
           if git diff --cached --quiet; then echo "nothing to save"; exit 0; fi
-          git commit -q -m "Photos for $SLUG: ${{ steps.run.outputs.summary }}"
+          git commit -q -m "Photos for $SLUG: ${{ steps.run.outputs.summary }} ${{ steps.modern.outputs.modern }}"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 5; done
       - name: Publish the site
         env:
@@ -69,7 +86,7 @@ jobs:
           TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
           FROM: ${{ secrets.TWILIO_PHONE_NUMBER }}
           TO: ${{ github.event.client_payload.notify }}
-          BODY: ${{ steps.run.outputs.message }}
+          BODY: ${{ steps.run.outputs.message || steps.modern.outputs.modern }}
         run: |
           [ -n "$SID" ] && [ -n "$FROM" ] || { echo "Twilio not set up; skipping text"; exit 0; }
           curl -s -o /dev/null -w "Twilio %{http_code}\n" -X POST "https://api.twilio.com/2010-04-01/Accounts/$SID/Messages.json" \

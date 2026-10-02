@@ -1,0 +1,46 @@
+{
+  "_about": "House Modern style for AI concept photos. Edit these to change how every new Modern version looks. Each photo uses the prompt for its room.",
+  "prefix": "Return the edited image in the same aspect ratio as the original photo. Remove any people and any photos of people.",
+  "rooms": {
+    "living": [
+      "living",
+      "family",
+      "dining"
+    ],
+    "kitchen": [
+      "kitchen"
+    ],
+    "bathroom": [
+      "bathroom"
+    ],
+    "bedroom": [
+      "bedroom",
+      "office"
+    ],
+    "front": [
+      "exterior_front",
+      "exterior_other",
+      "garage"
+    ],
+    "backyard": [
+      "backyard",
+      "pool",
+      "view"
+    ],
+    "interior": [
+      "laundry",
+      "hallway",
+      "other",
+      ""
+    ]
+  },
+  "prompts": {
+    "living": "Renovate and virtually stage this photo as a bright, move-in-ready modern home, like a professionally staged Bay Area real estate listing. Keep the exact same camera angle, framing and room shape, and keep every wall, window, door, doorway, closet and ceiling in exactly the same position and size. Do not add, remove or move any window or door. Finishes: bright white walls and ceiling, white baseboards and trim, light natural oak wide-plank floors, recessed ceiling lights. Accents: matte black faucets, handles, light fixtures and picture frames. Remove all clutter, personal items and old furniture. Bright natural daylight, crisp realistic professional real estate photo. Stage it as a living room with a cream linen sofa, white accent chairs, a glass or light wood coffee table, a neutral jute rug, abstract art in soft neutral and green tones, a ceramic table lamp and a few green plants. If there is a fireplace, make it white with a charcoal surround.",
+    "kitchen": "Renovate and virtually stage this photo as a bright, move-in-ready modern home, like a professionally staged Bay Area real estate listing. Keep the exact same camera angle, framing and room shape, and keep every wall, window, door, doorway, closet and ceiling in exactly the same position and size. Do not add, remove or move any window or door. Finishes: bright white walls and ceiling, white baseboards and trim, light natural oak wide-plank floors, recessed ceiling lights. Accents: matte black faucets, handles, light fixtures and picture frames. Remove all clutter, personal items and old furniture. Bright natural daylight, crisp realistic professional real estate photo. Make it a modern kitchen with white shaker cabinets and matte black bar pulls, a white subway tile backsplash, dark charcoal or white quartz countertops, a matte black faucet, stainless steel range, range hood, refrigerator and dishwasher, a small plant and a neutral patterned runner rug.",
+    "bedroom": "Renovate and virtually stage this photo as a bright, move-in-ready modern home, like a professionally staged Bay Area real estate listing. Keep the exact same camera angle, framing and room shape, and keep every wall, window, door, doorway, closet and ceiling in exactly the same position and size. Do not add, remove or move any window or door. Finishes: bright white walls and ceiling, white baseboards and trim, light natural oak wide-plank floors, recessed ceiling lights. Accents: matte black faucets, handles, light fixtures and picture frames. Remove all clutter, personal items and old furniture. Bright natural daylight, crisp realistic professional real estate photo. Stage it as a bedroom with an upholstered light gray or charcoal bed, crisp white bedding with a gray striped or textured throw, light oak nightstands with ceramic or matte black lamps, a neutral jute or black-and-white rug, abstract wall art, a light wood ceiling fan with a black center, and a green plant.",
+    "bathroom": "Renovate and virtually stage this photo as a bright, move-in-ready modern home, like a professionally staged Bay Area real estate listing. Keep the exact same camera angle, framing and room shape, and keep every wall, window, door, doorway, closet and ceiling in exactly the same position and size. Do not add, remove or move any window or door. Finishes: bright white walls and ceiling, white baseboards and trim, light natural oak wide-plank floors, recessed ceiling lights. Accents: matte black faucets, handles, light fixtures and picture frames. Remove all clutter, personal items and old furniture. Bright natural daylight, crisp realistic professional real estate photo. Make it a modern bathroom with white beveled subway tile, a white tub, a white pedestal sink or vanity, matte black faucet and shower fixtures, a black-framed mirror, glass vanity lights and white towels.",
+    "front": "Renovate the exterior of this house as a fresh, move-in-ready modern home, like a professionally photographed real estate listing. Keep the exact same camera angle and framing, and keep the same house shape, roofline, every window, door and garage opening in exactly the same position and size, and the same trees. Finishes: white or light gray stucco or siding with crisp white trim, charcoal gray roof shingles, a dark charcoal modern garage door, matte black wall lanterns, a new smooth light concrete driveway and walkways, a fresh green lawn, and tidy low plantings with dark mulch. Remove trash, traffic cones and debris. Clear blue sky, bright daylight, crisp realistic photo. Keep the exact same camera position, lens and framing: do not zoom in or out, do not reframe, do not straighten the view. Do not add any new building, room, window, door, chimney or structure, and keep every building exactly as large and as far away as it is.",
+    "backyard": "Renovate this backyard as a fresh, move-in-ready modern home, like a professionally photographed real estate listing. Keep the exact same camera angle and framing, and keep the house, every window and door, the pool shape (if any), fence lines and trees in exactly the same position. Finishes: light gray stucco or siding with white trim, a new natural cedar wood fence, a smooth light concrete patio and paths, a fresh green lawn, tidy planting beds with mulch, string lights, and simple modern outdoor furniture in white or light gray. If there is a pool: clear blue water, light gray coping and a light concrete deck with white lounge chairs. Remove trash, tarps, debris and clutter. Clear blue sky, bright daylight, crisp realistic photo. Keep the exact same camera position, lens and framing: do not zoom in or out, do not reframe, do not straighten the view. Do not add any new building, room, window, door, chimney or structure, and keep every building exactly as large and as far away as it is.",
+    "interior": "Renovate and virtually stage this photo as a bright, move-in-ready modern home, like a professionally staged Bay Area real estate listing. Keep the exact same camera angle, framing and room shape, and keep every wall, window, door, doorway, closet and ceiling in exactly the same position and size. Do not add, remove or move any window or door. Finishes: bright white walls and ceiling, white baseboards and trim, light natural oak wide-plank floors, recessed ceiling lights. Accents: matte black faucets, handles, light fixtures and picture frames. Remove all clutter, personal items and old furniture. Bright natural daylight, crisp realistic professional real estate photo. Keep the room's purpose, and stage it simply and tastefully with a few neutral modern pieces."
+  }
+}

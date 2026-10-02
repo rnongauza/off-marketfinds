@@ -64,7 +64,7 @@ def photo_src(slug, v):
 def build_property(d, contact, tpl):
     slug = d["slug"]
     P = dict(DEFAULT_PROPERTY)
-    P.update(d.get("property") or {})
+    P.update({k: v for k, v in (d.get("property") or {}).items() if not (k in ("eyebrow", "headline", "propertyType") and not v)})
     for k in ("offer", "deal"):
         merged = dict(DEFAULT_PROPERTY[k]); merged.update({a: b for a, b in (P.get(k) or {}).items() if b})
         P[k] = merged
