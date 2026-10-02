@@ -119,8 +119,9 @@
     "closingPct": 2,
     "months": 3,
     "holdingMonthly": 2200,
-    "targetPct": 10,
-    "sellerClosingPct": 1
+    "targetPct": 12,
+    "sellerClosingPct": 1,
+    "level": "moderate"
   },
   "links": {
     "more": "https://drive.google.com/drive/folders/1z5ksMAJZFfj-jdjQauuvIAGTrXV7jupk?usp=sharing",

@@ -626,7 +626,7 @@ function fillAll(){
   const ov=P.overview||[];$('f-ov1').value=ov[0]||'';$('f-ov2').value=ov[1]||'';
   const of=P.offer||{};$('f-deadline').value=of.deadline||'';$('f-access').value=of.access||'';$('f-closing').value=of.closing||'';
   const dd=P.deal||{};$('f-emd').value=dd.emd||'';$('f-dclosing').value=dd.closing||'';$('f-openHouse').value=dd.openHouse||'';
-  const c=d.calc||{};const defs={light:40,moderate:80,closingPct:2,months:3,holdingMonthly:2200,sellerClosingPct:1,targetPct:10};
+  const c=d.calc||{};const defs={light:40,moderate:65,closingPct:2,months:3,holdingMonthly:2200,sellerClosingPct:1,targetPct:12};
   CF.forEach(k=>$('c-'+k).value=c[k]??defs[k]);
   $('listed').checked=W.listed;
   $('more-url').value=W.links.more||'';$('more-show').checked=!!W.links.showMore;showMoreShort();
@@ -642,7 +642,7 @@ function readForms(){
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
   P.deal={emd:$('f-emd').value.trim(),closing:$('f-dclosing').value.trim(),openHouse:$('f-openHouse').value.trim()};
-  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
+  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;if(!calc.level)calc.level='moderate';CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
   const links=Object.assign({},W.links,{more:$('more-url').value.trim(),showMore:$('more-show').checked&&!!$('more-url').value.trim()});
   return{property:P,calc,photos:clone(W.photos),links,listed:$('listed').checked};
 }
@@ -652,11 +652,11 @@ function setDirty(v){dirty=v;$('save').disabled=!v||saving;$('discard').hidden=!
 function preview(){
   const v=id=>{const n=parseFloat($(id).value);return isFinite(n)?n:0;};
   const price=v('f-price'),arv=v('f-arv'),sqft=v('f-sqft');
-  const reno=v('c-light')*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
+  const lvl=((cur&&cur.data.calc||{}).level)==='light'?'light':'moderate',reno=v('c-'+lvl)*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
   const sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
   const total=price+reno+close+hold+sc,profit=arv-total,roi=total?profit/total*100:0,max=(arv-reno-hold-sc-tgt)/(1+v('c-closingPct')/100);
   const pc=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
-  const rows=[['Renovation budget (light)',reno],['Purchase closing costs',close],['Holding costs',hold],['Seller closing costs ('+pc(v('c-sellerClosingPct'))+')',sc],['Total project cost',total]];
+  const rows=[['Renovation budget ('+lvl+')',reno],['Purchase closing costs',close],['Holding costs',hold],['Seller closing costs ('+pc(v('c-sellerClosingPct'))+')',sc],['Total project cost',total]];
   const box=$('pv-rows');box.replaceChildren();
   rows.forEach(([k,n])=>{const d=document.createElement('div');const a=document.createElement('span');a.textContent=k;const b=document.createElement('b');b.textContent=money(n);d.append(a,b);box.appendChild(d);});
   $('pv-profit').textContent=(profit<0?'-':'')+money(Math.abs(profit));$('pv-profit').classList.toggle('neg',profit<0);

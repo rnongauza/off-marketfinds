@@ -97,13 +97,13 @@
     }
   ],
   "calc": {
-    "level": "light",
+    "level": "moderate",
     "light": 40,
-    "moderate": 80,
+    "moderate": 65,
     "closingPct": 2,
     "months": 3,
     "holdingMonthly": 2200,
-    "targetPct": 10,
+    "targetPct": 12,
     "loanPct": 80,
     "ratePct": 10,
     "pointsPct": 2,
