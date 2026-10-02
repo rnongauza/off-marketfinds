@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790901406589,
+  "updatedAt": 1790913719049,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -29,7 +29,7 @@
       "closing": ""
     },
     "deal": {
-      "emd": "",
+      "emd": "3% of purchase price",
       "closing": "",
       "openHouse": ""
     }
@@ -54,7 +54,7 @@
   ],
   "calc": {
     "light": 40,
-    "moderate": 80,
+    "moderate": 65,
     "closingPct": 2,
     "months": 3,
     "holdingMonthly": 2200,
