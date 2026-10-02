@@ -103,11 +103,13 @@
     "closingPct": 2,
     "months": 3,
     "holdingMonthly": 2200,
-    "sellingPct": 8,
     "targetPct": 12,
     "loanPct": 80,
     "ratePct": 10,
-    "pointsPct": 2
+    "pointsPct": 2,
+    "listingPct": 2.5,
+    "buyerBrokerPct": 2.5,
+    "sellerClosingPct": 1
   },
   "slug": "68-greenfield-ave-vallejo-ca-94590",
   "short": "68g",

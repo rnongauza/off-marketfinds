@@ -18,7 +18,8 @@ OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve
 SITE_URL = os.environ.get("SITE_URL", "https://off-marketfinds.com").rstrip("/")
 
 DEFAULT_CALC = {"level": "light", "light": 40, "moderate": 80, "closingPct": 2, "months": 3,
-                "holdingMonthly": 2200, "sellingPct": 8, "targetPct": 12, "loanPct": 80,
+                "holdingMonthly": 2200, "listingPct": 2.5, "buyerBrokerPct": 2.5,
+                "sellerClosingPct": 1, "targetPct": 12, "loanPct": 80,
                 "ratePct": 10, "pointsPct": 2}
 DEFAULT_PROPERTY = {"eyebrow": "Investor opportunity", "headline": "OFF-MARKET OPPORTUNITY",
                     "propertyType": "Single Family", "overview": [],
@@ -79,7 +80,7 @@ def build_property(d, contact, tpl):
             if v: o[k] = v
         if o.get("original") or o.get("modern"):
             photos.append(o)
-    calc = dict(DEFAULT_CALC); calc.update(d.get("calc") or {})
+    calc = dict(DEFAULT_CALC); calc.update({k: v for k, v in (d.get("calc") or {}).items() if k != "sellingPct"})
     L = d.get("links") or {}
     links = {"more": L.get("more") or "", "showMore": bool(L.get("showMore") and L.get("more")),
              "moreShortUrl": short_url(L.get("moreShort"))}

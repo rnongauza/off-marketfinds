@@ -119,8 +119,10 @@
     "closingPct": 2,
     "months": 3,
     "holdingMonthly": 2200,
-    "sellingPct": 8,
-    "targetPct": 12
+    "targetPct": 12,
+    "listingPct": 2.5,
+    "buyerBrokerPct": 2.5,
+    "sellerClosingPct": 1
   },
   "links": {
     "more": "https://drive.google.com/drive/folders/1z5ksMAJZFfj-jdjQauuvIAGTrXV7jupk?usp=sharing",

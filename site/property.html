@@ -381,7 +381,9 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
           <div class="fld"><label for="closingPct">Purchase closing costs</label><div class="box"><input id="closingPct" inputmode="decimal"><span class="suf">%</span></div></div>
           <div class="fld" data-show="quick flip"><label for="months">Holding period</label><div class="box"><input id="months" inputmode="decimal"><span class="suf">months</span></div></div>
           <div class="fld" data-show="quick flip"><label for="holdingMonthly">Holding cost monthly</label><div class="box"><span class="pre">$</span><input id="holdingMonthly" inputmode="decimal"></div></div>
-          <div class="fld" data-show="quick flip"><label for="sellingPct">Selling costs</label><div class="box"><input id="sellingPct" inputmode="decimal"><span class="suf">%</span></div></div>
+          <div class="fld" data-show="quick flip"><label for="listingPct">Listing broker commission</label><div class="box"><input id="listingPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
+          <div class="fld" data-show="quick flip"><label for="buyerBrokerPct">Buyer broker commission</label><div class="box"><input id="buyerBrokerPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
+          <div class="fld" data-show="quick flip"><label for="sellerClosingPct" title="Escrow, title, county and city transfer taxes and other closing costs. These vary by county.">Seller closing costs</label><div class="box"><input id="sellerClosingPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
           <div class="fld" data-show="quick flip"><label for="targetPct">Target profit</label><div class="box"><input id="targetPct" inputmode="decimal"><span class="suf">% of ARV</span></div></div>
 
           <div class="fld" data-show="flip"><label for="loanPct">Loan amount</label><div class="box"><input id="loanPct" inputmode="decimal"><span class="suf">% of cost</span></div></div>
@@ -591,7 +593,7 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
 
 /* analyzer */
 const S=Object.assign({},D.calc,{purchase:P.price,arv:P.arv,sqft:P.sqft});let mode='quick';
-const ids=['purchase','arv','sqft','light','moderate','closingPct','months','holdingMonthly','sellingPct','targetPct','loanPct','ratePct','pointsPct'];
+const ids=['purchase','arv','sqft','light','moderate','closingPct','months','holdingMonthly','listingPct','buyerBrokerPct','sellerClosingPct','targetPct','loanPct','ratePct','pointsPct'];
 ids.forEach(id=>{const el=$(id);el.value=S[id];el.addEventListener('input',()=>{const v=parseFloat(el.value.replace(/[^0-9.\-]/g,''));S[id]=isFinite(v)?v:0;render();});});
 document.querySelectorAll('#lvl button').forEach(b=>b.addEventListener('click',()=>{S.level=b.dataset.level;render();}));
 document.querySelectorAll('#modes button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;render();}));
@@ -603,12 +605,14 @@ function render(){
   document.querySelectorAll('[data-show]').forEach(el=>{el.hidden=!el.dataset.show.split(' ').includes(mode);});
   document.querySelectorAll('#lvl button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.level===S.level)));
   ['light','moderate'].forEach(k=>{document.querySelector('[data-rate="'+k+'"]').textContent='$'+Math.round(S[k]).toLocaleString('en-US')+' / Sq. Ft.';});
-  const reno=(S[S.level]||0)*S.sqft, closing=S.purchase*S.closingPct/100, holding=S.months*S.holdingMonthly, selling=S.arv*S.sellingPct/100, target=S.arv*S.targetPct/100;
+  const reno=(S[S.level]||0)*S.sqft, closing=S.purchase*S.closingPct/100, holding=S.months*S.holdingMonthly, listC=S.arv*S.listingPct/100, buyC=S.arv*S.buyerBrokerPct/100, sellC=S.arv*S.sellerClosingPct/100, selling=listC+buyC+sellC, target=S.arv*S.targetPct/100;
+  const pct=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
+  const saleRows=[['Listing broker commission ('+pct(S.listingPct)+')',money(listC)],['Buyer broker commission ('+pct(S.buyerBrokerPct)+')',money(buyC)],['Seller closing costs ('+pct(S.sellerClosingPct)+')',money(sellC)]];
   if(mode==='quick'){
     const total=S.purchase+reno+closing+holding+selling, profit=S.arv-total, roi=total?profit/total*100:0;
     const max=(S.arv-reno-holding-selling-target)/(1+S.closingPct/100);
     txt('r-title','Projected flip performance');
-    rows([['Renovation budget',money(reno)],['Purchase closing costs',money(closing)],['Holding costs',money(holding)],['Selling costs',money(selling)],['Total project cost',money(total)]]);
+    rows([['Renovation budget',money(reno)],['Purchase closing costs',money(closing)],['Holding costs',money(holding)],...saleRows,['Total project cost',money(total)]]);
     hero('PROJECTED PROFIT',money(profit),profit<0);pair('Projected ROI',roi.toFixed(1)+'%','Maximum offer',money(Math.max(0,max)));
     txt('r-note','Maximum offer is the most you could pay and still earn your target profit of '+money(target)+'.');
   }else if(mode==='flip'){
@@ -616,7 +620,7 @@ function render(){
     const total=S.purchase+reno+closing+holding+selling+fin,profit=S.arv-total,cash=total-loan,coc=cash>0?profit/cash*100:0;
     const max=(S.arv-reno-holding-selling-target-L*reno*k)/(1+S.closingPct/100+L*k);
     txt('r-title','Financed flip performance');
-    rows([['Renovation budget',money(reno)],['Purchase closing costs',money(closing)],['Holding costs',money(holding)],['Loan interest & points',money(fin)],['Selling costs',money(selling)],['Total project cost',money(total)]]);
+    rows([['Renovation budget',money(reno)],['Purchase closing costs',money(closing)],['Holding costs',money(holding)],['Loan interest & points',money(fin)],...saleRows,['Total project cost',money(total)]]);
     hero('PROJECTED PROFIT',money(profit),profit<0);pair('Return on your cash',coc.toFixed(1)+'%','Maximum offer',money(Math.max(0,max)));
     txt('r-note','Loan covers '+S.loanPct+'% of purchase + renovation ('+money(loan)+'), interest-only. Cash needed: '+money(cash)+'. 70% rule: '+money(.7*S.arv-reno)+'.');
   }
