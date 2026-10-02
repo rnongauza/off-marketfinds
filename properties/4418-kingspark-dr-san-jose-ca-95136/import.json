@@ -1,0 +1,12 @@
+{
+  "state": "done",
+  "at": 1790900554074,
+  "mode": "replace",
+  "found": 80,
+  "kept": 10,
+  "order": "photo, photo, photo, photo, photo, photo, photo, photo, photo, photo",
+  "notes": [
+    "GEMINI_API_KEY isn't set, so photos are in their original order."
+  ],
+  "summary": "10 photos on 4418 Kingspark Dr. Left out 70 (duplicates, people, blurry or extra)"
+}
