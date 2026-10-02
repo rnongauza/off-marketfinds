@@ -229,6 +229,29 @@ a.logo{text-decoration:none}
 .status.empty{padding:18px 4px}
 @media (max-width:900px){.ptable .hide-md{display:none}}
 @media (max-width:640px){.ptable .hide-sm{display:none}.propcell{min-width:0}.pthumb{width:56px;height:42px}.pname{font-size:16px}.plist-head .psearch{flex-basis:100%;margin-left:0}}
+
+/* editable indicators + green save */
+.btn.go{background:#1f7a4d;border-color:#1f7a4d;color:#fff}
+.btn.go:hover:not(:disabled){background:#17633e;border-color:#17633e}
+.btn.go:disabled{opacity:.45}
+.edit-hint{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);background:color-mix(in srgb,var(--select-line) 10%,var(--paper));border:1px solid color-mix(in srgb,var(--select-line) 30%,var(--line));border-radius:4px;padding:8px 11px}
+.pen,.editable input,#prop-form input[type=number],#prop-form input[type=text],#prop-form textarea{background-repeat:no-repeat}
+.pen{width:14px;height:14px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232785b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/%3E%3C/svg%3E") center/contain no-repeat}
+.editable input,#prop-form input[type=number],#prop-form input[type=text]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232785b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'/%3E%3Cpath d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/%3E%3C/svg%3E");background-position:right 9px center;background-size:13px;padding-right:30px}
+.editable input:hover,#prop-form input:hover,#prop-form textarea:hover{border-color:var(--select-line)}
+.preview{border:1px solid var(--line);border-radius:6px;background:var(--mist);padding:14px 16px;display:grid;gap:6px;font-size:13.5px}
+.pv-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.pv-head span{color:var(--muted);font-size:12px}
+#pv-rows div,.pv-total{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:4px 0;font-variant-numeric:tabular-nums}
+.pv-total{border-bottom:0;font-size:15px}
+.pv-total b{font-size:18px;color:var(--ok)}
+.pv-total b.neg{color:var(--accent)}
+.pv-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pv-pair div{display:grid;gap:2px;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:8px 10px}
+.pv-pair span{font-size:12px;color:var(--muted)}
+.pv-pair b{font-size:16px;font-variant-numeric:tabular-nums}
+.pv-max{background:#f5c542!important;border-color:#e2b02c!important;color:#1d2a31}
+.pv-max span{color:#5b4a12!important}
 </style>
 
 </head>
@@ -372,16 +395,23 @@ a.logo{text-decoration:none}
           <form class="panel" id="calc-form" novalidate>
             <h2>Calculator defaults</h2>
             <p class="sub">Buyers start from these numbers and can change them on the public page. Asking price, ARV and square feet come from Property details.</p>
-            <div class="fields three">
+            <p class="edit-hint"><span class="pen" aria-hidden="true"></span>Every box is editable. The preview below updates as you type; click Save changes to publish.</p>
+            <div class="fields three editable">
               <div class="fld"><label for="c-light">Light ($/sf)</label><input type="number" id="c-light"></div>
               <div class="fld"><label for="c-moderate">Moderate ($/sf)</label><input type="number" id="c-moderate"></div>
               <div class="fld"><label for="c-closingPct">Closing costs (%)</label><input type="number" id="c-closingPct" step="0.1"></div>
               <div class="fld"><label for="c-months">Holding (months)</label><input type="number" id="c-months"></div>
               <div class="fld"><label for="c-holdingMonthly">Holding $/month</label><input type="number" id="c-holdingMonthly"></div>
-              <div class="fld"><label for="c-listingPct">Listing broker (% of ARV)</label><input type="number" id="c-listingPct" step="0.25"></div>
-              <div class="fld"><label for="c-buyerBrokerPct">Buyer broker (% of ARV)</label><input type="number" id="c-buyerBrokerPct" step="0.25"></div>
-              <div class="fld"><label for="c-sellerClosingPct">Seller closing costs (% of ARV)</label><input type="number" id="c-sellerClosingPct" step="0.1"><small>Escrow, title, transfer taxes; varies by county</small></div>
+              <div class="fld"><label for="c-listingPct">Listing broker (% ARV)</label><input type="number" id="c-listingPct" step="0.25"></div>
+              <div class="fld"><label for="c-buyerBrokerPct">Buyer broker (% ARV)</label><input type="number" id="c-buyerBrokerPct" step="0.25"></div>
+              <div class="fld"><label for="c-sellerClosingPct">Seller closing (% ARV)</label><input type="number" id="c-sellerClosingPct" step="0.1"><small>Escrow, title, transfer taxes; varies by county</small></div>
               <div class="fld"><label for="c-targetPct">Target profit (% ARV)</label><input type="number" id="c-targetPct" step="0.5"></div>
+            </div>
+            <div class="preview" aria-live="polite">
+              <div class="pv-head"><b>Projected flip performance</b><span>same formula as the public page</span></div>
+              <div id="pv-rows"></div>
+              <div class="pv-total"><span>Projected profit</span><b id="pv-profit">—</b></div>
+              <div class="pv-pair"><div><span>Projected ROI</span><b id="pv-roi">—</b></div><div class="pv-max"><span>Maximum offer</span><b id="pv-max">—</b></div></div>
             </div>
           </form>
 
@@ -417,7 +447,7 @@ a.logo{text-decoration:none}
 
 <div class="statusbar" id="savebar" hidden><div class="wrap">
   <div><b id="save-title">All changes saved</b><div class="live" id="live"><span class="dot" id="live-dot" hidden></span><span id="live-text"></span></div></div>
-  <div class="row-actions"><button class="btn ghost" type="button" id="discard" hidden>Discard</button><button class="btn" type="button" id="save" disabled>Save changes</button></div>
+  <div class="row-actions"><button class="btn ghost" type="button" id="discard" hidden>Discard</button><button class="btn go" type="button" id="save" disabled>Save changes</button></div>
 </div></div>
 <footer class="wrap">Nongauza Real Estate Group by Kendrick Realty Inc. · Owner workspace</footer>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -603,7 +633,7 @@ function fillAll(){
   $('listed').checked=W.listed;
   $('more-url').value=W.links.more||'';$('more-show').checked=!!W.links.showMore;showMoreShort();
   const hasPhotos=(W.photos||[]).length>0;$('imp-replace').checked=!hasPhotos;$('imp-add').checked=hasPhotos;
-  renderPhotos();setDirty(false);
+  renderPhotos();setDirty(false);preview();
 }
 function showMoreShort(){const c=W.links.moreShort;$('more-short').textContent=c&&W.links.more?('Short link: '+SITE_SHORT+'/go/'+c+(clicks[c]!=null?' · '+clicks[c]+' clicks':'')):'A short off-marketfinds.com/go/… link is made for it when you save.';}
 async function loadClicks(){try{const j=await api('/api/links');clicks=j.clicks||{};const s=cur&&cur.data.short;$('e-clicks').textContent=s&&clicks[s]!=null?(clicks[s]+' click'+(clicks[s]===1?'':'s')+' on the short link'):'';showMoreShort();}catch(_){}}
@@ -621,6 +651,20 @@ function readForms(){
 function setDirty(v){dirty=v;$('save').disabled=!v||saving;$('discard').hidden=!v;
   $('save-title').textContent=saving?'Saving…':v?'You have unsaved changes':'All changes saved';}
 ['prop-form','calc-form'].forEach(id=>$(id).addEventListener('input',()=>setDirty(true)));
+function preview(){
+  const v=id=>{const n=parseFloat($(id).value);return isFinite(n)?n:0;};
+  const price=v('f-price'),arv=v('f-arv'),sqft=v('f-sqft');
+  const reno=v('c-light')*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
+  const lb=arv*v('c-listingPct')/100,bb=arv*v('c-buyerBrokerPct')/100,sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
+  const total=price+reno+close+hold+lb+bb+sc,profit=arv-total,roi=total?profit/total*100:0,max=(arv-reno-hold-lb-bb-sc-tgt)/(1+v('c-closingPct')/100);
+  const pc=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
+  const rows=[['Renovation budget (light)',reno],['Purchase closing costs',close],['Holding costs',hold],['Listing broker ('+pc(v('c-listingPct'))+')',lb],['Buyer broker ('+pc(v('c-buyerBrokerPct'))+')',bb],['Seller closing costs ('+pc(v('c-sellerClosingPct'))+')',sc],['Total project cost',total]];
+  const box=$('pv-rows');box.replaceChildren();
+  rows.forEach(([k,n])=>{const d=document.createElement('div');const a=document.createElement('span');a.textContent=k;const b=document.createElement('b');b.textContent=money(n);d.append(a,b);box.appendChild(d);});
+  $('pv-profit').textContent=(profit<0?'-':'')+money(Math.abs(profit));$('pv-profit').classList.toggle('neg',profit<0);
+  $('pv-roi').textContent=roi.toFixed(1)+'%';$('pv-max').textContent=money(Math.max(0,max));
+}
+['prop-form','calc-form'].forEach(id=>$(id).addEventListener('input',preview));
 ['listed','more-url','more-show'].forEach(id=>$(id).addEventListener('input',()=>setDirty(true)));
 ['prop-form','calc-form'].forEach(id=>$(id).addEventListener('submit',e=>{e.preventDefault();save();}));
 $('save').addEventListener('click',()=>save());
