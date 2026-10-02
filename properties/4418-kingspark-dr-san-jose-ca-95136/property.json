@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790900110922,
+  "updatedAt": 1790900309173,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -18,16 +18,36 @@
     "propertyType": "Single Family",
     "occupancy": "",
     "overview": [
-      "A single-family home, 4 bedrooms, 2 baths, 1,581 sq ft, built in 1971.",
-      "Contact Robert for access, disclosures and the full investor package."
-    ]
+      "A great investment opportunity in San Jose.\nA classic single-family house, 4 Bedrooms, 2 Baths, 1,581 Sqft, with a 2-car attached garage.\nThe HVAC, Plumbing, Electrical panel and Water heater are in good condition.\n\nWill be delivered vacant at closing.\n\nA wonderful Fix & Flip opportunity!",
+      "A-rated School District: East Side Union High School District.\n\nHardwood floors\n\nFireplace"
+    ],
+    "eyebrow": "Off-Market Investment Deal",
+    "headline": "",
+    "offer": {
+      "deadline": "Contact Robert",
+      "access": "Contact Robert",
+      "closing": ""
+    },
+    "deal": {
+      "emd": "",
+      "closing": "",
+      "openHouse": ""
+    }
   },
   "photos": [],
-  "calc": {},
+  "calc": {
+    "light": 40,
+    "moderate": 80,
+    "closingPct": 2,
+    "months": 3,
+    "holdingMonthly": 2200,
+    "sellingPct": 8,
+    "targetPct": 12
+  },
   "links": {
     "more": "",
     "moreShort": "",
-    "showMore": true
+    "showMore": false
   },
   "market": {
     "source": "RentCast",
