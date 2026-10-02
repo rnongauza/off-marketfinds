@@ -368,7 +368,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
     <div class="calc">
       <div class="inputs">
         <h3>Project assumptions</h3>
-        <p class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Every number in a box is editable. Click one to change it and the results update. Broker commissions are 2.5% listing + 2.5% buyer broker.</span><button type="button" id="calc-reset">Reset</button></p>
+        <p class="edit-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>Every number in a box is editable. Click one to change it and the results update.</span><button type="button" id="calc-reset">Reset</button></p>
         <div class="fields">
           <div class="fld"><label for="purchase">Asking price</label><div class="box"><span class="pre">$</span><input id="purchase" inputmode="decimal"></div></div>
           <div class="fld" data-show="quick flip"><label for="arv">After-repair value</label><div class="box"><span class="pre">$</span><input id="arv" inputmode="decimal"></div></div>
@@ -612,9 +612,9 @@ function render(){
   document.querySelectorAll('[data-show]').forEach(el=>{el.hidden=!el.dataset.show.split(' ').includes(mode);});
   document.querySelectorAll('#lvl button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.level===S.level)));
   ['light','moderate'].forEach(k=>{document.querySelector('[data-rate="'+k+'"]').textContent='$'+Math.round(S[k]).toLocaleString('en-US')+' / Sq. Ft.';});
-  const reno=(S[S.level]||0)*S.sqft, closing=S.purchase*S.closingPct/100, holding=S.months*S.holdingMonthly, listC=S.arv*S.listingPct/100, buyC=S.arv*S.buyerBrokerPct/100, sellC=S.arv*S.sellerClosingPct/100, selling=listC+buyC+sellC, target=S.arv*S.targetPct/100;
+  const reno=(S[S.level]||0)*S.sqft, closing=S.purchase*S.closingPct/100, holding=S.months*S.holdingMonthly, sellC=S.arv*S.sellerClosingPct/100, selling=sellC, target=S.arv*S.targetPct/100;
   const pct=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
-  const saleRows=[['Listing broker commission ('+pct(S.listingPct)+')',money(listC)],['Buyer broker commission ('+pct(S.buyerBrokerPct)+')',money(buyC)],['Seller closing costs ('+pct(S.sellerClosingPct)+')',money(sellC)]];
+  const saleRows=[['Seller closing costs ('+pct(S.sellerClosingPct)+')',money(sellC)]];
   if(mode==='quick'){
     const total=S.purchase+reno+closing+holding+selling, profit=S.arv-total, roi=total?profit/total*100:0;
     const max=(S.arv-reno-holding-selling-target)/(1+S.closingPct/100);
