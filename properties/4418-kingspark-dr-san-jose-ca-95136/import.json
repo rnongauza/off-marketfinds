@@ -1,10 +1,12 @@
 {
   "state": "done",
-  "at": 1790915896033,
-  "mode": "replace",
-  "found": 80,
-  "kept": 10,
-  "order": "photo, photo, photo, photo, photo, photo, photo, photo, photo, photo",
-  "notes": [],
-  "summary": "Made 2 Modern versions"
+  "at": 1790917017241,
+  "mode": "sort",
+  "found": 0,
+  "kept": 3,
+  "order": "42218ab4fa, 34163247f9, umuqhqjws0",
+  "notes": [
+    "GEMINI_API_KEY isn't set, so photos are in their original order."
+  ],
+  "summary": "3 photos on 4418 Kingspark Dr. Made 1 Modern version"
 }
