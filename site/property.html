@@ -270,8 +270,15 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 }
 @media (max-width:380px){.seg button{padding:9px 9px;font-size:13px}}
 
-/* hero photo wrapper: behind the text on desktop, its own uncovered block on phones */
+/* hero photo wrapper: its own uncovered panel beside the text on desktop, below it on phones */
 .hero-photo{position:absolute;inset:0;z-index:0}
+@media (min-width:701px){
+  .hero{grid-template-columns:minmax(320px,40fr) minmax(0,60fr);grid-template-rows:auto auto auto;min-height:0}
+  .hero::before{display:none}
+  .hero .copy{grid-row:1;grid-column:1;padding-block:40px}
+  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:2;aspect-ratio:3/2;min-height:420px;max-height:78vh;width:100%}
+  .hero-style,.metrics{grid-column:1/-1}
+}
 @media (max-width:700px){
   .hero{grid-template-rows:auto auto auto auto;min-height:0}
   .hero::before{display:none}
@@ -557,7 +564,7 @@ const mark=(s,k)=>s.querySelectorAll('button').forEach(b=>b.setAttribute('aria-c
 D.photos.forEach((ph,i)=>{
   const fig=document.createElement('figure');fig.className='shot';
   const fr=document.createElement('div');fr.className='frame';const imgs={};
-  STY.forEach(([k,label])=>{const v=ph[k];if(!v||!v.src)return;const im=new Image();im.src=v.src;im.decoding='async';
+  STY.forEach(([k,label])=>{const v=ph[k];if(!v||!v.src)return;const im=new Image();im.src=v.src;im.decoding='async';if(ph.focus!=null)im.style.objectPosition='50% '+ph.focus+'%';
     im.alt=(ph.caption||'Photo '+(i+1))+', '+label.toLowerCase();if(k==='original')im.className='on';fr.appendChild(im);imgs[k]=im;});
   const tag=document.createElement('span');tag.className='tag';tag.textContent='Original picture';
   const phl=document.createElement('span');phl.className='phl';phl.hidden=true;phl.textContent='AI design concept';
@@ -587,7 +594,7 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
 (function(){
   const c=D.photos[0]; if(!c){ $('hero-original').remove(); $('hero-modern').remove(); return; }
   const imgs={};
-  STY.forEach(([k,label])=>{const el=$('hero-'+k);if(c[k]&&c[k].src){el.src=c[k].src;el.alt=(c.caption||'Primary photo')+', '+label.toLowerCase();imgs[k]=el;}else el.remove();});
+  STY.forEach(([k,label])=>{const el=$('hero-'+k);if(c[k]&&c[k].src){el.src=c[k].src;el.style.objectPosition='50% '+(c.focus??50)+'%';el.alt=(c.caption||'Primary photo')+', '+label.toLowerCase();imgs[k]=el;}else el.remove();});
   let start=imgs.modern?'modern':'original';
   const tag=$('hero-tag');
   const set=k=>{Object.entries(imgs).forEach(([kk,el])=>el.classList.toggle('on',kk===k));
