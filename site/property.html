@@ -279,7 +279,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   .hero{grid-template-rows:auto auto auto;min-height:0}
   .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:75vw;width:100%}
   .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
-  .hero .copy{grid-row:1;grid-column:1;max-width:620px}
+  .hero .copy{grid-row:1;grid-column:1;max-width:620px;align-self:start;padding-top:clamp(56px,12vh,140px)}
   .hero-style{grid-row:1}
 }
 /* "See what it can become" + Original/Modern sit on the photo's lower-left corner */
@@ -616,9 +616,9 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
   Object.values(imgs).forEach(el=>el.style.objectPosition=pos);
   function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);
     const wide=matchMedia('(min-width:701px)').matches;
-    box.style.aspectRatio=(!wide&&first)?String(Math.max(4/3,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
+    box.style.aspectRatio=(!wide&&first)?String(Math.max(4/3/1.5,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
     /* desktop: tall frame (62% of the width) but never taller than the photo itself, so wide photos show top to bottom */
-    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.75,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
+    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.75*1.5,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
   Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
   addEventListener('resize',layout);layout();
 })();
