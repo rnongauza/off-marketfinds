@@ -571,7 +571,8 @@ D.photos.forEach((ph,i)=>{
 });
 const all=seg(k=>{cards.forEach(c=>c.set(k));mark(all,k);});
 all.setAttribute('aria-labelledby','setall-label');$('setall').replaceWith(all);
-cards.forEach(c=>c.set('modern'));mark(all,'modern');
+/* default: primary photo shows Modern, the rest show the original */
+cards.forEach((c,i)=>c.set(i===0?'modern':'original'));mark(all,cards.length>1?'':'modern');
 
 /* "See all photos" link under the grid */
 (function(){
