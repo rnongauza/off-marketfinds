@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": true,
   "createdAt": 1791056151488,
-  "updatedAt": 1791057372126,
+  "updatedAt": 1791057944759,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -38,113 +38,114 @@
   "photos": [
     {
       "id": "ph9c710c094f",
+      "caption": "Front of house",
+      "room": "exterior_front",
       "original": {
         "src": "img/ph9c710c094f-original-hd-978ae619.jpg"
       },
-      "caption": "Front of house",
       "modern": {
         "src": "img/ph9c710c094f-modern-hd-46fa091a.jpg"
       },
-      "room": "exterior_front"
+      "cy": 100
     },
     {
       "id": "ph3e9f456622",
+      "caption": "Living room",
+      "room": "living",
       "original": {
         "src": "img/3e9f456622.jpg"
       },
-      "caption": "Living room",
       "modern": {
         "src": "img/ph3e9f456622-modern-fc3b11ff.jpg"
-      },
-      "room": "living"
+      }
     },
     {
       "id": "ph94f6000415",
+      "caption": "Dining and kitchen",
+      "room": "dining",
       "original": {
         "src": "img/94f6000415.jpg"
       },
-      "caption": "Dining and kitchen",
       "modern": {
         "src": "img/ph94f6000415-modern-e9b621de.jpg"
-      },
-      "room": "dining"
+      }
     },
     {
       "id": "ph91628d373b",
+      "caption": "Bathroom",
+      "room": "bathroom",
       "original": {
         "src": "img/91628d373b.jpg"
       },
-      "caption": "Bathroom",
       "modern": {
         "src": "img/ph91628d373b-modern-0cb4dd77.jpg"
-      },
-      "room": "bathroom"
+      }
     },
     {
       "id": "ph0836517214",
+      "caption": "Bedroom",
+      "room": "bedroom",
       "original": {
         "src": "img/0836517214.jpg"
       },
-      "caption": "Bedroom",
       "modern": {
         "src": "img/ph0836517214-modern-49279797.jpg"
-      },
-      "room": "bedroom"
+      }
     },
     {
       "id": "ph1a9b2e2243",
+      "caption": "Bedroom",
+      "room": "bedroom",
       "original": {
         "src": "img/1a9b2e2243.jpg"
       },
-      "caption": "Bedroom",
       "modern": {
         "src": "img/ph1a9b2e2243-modern-9f5f9dec.jpg"
-      },
-      "room": "bedroom"
+      }
     },
     {
       "id": "ph052883f26c",
+      "caption": "Garage",
+      "room": "garage",
       "original": {
         "src": "img/052883f26c.jpg"
       },
-      "caption": "Garage",
       "modern": {
         "src": "img/ph052883f26c-modern-14b2cf56.jpg"
-      },
-      "room": "garage"
+      }
     },
     {
       "id": "ph2ebb2b7632",
+      "caption": "Covered patio",
+      "room": "backyard",
       "original": {
         "src": "img/2ebb2b7632.jpg"
       },
-      "caption": "Covered patio",
       "modern": {
         "src": "img/ph2ebb2b7632-modern-d373ae54.jpg"
-      },
-      "room": "backyard"
+      }
     },
     {
       "id": "ph95b09287e7",
+      "caption": "Den / office",
+      "room": "office",
       "original": {
         "src": "img/ph95b09287e7-original-hd-2507a8c3.jpg"
       },
-      "caption": "Den / office",
       "modern": {
         "src": "img/ph95b09287e7-modern-hd-9061efeb.jpg"
-      },
-      "room": "office"
+      }
     },
     {
       "id": "pha9de6dba91",
+      "caption": "Hallway",
+      "room": "hallway",
       "original": {
         "src": "img/a9de6dba91.jpg"
       },
-      "caption": "Hallway",
       "modern": {
         "src": "img/pha9de6dba91-modern-cac010f8.jpg"
-      },
-      "room": "hallway"
+      }
     }
   ],
   "calc": {
