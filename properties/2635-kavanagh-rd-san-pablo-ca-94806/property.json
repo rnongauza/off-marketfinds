@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": true,
   "createdAt": 1791056151488,
-  "updatedAt": 1791056252847,
+  "updatedAt": 1791056600379,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -47,9 +47,9 @@
     "targetPct": 10
   },
   "links": {
-    "more": "",
-    "moreShort": "",
-    "showMore": false
+    "more": "https://drive.google.com/drive/folders/1hIg46YIwPDNVryQUdqZp_8_RwSf9WAjr",
+    "moreShort": "2635kpic",
+    "showMore": true
   },
   "market": {
     "source": "RentCast",
