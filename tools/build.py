@@ -110,6 +110,9 @@ def build_property(d, contact, tpl):
     L = d.get("links") or {}
     links = {"more": L.get("more") or "", "showMore": bool(L.get("showMore") and L.get("more")),
              "moreShortUrl": short_url(neutral_code(slug, True) if (d.get("property") or {}).get("hideStreet") and L.get("moreShort") else L.get("moreShort"))}
+    t = P.get("heroText")
+    if not (isinstance(t, dict) and all(isinstance(t.get(k), (int, float)) for k in ("x", "y"))):
+        P.pop("heroText", None)
     hide = bool(P.get("hideStreet"))
     if hide:  # never put the real street in the public page
         P["street"] = ""

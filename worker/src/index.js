@@ -244,6 +244,11 @@ function cleanProperty(input, current) {
   const keep = ["eyebrow", "headline", "street", "cityLine", "price", "arv", "beds", "baths", "sqft", "lot", "yearBuilt",
     "occupancy", "propertyType", "overview", "offer", "deal", "hideStreet"];
   for (const k of keep) if (k in P) d.property[k] = P[k];
+  if ("heroText" in P) {  // where the headline block sits on the cover (admin photo editor)
+    const t = P.heroText, ok = v => v !== "" && v != null && Number.isFinite(+v);
+    if (t && ok(t.x) && ok(t.y)) d.property.heroText = { x: Math.max(0, Math.min(100, Math.round(+t.x * 10) / 10)), y: Math.max(0, Math.min(100, Math.round(+t.y * 10) / 10)) };
+    else delete d.property.heroText;
+  }
   if (Array.isArray(input.photos)) {
     d.photos = input.photos.slice(0, 40).map((p, i) => ({
       id: String(p.id || `p${i + 1}`).slice(0, 40), caption: String(p.caption || "").slice(0, 120), room: String(p.room || "").slice(0, 30),

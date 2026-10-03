@@ -311,6 +311,26 @@ a.logo{text-decoration:none}
 @media (max-width:640px){.ped-lbl{min-width:100%}.ped-bar .seg{width:100%}.ped-bar .seg button{flex:1}}
 
 #more-import{justify-self:start;margin-top:6px}
+
+/* editor: text block, crop tool */
+.ped-copy.movable{pointer-events:auto;cursor:move;outline:2px dashed rgba(255,255,255,.55);outline-offset:10px;border-radius:2px}
+.ped-copy.movable:hover{outline-color:#5fb0e0}
+.ped-copy.grabbing{cursor:grabbing}
+.ped-copy.r{text-align:right}.ped-copy.c{text-align:center}
+.ped-grad.r{background:linear-gradient(270deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
+.ped-grad.c{background:radial-gradient(ellipse at var(--tx,50%) var(--ty,50%),rgba(10,30,40,.62) 0%,rgba(10,30,40,.3) 38%,rgba(10,30,40,0) 70%)}
+.ped-sub{font-size:12.5px;color:var(--muted)}
+#ped-txtpos button{padding:5px 10px;font-size:12px}
+.ped-cropbtn{margin-left:auto;background:var(--btn);color:var(--btn-ink)}
+.ped-croprow .ped-row span{flex:1}
+.crop-wrap{position:relative;margin:10px auto;overflow:hidden;user-select:none;touch-action:none}
+.crop-img{display:block;width:100%;height:100%;pointer-events:none}
+.crop-box{position:absolute;box-shadow:0 0 0 9999px rgba(8,18,24,.6);outline:2px solid #fff;cursor:move;background:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)) 33.3% 0/1px 100% no-repeat,linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35)) 66.6% 0/1px 100% no-repeat,linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.35)) 0 33.3%/100% 1px no-repeat,linear-gradient(90deg,rgba(255,255,255,.35),rgba(255,255,255,.35)) 0 66.6%/100% 1px no-repeat}
+.crop-h{position:absolute;width:18px;height:18px;background:#fff;border:2px solid #12303c;border-radius:3px}
+.crop-h.nw{left:-9px;top:-9px;cursor:nwse-resize}.crop-h.se{right:-9px;bottom:-9px;cursor:nwse-resize}
+.crop-h.ne{right:-9px;top:-9px;cursor:nesw-resize}.crop-h.sw{left:-9px;bottom:-9px;cursor:nesw-resize}
+.adj-row{display:grid;grid-template-columns:1fr auto;gap:6px}
+#move-text{width:auto;justify-self:start}
 </style>
 
 </head>
@@ -427,6 +447,7 @@ a.logo{text-decoration:none}
           <div class="fields">
             <div class="fld"><label for="f-eyebrow">Label above headline</label><input type="text" id="f-eyebrow"></div>
             <div class="fld"><label for="f-headline">Headline</label><input type="text" id="f-headline"></div>
+            <div class="fld full"><button type="button" class="btn small adjust-btn" id="move-text"><span class="pen" aria-hidden="true"></span>Move the label, headline and address on the cover photo (with preview)</button></div>
             <div class="fld"><label for="f-street">Street address</label><input type="text" id="f-street"></div>
             <div class="fld"><label for="f-cityLine">City, state, ZIP</label><input type="text" id="f-cityLine"></div>
             <div class="fld full"><label class="check"><input type="checkbox" id="f-showStreet"><span><b>Show the full street address on the public page.</b> Turn it off to keep the address private: the page shows “Address provided on request” with the city, state and ZIP, and the page link changes to one without the address.</span></label></div>
@@ -514,10 +535,17 @@ a.logo{text-decoration:none}
     <div class="seg" id="ped-tabs" role="radiogroup" aria-label="Where the photo shows"></div>
     <div class="seg" id="ped-view" role="radiogroup" aria-label="Preview on"></div>
     <div class="seg" id="ped-ver" role="radiogroup" aria-label="Version"></div>
+    <button type="button" class="btn small ped-cropbtn" id="ped-crop">✂ Crop photo</button>
   </div>
-  <p class="ped-hint"><span class="pen" aria-hidden="true"></span>This is exactly how it will look on the public page. Drag the picture to move it, scroll or use the zoom slider to zoom.</p>
+  <p class="ped-hint" id="ped-hint"><span class="pen" aria-hidden="true"></span>This is exactly how it will look on the public page. Drag the picture to move it, scroll or use the zoom slider to zoom.</p>
   <div class="ped-stage" id="ped-stage"></div>
-  <div class="ped-ctrl">
+  <div class="ped-ctrl ped-croprow" id="ped-crop-row" hidden>
+    <div class="ped-row"><div class="seg" id="ped-cshape" role="radiogroup" aria-label="Crop box shape"></div><span></span>
+      <button type="button" class="btn ghost" id="ped-crop-cancel">Back without cropping</button><button type="button" class="btn go" id="ped-crop-apply">Use this crop</button></div>
+  </div>
+  <div class="ped-ctrl" id="ped-main-ctrl">
+    <div class="ped-row" id="ped-text-row"><span class="ped-lbl">Headline &amp; address</span><span class="ped-sub">Drag the text in the preview, or pick a spot:</span>
+      <div class="ped-chips" id="ped-txtpos"></div><button type="button" class="btn ghost small" id="ped-txtdef">Default spot</button></div>
     <div class="ped-row" id="ped-shape-row"><span class="ped-lbl">Crop shape</span><div class="ped-chips" id="ped-shape" role="radiogroup" aria-label="Crop shape"></div></div>
     <div class="ped-row"><span class="ped-lbl">Zoom</span>
       <button type="button" class="btn small" id="ped-zout" aria-label="Zoom out">−</button>
@@ -699,7 +727,7 @@ async function openProperty(slug){
   try{const j=await api('/api/properties/'+slug);setCurrent(slug,j.data,j.sha);fillAll();watchImport(j);loadClicks();}
   catch(e){if(e.code==='login')return;$('e-title').textContent=e.status===404?'Property not found':'Couldn’t load';toast(e.message);}
 }
-function setCurrent(slug,data,sha){cur={slug,data,sha,base:shape(data)};W={photos:clone(data.photos||[]),links:Object.assign({more:'',moreShort:'',showMore:false},clone(data.links||{})),listed:data.listed!==false};}
+function setCurrent(slug,data,sha){cur={slug,data,sha,base:shape(data)};W={photos:clone(data.photos||[]),links:Object.assign({more:'',moreShort:'',showMore:false},clone(data.links||{})),listed:data.listed!==false,heroText:clone((data.property||{}).heroText||null)};}
 function shape(d){return{property:clone(d.property||{}),calc:clone(d.calc||{}),photos:clone(d.photos||[]),links:Object.assign({more:'',moreShort:'',showMore:false},clone(d.links||{})),listed:d.listed!==false};}
 function fillAll(){
   const d=cur.data,P=d.property||{};
@@ -730,6 +758,7 @@ async function setPublicLink(){const s=cur.slug,hide=!!(cur.data.property||{}).h
 function readForms(){
   const P=clone(cur.data.property||{});
   P.hideStreet=!$('f-showStreet').checked;
+  if(W.heroText)P.heroText=W.heroText;else if('heroText' in P)P.heroText=null;
   PF.forEach(k=>{const v=$('f-'+k).value.trim();P[k]=NUMF.includes(k)?(v===''?(k==='lot'||k==='beds'||k==='baths'?'':0):+v):v;});
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
@@ -843,7 +872,9 @@ function photoCard(ph,i){
   const two=document.createElement('div');two.className='two';two.append(f1,f2);el.appendChild(two);
   const adj=document.createElement('button');adj.type='button';adj.className='btn small adjust-btn';
   adj.innerHTML='<span class="pen" aria-hidden="true"></span>'+(i===0?'Adjust cover &amp; photo (zoom, crop, position)':'Adjust photo (zoom, crop, position)');
-  adj.addEventListener('click',()=>openEditor(i));el.appendChild(adj);
+  adj.addEventListener('click',()=>openEditor(i));
+  const crp=document.createElement('button');crp.type='button';crp.className='btn small adjust-btn';crp.textContent='✂ Crop this photo';crp.addEventListener('click',()=>openEditor(i,{crop:true}));
+  const ab=document.createElement('div');ab.className='adj-row';ab.append(adj,crp);el.appendChild(ab);
   const acts=document.createElement('div');acts.className='row-actions';
   const fb=document.createElement('span');fb.className='btn ghost small file-btn';fb.textContent=has('modern')?'Replace Modern version':'Add Modern version';
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('aria-label',fb.textContent+' for photo '+(i+1));
@@ -896,6 +927,7 @@ const drop=$('drop');
 drop.addEventListener('drop',e=>uploadFiles(e.dataTransfer.files));
 
 /* import from link / AI sort */
+$('move-text').addEventListener('click',()=>{if(!W.photos.length){toast('Add photos first: the headline sits on the cover photo.');return;}openEditor(0);});
 $('more-import').addEventListener('click',()=>{const u=$('more-url').value.trim();if(!isShareLink(u)){toast('Paste a Google Drive, Dropbox, iCloud or Google Photos share link first.');$('more-url').focus();return;}
   startImport('link',{url:u,mode:W.photos.length?($('imp-add').checked?'add':'replace'):'replace'});});
 $('imp-go').addEventListener('click',()=>{const u=$('imp-url').value.trim();if(!/^https:\/\/\S+$/.test(u)){toast('Paste the full share link, starting with https://');$('imp-url').focus();return;}startImport('link');});
@@ -969,15 +1001,16 @@ function placeIn(box,el,o){const go=()=>placeImg(el,box.clientWidth,box.clientHe
   if(window.ResizeObserver)new ResizeObserver(go).observe(box);}
 const SHAPES=[['','Automatic'],['photo','Photo’s own shape'],[16/9,'Wide 16:9'],[3/2,'3:2'],[4/3,'4:3'],[1,'Square'],[4/5,'Tall 4:5'],[2/3,'Very tall 2:3']];
 let ED=null;
-function openEditor(i){
+function openEditor(i,opt){
   const ph=W.photos[i];if(!ph)return;
   const has=k=>ph[k]&&ph[k].src;
   ED={i,ph,tab:i===0?'cover':'grid',view:'desktop',ver:has('modern')&&(i===0||ph._view==='modern')?'modern':(has('original')?'original':'modern'),
     cover:{x:ph.cx??50,y:ph.cy??ph.focus??50,z:ph.cz??1,frame:ph.frame??''},
-    grid:{x:ph.x??50,y:ph.y??ph.focus??50,z:ph.z??1}};
+    grid:{x:ph.x??50,y:ph.y??ph.focus??50,z:ph.z??1},text:W.heroText?clone(W.heroText):null,crop:null};
   $('ped-title').textContent=i===0?'Adjust the cover photo':'Adjust photo '+(i+1);
   $('ped-tabs').hidden=i!==0;
   const d=$('ped');if(!d.open)d.showModal();edRender();
+  if(opt&&opt.crop)edStartCrop();
 }
 function edSet(seg,val){seg.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===String(val))));}
 function edText(){const v=id=>($(id)&&$(id).value.trim())||'';
@@ -987,7 +1020,8 @@ function edRender(){
   if(!ED)return;const {ph,tab,view}=ED,o=ED[tab],stage=$('ped-stage');
   edSet($('ped-tabs'),tab);edSet($('ped-view'),view);edSet($('ped-ver'),ED.ver);
   $('ped-ver').hidden=!(ph.original&&ph.original.src&&ph.modern&&ph.modern.src);
-  $('ped-shape-row').hidden=tab!=='cover';
+  $('ped-shape-row').hidden=tab!=='cover';$('ped-text-row').hidden=!(tab==='cover'&&view==='desktop');
+  if(ED.crop){edCropRender();return;}
   const src=imgUrl(cur.slug,(ph[ED.ver]||ph.original||ph.modern||{}).src);
   const img=new Image();img.className='ped-img';img.alt='';img.draggable=false;img.src=src;
   const T=edText(),desk=view==='desktop';
@@ -1004,7 +1038,7 @@ function edRender(){
     frame=document.createElement('div');frame.className='ped-frame';frame.appendChild(img);
     const ov=document.createElement('div');ov.className='ped-ov';
     ov.innerHTML='<div class="ped-tag">'+(ED.ver==='modern'?'AI design concept · Modern':'')+'</div><div class="ped-pick"><span>See what it can become</span><span class="ped-seg"><b'+(ED.ver==='original'?' class="on"':'')+'>Original</b><b'+(ED.ver==='modern'?' class="on"':'')+'>Modern</b></span></div>';
-    if(desk){const grad=document.createElement('div');grad.className='ped-grad';frame.append(grad,copy,ov);hero.appendChild(frame);}
+    if(desk){const grad=document.createElement('div');grad.className='ped-grad';frame.append(grad,copy,ov);hero.appendChild(frame);copy.classList.add('movable');copy.title='Drag to move the headline and address';edTextDrag(copy);}
     else{hero.append(copy,frame);frame.appendChild(ov);}
     page.appendChild(hero);
   }else{
@@ -1025,6 +1059,7 @@ function edRender(){
     page.style.transform='scale('+k+')';stage.style.height=Math.ceil(page.offsetHeight*k)+'px';
     page.style.marginLeft=Math.max(0,(stage.clientWidth-parseFloat(page.style.width)*k)/2)+'px';
     const res=placeImg(img,frame.clientWidth,frame.clientHeight,o);ED.k=k;ED.frame=frame;ED.img=img;ED.res=res;
+    if(tab==='cover'&&desk)edPlaceText();
     if(res){const zr=$('ped-zoom');zr.min=Math.round(res.min*100);zr.max=400;zr.value=Math.round(res.z*100);
       $('ped-zoomv').textContent=res.z<=res.min+.005?'Whole photo':Math.round(res.z*100)+'%'+(Math.abs(res.z-1)<.005?' (fills the frame)':'');
       $('ped-x').value=o.x;$('ped-y').value=o.y;}
@@ -1033,6 +1068,59 @@ function edRender(){
   if(img.complete&&img.naturalWidth)fit();else img.addEventListener('load',fit);
   edDrag(frame);
 }
+function edPlaceText(){const fr=ED.frame,copy=fr&&fr.querySelector('.ped-copy'),grad=fr&&fr.querySelector('.ped-grad');if(!copy)return;
+  const t=ED.text,W=fr.clientWidth,H=fr.clientHeight,pad=Math.min(56,W*.04);
+  copy.classList.remove('r','c');grad.className='ped-grad';
+  if(!t){copy.style.left='56px';copy.style.top='108px';return;}
+  const x=t.x/100,y=t.y/100;if(x>.66){copy.classList.add('r');grad.classList.add('r');}else if(x>.34){copy.classList.add('c');grad.classList.add('c');grad.style.setProperty('--tx',t.x+'%');grad.style.setProperty('--ty',t.y+'%');}
+  copy.style.left=Math.round(pad+Math.max(0,W-2*pad-copy.offsetWidth)*x)+'px';copy.style.top=Math.round(40+Math.max(0,H-80-copy.offsetHeight)*y)+'px';
+  $('ped-txtpos').querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===t.x+','+t.y)));}
+function edTextDrag(copy){let st=null;
+  copy.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();copy.setPointerCapture(e.pointerId);
+    const fr=ED.frame,W=fr.clientWidth,H=fr.clientHeight,pad=Math.min(56,W*.04),sx=Math.max(1,W-2*pad-copy.offsetWidth),sy=Math.max(1,H-80-copy.offsetHeight);
+    if(!ED.text)ED.text={x:Math.max(0,Math.min(100,(copy.offsetLeft-pad)/sx*100)),y:Math.max(0,Math.min(100,(copy.offsetTop-40)/sy*100))};
+    st={x:e.clientX,y:e.clientY,ox:ED.text.x,oy:ED.text.y,sx,sy};copy.classList.add('grabbing');});
+  copy.addEventListener('pointermove',e=>{if(!st)return;const k=ED.k||1;
+    ED.text={x:Math.round(Math.max(0,Math.min(100,st.ox+(e.clientX-st.x)/k/st.sx*100))*10)/10,y:Math.round(Math.max(0,Math.min(100,st.oy+(e.clientY-st.y)/k/st.sy*100))*10)/10};edPlaceText();});
+  const end=()=>{st=null;copy.classList.remove('grabbing');};copy.addEventListener('pointerup',end);copy.addEventListener('pointercancel',end);}
+/* crop tool: draw the part of the photo to keep; it becomes the zoom + position (and, for the cover, the shape) */
+function edFrameRatio(img){const o=ED[ED.tab];if(ED.tab!=='cover')return 4/3;const ar=img.naturalWidth/img.naturalHeight;
+  return o.frame==='photo'?ar:(+o.frame>0?+o.frame:Math.max(8/9,ar));}
+function edStartCrop(){const src=imgUrl(cur.slug,(ED.ph[ED.ver]||ED.ph.original||ED.ph.modern||{}).src),img=new Image();img.src=src;
+  img.onload=()=>{const w=img.naturalWidth,h=img.naturalHeight,o=ED[ED.tab],r=edFrameRatio(img),Wf=r,Hf=1,cover=Math.max(Wf/w,Hf/h),s=cover*Math.max(1,o.z||1);
+    const iw=w*s,ih=h*s,left=(Wf-iw)*(o.x??50)/100,top=(Hf-ih)*(o.y??50)/100;
+    let rw=Math.min(w,Wf/s),rh=Math.min(h,Hf/s),rx=Math.max(0,Math.min(w-rw,-left/s)),ry=Math.max(0,Math.min(h-rh,-top/s));
+    ED.crop={img,w,h,rx,ry,rw,rh,lock:ED.tab==='cover'&&ED.cover.free?0:r};edRender();};}
+function edCropRender(){const c=ED.crop,stage=$('ped-stage');stage.replaceChildren();
+  $('ped-crop-row').hidden=false;$('ped-main-ctrl').hidden=true;$('ped-hint').textContent=ED.tab==='cover'?'Drag the box to choose what shows. Drag a corner to make it bigger or smaller. Pick “Free” to draw any shape.':'Drag the box to choose what shows. Drag a corner to make it bigger or smaller. Grid photos are always 4:3.';
+  const maxW=stage.clientWidth-20,maxH=Math.max(260,innerHeight*.5),d=Math.min(maxW/c.w,maxH/c.h);c.d=d;
+  const wrap=document.createElement('div');wrap.className='crop-wrap';wrap.style.width=c.w*d+'px';wrap.style.height=c.h*d+'px';
+  const im=c.img.cloneNode();im.className='crop-img';wrap.appendChild(im);
+  const box=document.createElement('div');box.className='crop-box';['nw','ne','sw','se'].forEach(k=>{const h=document.createElement('span');h.className='crop-h '+k;h.dataset.h=k;box.appendChild(h);});
+  wrap.appendChild(box);stage.appendChild(wrap);stage.style.height=(c.h*d+20)+'px';
+  const draw=()=>Object.assign(box.style,{left:c.rx*d+'px',top:c.ry*d+'px',width:c.rw*d+'px',height:c.rh*d+'px'});draw();
+  let st=null;
+  box.addEventListener('pointerdown',e=>{e.preventDefault();box.setPointerCapture(e.pointerId);st={h:e.target.dataset.h||'',x:e.clientX,y:e.clientY,rx:c.rx,ry:c.ry,rw:c.rw,rh:c.rh};});
+  box.addEventListener('pointermove',e=>{if(!st)return;const dx=(e.clientX-st.x)/d,dy=(e.clientY-st.y)/d,min=Math.min(c.w,c.h)*.06;
+    if(!st.h){c.rx=Math.max(0,Math.min(c.w-c.rw,st.rx+dx));c.ry=Math.max(0,Math.min(c.h-c.rh,st.ry+dy));draw();return;}
+    const L=st.h.includes('w'),T=st.h.includes('n'),ax=L?st.rx+st.rw:st.rx,ay=T?st.ry+st.rh:st.ry;
+    let nw=Math.max(min,st.rw+(L?-dx:dx)),nh=Math.max(min,st.rh+(T?-dy:dy));
+    const maxw=L?ax:c.w-ax,maxh=T?ay:c.h-ay;
+    if(c.lock){if(nw/nh>c.lock)nh=nw/c.lock;else nw=nh*c.lock;const f=Math.min(1,maxw/nw,maxh/nh);nw*=f;nh*=f;}else{nw=Math.min(nw,maxw);nh=Math.min(nh,maxh);}
+    c.rw=nw;c.rh=nh;c.rx=L?ax-nw:ax;c.ry=T?ay-nh:ay;draw();});
+  const end=()=>{st=null;};box.addEventListener('pointerup',end);box.addEventListener('pointercancel',end);
+  $('ped-cshape').querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===(c.lock?'lock':'free'))));
+  $('ped-cshape').hidden=ED.tab!=='cover';}
+function edCropLock(free){const c=ED.crop;if(!c)return;if(free){c.lock=0;ED.cover.free=true;}else{ED.cover.free=false;const r=edFrameRatio(c.img);c.lock=r;
+  let nw=c.rw,nh=nw/r;if(nh>c.h){nh=c.h;nw=nh*r;}if(nw>c.w){nw=c.w;nh=nw/r;}c.rw=nw;c.rh=nh;c.rx=Math.min(c.rx,c.w-nw);c.ry=Math.min(c.ry,c.h-nh);}edCropRender();}
+function edApplyCrop(){const c=ED.crop,o=ED[ED.tab];
+  if(ED.tab==='cover'&&!c.lock)o.frame=Math.round(c.rw/c.rh*10000)/10000;
+  const r=ED.tab==='cover'?(o.frame==='photo'||!o.frame?(c.lock||c.rw/c.rh):+o.frame):4/3;
+  const Wf=r,Hf=1,cover=Math.max(Wf/c.w,Hf/c.h),s=Wf/c.rw,iw=c.w*s,ih=c.h*s;
+  o.z=Math.round(s/cover*1000)/1000;o.x=Math.abs(Wf-iw)>1e-6?Math.max(0,Math.min(100,(-c.rx*s)/(Wf-iw)*100)):50;o.y=Math.abs(Hf-ih)>1e-6?Math.max(0,Math.min(100,(-c.ry*s)/(Hf-ih)*100)):50;
+  o.x=Math.round(o.x*10)/10;o.y=Math.round(o.y*10)/10;edEndCrop();}
+function edEndCrop(){ED.crop=null;$('ped-crop-row').hidden=true;$('ped-main-ctrl').hidden=false;
+  $('ped-hint').innerHTML='<span class="pen" aria-hidden="true"></span>This is exactly how it will look on the public page. Drag the picture to move it, scroll or use the zoom slider to zoom.';edRender();}
 function edApplyZoom(z){const o=ED[ED.tab],m=ED.res?ED.res.min:.2;o.z=Math.max(m,Math.min(4,z));edRefresh();}
 function edRefresh(){if(!ED||!ED.img)return;const o=ED[ED.tab],res=placeImg(ED.img,ED.frame.clientWidth,ED.frame.clientHeight,o);ED.res=res;
   if(res){$('ped-zoom').value=Math.round(res.z*100);$('ped-zoomv').textContent=res.z<=res.min+.005?'Whole photo':Math.round(res.z*100)+'%'+(Math.abs(res.z-1)<.005?' (fills the frame)':'');}
@@ -1057,6 +1145,11 @@ function edInit(){
   segBtns('ped-ver',[['original','Original'],['modern','Modern']],v=>{ED.ver=v;edRender();});
   segBtns('ped-shape',SHAPES,v=>{ED.cover.frame=v;edRender();});
   $('ped-zoom').addEventListener('input',e=>edApplyZoom(e.target.value/100));
+  $('ped-crop').addEventListener('click',edStartCrop);$('ped-crop-apply').addEventListener('click',edApplyCrop);$('ped-crop-cancel').addEventListener('click',edEndCrop);
+  segBtns('ped-cshape',[['lock','Keep the crop shape above'],['free','Free (any shape)']],v=>edCropLock(v==='free'));
+  const tp=$('ped-txtpos');[[0,0,'↖ Top left'],[50,0,'↑ Top center'],[100,0,'↗ Top right'],[0,50,'← Middle left'],[50,50,'• Center'],[100,50,'→ Middle right'],[0,100,'↙ Bottom left'],[50,100,'↓ Bottom center'],[100,100,'↘ Bottom right']].forEach(([x,y,l])=>{
+    const b=document.createElement('button');b.type='button';b.dataset.v=x+','+y;b.textContent=l;b.addEventListener('click',()=>{ED.text={x,y};edPlaceText();});tp.appendChild(b);});
+  $('ped-txtdef').addEventListener('click',()=>{ED.text=null;edRender();});
   $('ped-zin').addEventListener('click',()=>edApplyZoom((ED[ED.tab].z||1)*1.1));
   $('ped-zout').addEventListener('click',()=>edApplyZoom((ED[ED.tab].z||1)/1.1));
   $('ped-whole').addEventListener('click',()=>edApplyZoom(0));
@@ -1064,14 +1157,14 @@ function edInit(){
   $('ped-center').addEventListener('click',()=>{const o=ED[ED.tab];o.x=50;o.y=50;edRefresh();});
   $('ped-x').addEventListener('input',e=>{ED[ED.tab].x=+e.target.value;edRefresh();});
   $('ped-y').addEventListener('input',e=>{ED[ED.tab].y=+e.target.value;edRefresh();});
-  $('ped-reset').addEventListener('click',()=>{if(ED.tab==='cover')ED.cover={x:50,y:50,z:1,frame:''};else ED.grid={x:50,y:50,z:1};edRender();});
-  const close=()=>{$('ped').close();ED=null;};
+  $('ped-reset').addEventListener('click',()=>{if(ED.tab==='cover'){ED.cover={x:50,y:50,z:1,frame:''};ED.text=null;}else ED.grid={x:50,y:50,z:1};ED.crop=null;edEndCrop();});
+  const close=()=>{$('ped').close();if(ED&&ED.crop){$('ped-crop-row').hidden=true;$('ped-main-ctrl').hidden=false;}ED=null;};
   $('ped-cancel').addEventListener('click',close);$('ped-x-btn').addEventListener('click',close);
   $('ped-done').addEventListener('click',()=>{const {ph,i,cover,grid}=ED,r1=n=>Math.round(n*10)/10,r3=n=>Math.round(n*1000)/1000;
     delete ph.focus;
     const put=(k,v,def)=>{if(v==null||Math.abs(v-def)<1e-6)delete ph[k];else ph[k]=v;};
     put('x',r1(grid.x),50);put('y',r1(grid.y),50);put('z',r3(grid.z),1);
-    if(i===0){put('cx',r1(cover.x),50);put('cy',r1(cover.y),50);put('cz',r3(cover.z),1);if(cover.frame==='')delete ph.frame;else ph.frame=cover.frame;}
+    if(i===0){put('cx',r1(cover.x),50);put('cy',r1(cover.y),50);put('cz',r3(cover.z),1);if(cover.frame==='')delete ph.frame;else ph.frame=cover.frame;W.heroText=ED.text?{x:r1(ED.text.x),y:r1(ED.text.y)}:null;}
     close();setDirty(true);renderPhotos();toast('Photo adjusted. Click Save changes to put it on the public page.');});
   $('ped').addEventListener('cancel',()=>{ED=null;});
   addEventListener('resize',()=>{if(ED)edRender();});
