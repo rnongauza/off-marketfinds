@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": true,
   "createdAt": 1791056151488,
-  "updatedAt": 1791057321715,
+  "updatedAt": 1791057372126,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -39,11 +39,11 @@
     {
       "id": "ph9c710c094f",
       "original": {
-        "src": "img/9c710c094f.jpg"
+        "src": "img/ph9c710c094f-original-hd-978ae619.jpg"
       },
       "caption": "Front of house",
       "modern": {
-        "src": "img/ph9c710c094f-modern-c1f8f44d.jpg"
+        "src": "img/ph9c710c094f-modern-hd-46fa091a.jpg"
       },
       "room": "exterior_front"
     },
