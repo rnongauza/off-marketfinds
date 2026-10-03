@@ -53,12 +53,13 @@ nav.links a:hover{color:var(--blue)}
 .hero .copy{position:relative;z-index:2;align-self:center;padding-block:56px 44px;max-width:none;margin:0;padding-inline:clamp(20px,4vw,56px)}
 .hero-style{position:relative;z-index:3;grid-row:2;grid-column:1;background:#0d2630;padding:12px clamp(20px,4vw,56px);display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.12)}
 .hero-tag{background:transparent;padding-left:0!important;color:#fff;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;padding:7px 10px}
-.hero-cta{flex-basis:100%;font-family:var(--serif);font-size:20px;line-height:1.2;color:#fff;margin-bottom:-2px}
+.hero-pick{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-left:auto;justify-content:flex-end}
+.hero-cta{font-family:var(--serif);font-size:20px;line-height:1.2;color:#fff}
 .hero-style .seg{background:rgba(255,255,255,.95);border-color:transparent}
 .metrics .wrap{padding-inline:clamp(20px,4vw,56px);max-width:none}
 .hero .copy{grid-row:1;grid-column:1}
 .metrics{grid-row:3}
-@media (max-width:640px){.hero{min-height:0}.hero .copy{min-height:340px;padding-block:40px 36px}.hero-style{justify-content:flex-start}}
+@media (max-width:640px){.hero{min-height:0}.hero .copy{min-height:340px;padding-block:40px 36px}.hero-style{justify-content:flex-start}.hero-pick{margin-left:0;justify-content:flex-start}}
 @media (max-width:420px){header.site .wrap{gap:10px}.logo .nm{font-size:18px}.logo .gp{font-size:7.5px;letter-spacing:.18em}nav.links{gap:12px;font-size:11px;letter-spacing:.06em}}
 .hero .eyebrow{color:#5fb0e0}
 .hero h1{font-size:36px;line-height:1.15;letter-spacing:.01em;margin-top:18px;max-width:100%;overflow-wrap:anywhere}
@@ -273,11 +274,11 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 /* hero photo wrapper: its own uncovered panel beside the text on desktop, below it on phones */
 .hero-photo{position:absolute;inset:0;z-index:0}
 @media (min-width:701px){
-  .hero{grid-template-columns:minmax(320px,40fr) minmax(0,60fr);grid-template-rows:auto auto auto;min-height:0}
-  .hero::before{display:none}
-  .hero .copy{grid-row:1;grid-column:1;padding-block:40px}
-  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:2;aspect-ratio:3/2;min-height:420px;max-height:78vh;width:100%}
-  .hero-style,.metrics{grid-column:1/-1}
+  /* one frame: the photo sits behind the text and is tall enough to show the whole front of the house */
+  .hero{grid-template-rows:auto auto auto;min-height:0}
+  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:clamp(520px,44vw,820px);width:100%}
+  .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
+  .hero .copy{grid-row:1;grid-column:1;max-width:620px}
 }
 @media (max-width:700px){
   .hero{grid-template-rows:auto auto auto auto;min-height:0}
@@ -305,7 +306,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
       <img class="bg" id="hero-original" alt="">
       <img class="bg on" id="hero-modern" alt="">
     </div>
-    <div class="hero-style"><span class="hero-cta">See what it can become</span><span class="hero-tag" id="hero-tag">AI design concept · Modern</span><div id="hero-seg"></div></div>
+    <div class="hero-style"><span class="hero-tag" id="hero-tag">AI design concept · Modern</span><div class="hero-pick"><span class="hero-cta">See what it can become</span><div id="hero-seg"></div></div></div>
     <div class="wrap copy">
       <div class="eyebrow" id="h-eyebrow"></div>
       <h1 id="h-headline"></h1>
