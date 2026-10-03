@@ -277,17 +277,22 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 @media (min-width:701px){
   /* one frame: the photo sits behind the text and is tall enough to show the whole front of the house */
   .hero{grid-template-rows:auto auto auto;min-height:0}
-  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:clamp(600px,62vw,1080px);width:100%}
+  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:75vw;width:100%}
   .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero .copy{grid-row:1;grid-column:1;max-width:620px}
+  .hero-style{grid-row:1}
 }
+/* "See what it can become" + Original/Modern sit on the photo's lower-left corner */
+.hero-style{grid-column:1;align-self:end;background:linear-gradient(180deg,rgba(10,30,40,0) 0%,rgba(10,30,40,.55) 55%,rgba(10,30,40,.75) 100%);border-bottom:0;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:8px;padding:48px clamp(20px,4vw,56px) 22px}
+.hero-style .hero-pick{margin-left:0;justify-content:flex-start}
+.hero-style .hero-cta{text-shadow:0 1px 6px rgba(0,0,0,.45)}
 @media (max-width:700px){
   .hero{grid-template-rows:auto auto auto auto;min-height:0}
   .hero::before{display:none}
   .hero .copy{grid-row:1;min-height:0;padding-block:32px 28px}
   .hero-photo{position:relative;inset:auto;grid-row:2;grid-column:1;aspect-ratio:4/3;width:100%}
-  .hero-style{grid-row:3}
-  .metrics{grid-row:4}
+  .hero-style{grid-row:2;padding:36px 16px 14px}
+  .metrics{grid-row:3}
 }
 </style>
 </head>
@@ -604,13 +609,13 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
   const hs=seg(set,k=>!!imgs[k]);hs.setAttribute('aria-label','Primary photo style');
   $('hero-seg').replaceWith(hs);set(start);
   /* the cover always fills the whole frame; the frame is tall so the whole front shows. On phones the frame follows the photo's shape */
-  const box=document.querySelector('.hero-photo'),pos='50% '+(c.focus??37)+'%';
+  const box=document.querySelector('.hero-photo'),pos='50% '+(c.focus??50)+'%';
   Object.values(imgs).forEach(el=>el.style.objectPosition=pos);
   function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);
     const wide=matchMedia('(min-width:701px)').matches;
-    box.style.aspectRatio=(!wide&&first)?String(Math.max(.8,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
+    box.style.aspectRatio=(!wide&&first)?String(Math.max(4/3,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
     /* desktop: tall frame (62% of the width) but never taller than the photo itself, so wide photos show top to bottom */
-    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.62,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
+    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.75,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
   Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
   addEventListener('resize',layout);layout();
 })();

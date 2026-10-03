@@ -763,7 +763,7 @@ function photoCard(ph,i){
   const two=document.createElement('div');two.className='two';two.append(f1,f2);el.appendChild(two);
   if(i===0){const ff=document.createElement('div');ff.className='fld';
     const fl=document.createElement('label');fl.htmlFor='focus-0';fl.textContent='Cover framing: slide until the whole front of the house shows';
-    const rg=document.createElement('input');rg.type='range';rg.id='focus-0';rg.min=0;rg.max=100;rg.step=1;rg.value=ph.focus??37;
+    const rg=document.createElement('input');rg.type='range';rg.id='focus-0';rg.min=0;rg.max=100;rg.step=1;rg.value=ph.focus??50;
     const ends=document.createElement('div');ends.className='range-ends';ends.innerHTML='<span>Show top</span><span>Show bottom</span>';
     rg.addEventListener('input',()=>{ph.focus=+rg.value;im.style.objectPosition='50% '+rg.value+'%';setDirty(true);});
     ff.append(fl,rg,ends);el.appendChild(ff);
