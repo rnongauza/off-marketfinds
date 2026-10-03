@@ -309,6 +309,8 @@ a.logo{text-decoration:none}
 .ped-foot{display:flex;gap:8px;align-items:center;padding:10px 18px 16px;border-top:1px solid var(--line)}
 .ped-foot span{flex:1}
 @media (max-width:640px){.ped-lbl{min-width:100%}.ped-bar .seg{width:100%}.ped-bar .seg button{flex:1}}
+
+#more-import{justify-self:start;margin-top:6px}
 </style>
 
 </head>
@@ -414,7 +416,7 @@ a.logo{text-decoration:none}
         <div class="importbox" id="imp-box" hidden></div>
         <div class="photos" id="photos"></div>
         <div class="fields" style="border-top:1px solid var(--line);padding-top:16px">
-          <div class="fld full"><label for="more-url">“See all photos” link (shown under the photos on the public page)</label><input type="text" id="more-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/…"><small id="more-short">A short off-marketfinds.com/go/… link is made for it when you save.</small></div>
+          <div class="fld full"><label for="more-url">“See all photos” link (shown under the photos on the public page)</label><input type="text" id="more-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/…"><small id="more-short">A short off-marketfinds.com/go/… link is made for it when you save.</small><button type="button" class="btn small" id="more-import">Import the photos from this link</button><small>Saving a link here only adds “See all photos” to the public page. To bring the pictures into the admin, click the button above (it happens automatically when a property has no photos yet).</small></div>
           <label class="check full"><input type="checkbox" id="more-show"><span>Show “See all photos” on the public page</span></label>
         </div>
       </section>
@@ -768,11 +770,13 @@ async function save(silent){
   if(!cur||saving)return true;
   if(!$('f-street').value.trim()){toast('The street address can’t be empty.');return false;}
   saving=true;setDirty(dirty);
-  let body=readForms(),sha=cur.sha;
+  let body=readForms(),sha=cur.sha;const prevMore=(cur.base.links||{}).more||'';
   try{
     for(let attempt=0;attempt<3;attempt++){
       try{const j=await api('/api/properties/'+cur.slug,{method:'PUT',body:{data:body,sha}});
-        saving=false;setCurrent(cur.slug,j.data,j.sha);fillAll();if(!silent)toast('Saved. Publishing to off-marketfinds.com…');watchLive(j.data.updatedAt);return true;}
+        saving=false;setCurrent(cur.slug,j.data,j.sha);fillAll();if(!silent)toast('Saved. Publishing to off-marketfinds.com…');watchLive(j.data.updatedAt);
+        const nm=(j.data.links||{}).more||'';if(!silent&&nm&&nm!==prevMore&&isShareLink(nm)&&!(j.data.photos||[]).length){toast('Saved. This property has no photos yet, so I’m importing them from your link…');startImport('link',{url:nm,mode:'replace'});}
+        return true;}
       catch(e){if(e.status!==409||!e.body||!e.body.data)throw e;
         // someone else (the photo AI, RentCast fill-in) saved first: keep their changes and yours
         body=merge3(cur.base,body,shape(e.body.data));sha=e.body.sha;}
@@ -892,6 +896,8 @@ const drop=$('drop');
 drop.addEventListener('drop',e=>uploadFiles(e.dataTransfer.files));
 
 /* import from link / AI sort */
+$('more-import').addEventListener('click',()=>{const u=$('more-url').value.trim();if(!isShareLink(u)){toast('Paste a Google Drive, Dropbox, iCloud or Google Photos share link first.');$('more-url').focus();return;}
+  startImport('link',{url:u,mode:W.photos.length?($('imp-add').checked?'add':'replace'):'replace'});});
 $('imp-go').addEventListener('click',()=>{const u=$('imp-url').value.trim();if(!/^https:\/\/\S+$/.test(u)){toast('Paste the full share link, starting with https://');$('imp-url').focus();return;}startImport('link');});
 $('imp-sort').addEventListener('click',()=>{if(!W.photos.length){toast('There are no photos to sort yet.');return;}startImport('sort');});
 $('imp-modernall').addEventListener('click',()=>{if(!W.photos.length){toast('There are no photos yet.');return;}if(W.photos.every(p=>p.modern&&p.modern.src)){toast('Every photo already has a Modern version. Use “Redo Modern with AI” on a photo to replace one.');return;}startModern([],false);});
@@ -900,12 +906,13 @@ async function startModern(ids,redo){
   try{const j=await api('/api/properties/'+cur.slug+'/modern',{method:'POST',body:{ids,redo}});watchImport({queued:j.queued,import:null});}
   catch(e){if(e.code!=='login')toast(e.message);}
 }
+function isShareLink(u){return /^https:\/\/(drive\.google\.com|www\.dropbox\.com|dropbox\.com|www\.icloud\.com|icloud\.com|share\.icloud\.com|photos\.app\.goo\.gl|photos\.google\.com)\//i.test(u||'');}
 async function startImport(kind,extra){
   if(dirty&&!(await save(true)))return;
   try{
-    const body=kind==='sort'?Object.assign({ai:true,modern:false},extra||{}):{url:$('imp-url').value.trim(),mode:$('imp-add').checked?'add':'replace',ai:$('imp-ai').checked,setMore:$('imp-more').checked,modern:$('imp-modern').checked};
+    const body=kind==='sort'?Object.assign({ai:true,modern:false},extra||{}):{url:(extra&&extra.url)||$('imp-url').value.trim(),mode:extra&&extra.mode||($('imp-add').checked?'add':'replace'),ai:$('imp-ai').checked,setMore:extra&&extra.url?false:$('imp-more').checked,modern:$('imp-modern').checked};
     const j=await api('/api/properties/'+cur.slug+'/'+(kind==='sort'?'sort':'import'),{method:'POST',body});
-    if(kind!=='sort')$('imp-url').value='';
+    if(kind!=='sort'&&!(extra&&extra.url))$('imp-url').value='';
     watchImport({queued:j.queued,import:null});
   }catch(e){if(e.code!=='login')toast(e.message);}
 }
