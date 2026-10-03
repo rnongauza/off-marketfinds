@@ -5,20 +5,22 @@
   "createdAt": 1791056151488,
   "updatedAt": 1791056151488,
   "createdVia": "admin",
-  "needsEnrich": true,
   "property": {
     "street": "2635 Kavanagh Rd",
     "cityLine": "San Pablo, CA 94806",
     "price": 439610,
-    "arv": 0,
-    "beds": "",
-    "baths": "",
-    "sqft": 0,
-    "lot": "",
-    "yearBuilt": "",
+    "arv": 656000,
+    "beds": 3,
+    "baths": 2,
+    "sqft": 1188,
+    "lot": 10269,
+    "yearBuilt": "1963",
     "propertyType": "Single Family",
     "occupancy": "",
-    "overview": []
+    "overview": [
+      "A single-family home, 3 bedrooms, 2 baths, 1,188 sq ft, built in 1963.",
+      "Contact Robert for access, disclosures and the full investor package."
+    ]
   },
   "photos": [],
   "calc": {},
@@ -26,5 +28,65 @@
     "more": "",
     "moreShort": "",
     "showMore": true
+  },
+  "market": {
+    "source": "RentCast",
+    "asOf": "2026-10-03T19:36:06.499805+00:00",
+    "value": 656000,
+    "low": 605000,
+    "high": 708000,
+    "rent": 3310,
+    "rentLow": 3110,
+    "rentHigh": 3510,
+    "comps": [
+      {
+        "address": "2860 Sargent Ave, San Pablo, CA 94806",
+        "price": 629000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1187,
+        "yearBuilt": 1963,
+        "type": "Single Family",
+        "distance": 0.0771,
+        "status": "Active listing",
+        "date": "2026-04-08T00:00:00.000Z"
+      },
+      {
+        "address": "2908 Sargent Ave, San Pablo, CA 94806",
+        "price": 739990,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1188,
+        "yearBuilt": 1962,
+        "type": "Single Family",
+        "distance": 0.1167,
+        "status": "Active listing",
+        "date": "2026-08-06T00:00:00.000Z"
+      },
+      {
+        "address": "2645 Odonnell Dr, San Pablo, CA 94806",
+        "price": 499999,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1188,
+        "yearBuilt": 1963,
+        "type": "Single Family",
+        "distance": 0.3429,
+        "status": "Off market",
+        "date": "2026-09-06T00:00:00.000Z"
+      },
+      {
+        "address": "2634 Kenney Dr, San Pablo, CA 94806",
+        "price": 650000,
+        "beds": 3,
+        "baths": 2,
+        "sqft": 1188,
+        "yearBuilt": 1964,
+        "type": "Single Family",
+        "distance": 0.4084,
+        "status": "Off market",
+        "date": "2026-09-19T00:00:00.000Z"
+      }
+    ]
   }
 }
