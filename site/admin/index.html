@@ -626,7 +626,7 @@ function fillAll(){
   const ov=P.overview||[];$('f-ov1').value=ov[0]||'';$('f-ov2').value=ov[1]||'';
   const of=P.offer||{};$('f-deadline').value=of.deadline||'';$('f-access').value=of.access||'';$('f-closing').value=of.closing||'';
   const dd=P.deal||{};$('f-emd').value=dd.emd||'';$('f-dclosing').value=dd.closing||'';$('f-openHouse').value=dd.openHouse||'';
-  const c=d.calc||{};const defs={light:40,moderate:65,closingPct:2,months:3,holdingMonthly:2200,sellerClosingPct:1,targetPct:12};
+  const c=d.calc||{};const defs={light:40,moderate:65,closingPct:2,months:3,holdingMonthly:2200,sellerClosingPct:1,targetPct:10};
   CF.forEach(k=>$('c-'+k).value=c[k]??defs[k]);
   $('listed').checked=W.listed;
   $('more-url').value=W.links.more||'';$('more-show').checked=!!W.links.showMore;showMoreShort();

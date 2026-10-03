@@ -18,7 +18,7 @@ OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve
 SITE_URL = os.environ.get("SITE_URL", "https://off-marketfinds.com").rstrip("/")
 
 DEFAULT_CALC = {"level": "moderate", "light": 40, "moderate": 65, "closingPct": 2, "months": 3,
-                "holdingMonthly": 2200, "sellerClosingPct": 1, "targetPct": 12, "loanPct": 80,
+                "holdingMonthly": 2200, "sellerClosingPct": 1, "targetPct": 10, "loanPct": 80,
                 "ratePct": 10, "pointsPct": 2}
 DEFAULT_PROPERTY = {"eyebrow": "Investor opportunity", "headline": "OFF-MARKET OPPORTUNITY",
                     "propertyType": "Single Family", "overview": [],
