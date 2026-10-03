@@ -754,10 +754,17 @@ function photoCard(ph,i){
   const two=document.createElement('div');two.className='two';two.append(f1,f2);el.appendChild(two);
   if(i===0){const ff=document.createElement('div');ff.className='fld';
     const fl=document.createElement('label');fl.htmlFor='focus-0';fl.textContent='Cover framing: slide until the whole front of the house shows';
-    const rg=document.createElement('input');rg.type='range';rg.id='focus-0';rg.min=0;rg.max=100;rg.step=1;rg.value=ph.focus??50;
+    const rg=document.createElement('input');rg.type='range';rg.id='focus-0';rg.min=0;rg.max=100;rg.step=1;rg.value=ph.focus??40;
     const ends=document.createElement('div');ends.className='range-ends';ends.innerHTML='<span>Show top</span><span>Show bottom</span>';
     rg.addEventListener('input',()=>{ph.focus=+rg.value;im.style.objectPosition='50% '+rg.value+'%';setDirty(true);});
-    ff.append(fl,rg,ends);el.appendChild(ff);}
+    ff.append(fl,rg,ends);el.appendChild(ff);
+    const zf=document.createElement('div');zf.className='fld';
+    const zl=document.createElement('label');zl.htmlFor='zoom-0';zl.textContent='Cover zoom on the public page';
+    const zr=document.createElement('input');zr.type='range';zr.id='zoom-0';zr.min=0;zr.max=100;zr.step=5;zr.value=ph.zoom??100;
+    if(ph.zoom==null)im.addEventListener('load',()=>{if(ph.zoom==null)zr.value=im.naturalHeight>im.naturalWidth*1.1?60:100;});
+    const ze=document.createElement('div');ze.className='range-ends';ze.innerHTML='<span>Zoomed in</span><span>Whole photo</span>';
+    zr.addEventListener('input',()=>{ph.zoom=+zr.value;setDirty(true);});
+    zf.append(zl,zr,ze);el.appendChild(zf);}
   const acts=document.createElement('div');acts.className='row-actions';
   const fb=document.createElement('span');fb.className='btn ghost small file-btn';fb.textContent=has('modern')?'Replace Modern version':'Add Modern version';
   const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('aria-label',fb.textContent+' for photo '+(i+1));

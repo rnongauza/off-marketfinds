@@ -74,8 +74,9 @@ def build_property(d, contact, tpl):
     photos = []
     for i, ph in enumerate(d.get("photos") or []):
         o = {"id": ph.get("id") or f"p{i+1}", "caption": ph.get("caption") or ""}
-        if isinstance(ph.get("focus"), (int, float)):
-            o["focus"] = max(0, min(100, ph["focus"]))
+        for k in ("focus", "zoom"):
+            if isinstance(ph.get(k), (int, float)):
+                o[k] = max(0, min(100, ph[k]))
         for k in ("original", "modern"):
             v = photo_src(slug, ph.get(k))
             if v: o[k] = v

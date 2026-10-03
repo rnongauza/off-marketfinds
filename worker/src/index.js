@@ -241,6 +241,7 @@ function cleanProperty(input, current) {
       ...(p.modern && p.modern.src ? { modern: { src: String(p.modern.src) } } : {}),
       ...(p.ai ? { ai: p.ai } : {}),
       ...(Number.isFinite(+p.focus) && p.focus !== "" && p.focus != null ? { focus: Math.max(0, Math.min(100, Math.round(+p.focus))) } : {}),
+      ...(Number.isFinite(+p.zoom) && p.zoom !== "" && p.zoom != null ? { zoom: Math.max(0, Math.min(100, Math.round(+p.zoom))) } : {}),
     }));
   }
   if (input.calc && typeof input.calc === "object") d.calc = input.calc;

@@ -272,7 +272,9 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 @media (max-width:380px){.seg button{padding:9px 9px;font-size:13px}}
 
 /* hero photo wrapper: its own uncovered panel beside the text on desktop, below it on phones */
-.hero-photo{position:absolute;inset:0;z-index:0}
+.hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden}
+.hero-blur{position:absolute;inset:-40px;background:#123 center/cover no-repeat;filter:blur(26px) brightness(.62) saturate(1.1)}
+.hero-photo.fit img.bg{object-fit:fill}
 @media (min-width:701px){
   /* one frame: the photo sits behind the text and is tall enough to show the whole front of the house */
   .hero{grid-template-rows:auto auto auto;min-height:0}
@@ -302,7 +304,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 
 <main id="top">
   <section class="hero" aria-labelledby="h-headline">
-    <div class="hero-photo">
+    <div class="hero-photo"><div class="hero-blur" id="hero-blur" aria-hidden="true"></div>
       <img class="bg" id="hero-original" alt="">
       <img class="bg on" id="hero-modern" alt="">
     </div>
@@ -602,6 +604,25 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
     tag.hidden=(k==='original');tag.textContent='AI design concept · Modern';mark(hs,k);};
   const hs=seg(set,k=>!!imgs[k]);hs.setAttribute('aria-label','Primary photo style');
   $('hero-seg').replaceWith(hs);set(start);
+  /* zoom: 100 shows the whole photo, 0 fills the frame edge to edge; blurred copy fills any space left over */
+  const box=document.querySelector('.hero-photo'),blur=$('hero-blur'),F=(c.focus??40)/100;
+  box.classList.add('fit');
+  function layout(){
+    const W=box.clientWidth,H=box.clientHeight,wide=matchMedia('(min-width:701px)').matches;if(!W||!H)return;
+    const first=Object.values(imgs).find(e=>e.naturalWidth);
+    if(!wide&&first){box.style.aspectRatio=String(Math.max(.8,Math.min(1.6,first.naturalWidth/first.naturalHeight)));}else box.style.aspectRatio='';
+    const Wd=box.clientWidth,Hd=box.clientHeight;
+    Object.values(imgs).forEach(el=>{const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h)return;
+      const W=Wd,H=Hd,Z=Math.max(0,Math.min(100,c.zoom??(h>w*1.1?60:100)))/100;
+      const cover=Math.max(W/w,H/h),contain=Math.min(W/w,H/h),sc=wide?cover+(contain-cover)*Z:Math.max(W/w,cover+(contain-cover)*Z),rw=w*sc,rh=h*sc;
+      const x=rw>=W?(W-rw)/2:(wide?W-rw:(W-rw)/2), y=rh>=H?-(rh-H)*F:(H-rh)/2;
+      Object.assign(el.style,{width:rw+'px',height:rh+'px',left:x+'px',top:y+'px',right:'auto',bottom:'auto',objectPosition:'50% 50%'});
+      el.style.webkitMaskImage=el.style.maskImage=(rw<W-2&&wide)?'linear-gradient(90deg,transparent 0,#000 12%)':'none';});
+    const on=Object.values(imgs).find(e=>e.classList.contains('on'))||Object.values(imgs)[0];
+    if(on)blur.style.backgroundImage='url("'+on.src+'")';
+  }
+  Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
+  addEventListener('resize',layout);hs.addEventListener('click',()=>setTimeout(layout));layout();
 })();
 
 /* analyzer */
