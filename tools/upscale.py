@@ -14,6 +14,7 @@ from PIL import Image, ImageOps
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 MIN_WIDTH = 1800      # wide enough for a full-width cover on most screens
 MAX_SIDE = 3200       # keep files a sensible size
+MAX_IN_PIXELS = 1_440_000  # Real-ESRGAN on Replicate fails on larger inputs
 
 
 def run(token, model, jpg):
@@ -68,7 +69,11 @@ def main():
             im = ImageOps.exif_transpose(Image.open(pdir / src)).convert("RGB")
             if im.width >= MIN_WIDTH:
                 continue
-            buf = io.BytesIO(); im.save(buf, "JPEG", quality=95)
+            src_im = im
+            if im.width * im.height > MAX_IN_PIXELS:  # the upscaler has an input size limit
+                f = (MAX_IN_PIXELS / (im.width * im.height)) ** 0.5
+                src_im = im.resize((int(im.width * f), int(im.height * f)), Image.LANCZOS)
+            buf = io.BytesIO(); src_im.save(buf, "JPEG", quality=95)
             try:
                 big = ImageOps.exif_transpose(Image.open(io.BytesIO(run(token, model, buf.getvalue())))).convert("RGB")
             except Exception as e:
