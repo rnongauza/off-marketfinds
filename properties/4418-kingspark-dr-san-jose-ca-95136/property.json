@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790967674946,
+  "updatedAt": 1790988614250,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -22,7 +22,7 @@
       "A-rated School District: East Side Union High School District.\n\nHardwood floors\n\nFireplace"
     ],
     "eyebrow": "Off-Market Investment Deal",
-    "headline": "You need to jump on this",
+    "headline": "",
     "offer": {
       "deadline": "Contact Robert",
       "access": "Contact Robert",
@@ -44,8 +44,7 @@
       },
       "modern": {
         "src": "img/ph42218ab4fa-modern-7415be4a.jpg"
-      },
-      "focus": 36
+      }
     },
     {
       "id": "ph34163247f9",
