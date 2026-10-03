@@ -33,10 +33,10 @@
       "id": "p1",
       "caption": "Driveway and garage",
       "original": {
-        "src": "img/p1-original.jpg"
+        "src": "img/p1-original-hd-e2aebe3e.jpg"
       },
       "modern": {
-        "src": "img/p1-concept.jpg"
+        "src": "img/p1-modern-hd-48740ad9.jpg"
       },
       "room": "exterior_other"
     },
@@ -176,5 +176,6 @@
         "date": "2026-06-19T00:00:00.000Z"
       }
     ]
-  }
+  },
+  "updatedAt": 1791003160205
 }
