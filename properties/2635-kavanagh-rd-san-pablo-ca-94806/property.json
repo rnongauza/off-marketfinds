@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": true,
   "createdAt": 1791056151488,
-  "updatedAt": 1791057284486,
+  "updatedAt": 1791057321715,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -37,104 +37,114 @@
   },
   "photos": [
     {
-      "id": "ph95b09287e7",
+      "id": "ph9c710c094f",
       "original": {
-        "src": "img/ph95b09287e7-original-hd-2507a8c3.jpg"
+        "src": "img/9c710c094f.jpg"
       },
-      "caption": "",
+      "caption": "Front of house",
       "modern": {
-        "src": "img/ph95b09287e7-modern-hd-9061efeb.jpg"
-      }
-    },
-    {
-      "id": "ph0836517214",
-      "original": {
-        "src": "img/0836517214.jpg"
+        "src": "img/ph9c710c094f-modern-c1f8f44d.jpg"
       },
-      "caption": "",
-      "modern": {
-        "src": "img/ph0836517214-modern-49279797.jpg"
-      }
-    },
-    {
-      "id": "ph1a9b2e2243",
-      "original": {
-        "src": "img/1a9b2e2243.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/ph1a9b2e2243-modern-9f5f9dec.jpg"
-      }
-    },
-    {
-      "id": "ph94f6000415",
-      "original": {
-        "src": "img/94f6000415.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/ph94f6000415-modern-e9b621de.jpg"
-      }
-    },
-    {
-      "id": "pha9de6dba91",
-      "original": {
-        "src": "img/a9de6dba91.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/pha9de6dba91-modern-cac010f8.jpg"
-      }
+      "room": "exterior_front"
     },
     {
       "id": "ph3e9f456622",
       "original": {
         "src": "img/3e9f456622.jpg"
       },
-      "caption": "",
+      "caption": "Living room",
       "modern": {
         "src": "img/ph3e9f456622-modern-fc3b11ff.jpg"
-      }
+      },
+      "room": "living"
+    },
+    {
+      "id": "ph94f6000415",
+      "original": {
+        "src": "img/94f6000415.jpg"
+      },
+      "caption": "Dining and kitchen",
+      "modern": {
+        "src": "img/ph94f6000415-modern-e9b621de.jpg"
+      },
+      "room": "dining"
     },
     {
       "id": "ph91628d373b",
       "original": {
         "src": "img/91628d373b.jpg"
       },
-      "caption": "",
+      "caption": "Bathroom",
       "modern": {
         "src": "img/ph91628d373b-modern-0cb4dd77.jpg"
-      }
+      },
+      "room": "bathroom"
     },
     {
-      "id": "ph2ebb2b7632",
+      "id": "ph0836517214",
       "original": {
-        "src": "img/2ebb2b7632.jpg"
+        "src": "img/0836517214.jpg"
       },
-      "caption": "",
+      "caption": "Bedroom",
       "modern": {
-        "src": "img/ph2ebb2b7632-modern-d373ae54.jpg"
-      }
+        "src": "img/ph0836517214-modern-49279797.jpg"
+      },
+      "room": "bedroom"
+    },
+    {
+      "id": "ph1a9b2e2243",
+      "original": {
+        "src": "img/1a9b2e2243.jpg"
+      },
+      "caption": "Bedroom",
+      "modern": {
+        "src": "img/ph1a9b2e2243-modern-9f5f9dec.jpg"
+      },
+      "room": "bedroom"
     },
     {
       "id": "ph052883f26c",
       "original": {
         "src": "img/052883f26c.jpg"
       },
-      "caption": "",
+      "caption": "Garage",
       "modern": {
         "src": "img/ph052883f26c-modern-14b2cf56.jpg"
-      }
+      },
+      "room": "garage"
     },
     {
-      "id": "ph9c710c094f",
+      "id": "ph2ebb2b7632",
       "original": {
-        "src": "img/9c710c094f.jpg"
+        "src": "img/2ebb2b7632.jpg"
       },
-      "caption": "",
+      "caption": "Covered patio",
       "modern": {
-        "src": "img/ph9c710c094f-modern-c1f8f44d.jpg"
-      }
+        "src": "img/ph2ebb2b7632-modern-d373ae54.jpg"
+      },
+      "room": "backyard"
+    },
+    {
+      "id": "ph95b09287e7",
+      "original": {
+        "src": "img/ph95b09287e7-original-hd-2507a8c3.jpg"
+      },
+      "caption": "Den / office",
+      "modern": {
+        "src": "img/ph95b09287e7-modern-hd-9061efeb.jpg"
+      },
+      "room": "office"
+    },
+    {
+      "id": "pha9de6dba91",
+      "original": {
+        "src": "img/a9de6dba91.jpg"
+      },
+      "caption": "Hallway",
+      "modern": {
+        "src": "img/pha9de6dba91-modern-cac010f8.jpg"
+      },
+      "room": "hallway"
     }
   ],
   "calc": {
