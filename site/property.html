@@ -271,27 +271,27 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 }
 @media (max-width:380px){.seg button{padding:9px 9px;font-size:13px}}
 
-/* hero photo wrapper: its own uncovered panel beside the text on desktop, below it on phones */
-.hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden}
-
-@media (min-width:701px){
-  /* one frame: the photo sits behind the text and is tall enough to show the whole front of the house */
-  .hero{grid-template-rows:auto auto auto;min-height:0}
-  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:75vw;width:100%}
-  .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
-  .hero .copy{grid-row:1;grid-column:1;max-width:620px}
-  .hero-style{grid-row:1}
-}
+/* hero: the cover photo is shown uncropped, at its own original shape */
+.hero-photo{position:relative;z-index:0;overflow:hidden;background:#0d2630}
+.hero img.bg{object-fit:contain}
 /* "See what it can become" + Original/Modern sit on the photo's lower-left corner */
-.hero-style{grid-column:1;align-self:end;background:linear-gradient(180deg,rgba(10,30,40,0) 0%,rgba(10,30,40,.55) 55%,rgba(10,30,40,.75) 100%);border-bottom:0;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:8px;padding:48px clamp(20px,4vw,56px) 22px}
+.hero-style{grid-row:1;align-self:end;justify-self:stretch;background:linear-gradient(180deg,rgba(10,30,40,0) 0%,rgba(10,30,40,.55) 55%,rgba(10,30,40,.78) 100%);border-bottom:0;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:8px;padding:48px 20px 18px}
 .hero-style .hero-pick{margin-left:0;justify-content:flex-start}
 .hero-style .hero-cta{text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.hero::before{display:none}
+@media (min-width:701px){
+  /* one dark frame: text on the left, the whole photo on the right */
+  .hero{grid-template-columns:minmax(300px,1fr) auto;grid-template-rows:auto auto;min-height:0}
+  .hero .copy{grid-row:1;grid-column:1;align-self:center}
+  .hero-photo{grid-row:1;grid-column:2;width:var(--cw,60vw);height:var(--ch,45vw)}
+  .hero-style{grid-column:2}
+  .metrics{grid-row:2;grid-column:1/-1}
+}
 @media (max-width:700px){
-  .hero{grid-template-rows:auto auto auto auto;min-height:0}
-  .hero::before{display:none}
+  .hero{grid-template-rows:auto auto auto;min-height:0}
   .hero .copy{grid-row:1;min-height:0;padding-block:32px 28px}
-  .hero-photo{position:relative;inset:auto;grid-row:2;grid-column:1;aspect-ratio:4/3;width:100%}
-  .hero-style{grid-row:2;padding:28px 12px 10px;gap:6px}
+  .hero-photo{grid-row:2;grid-column:1;width:100%;aspect-ratio:var(--ar,4/3)}
+  .hero-style{grid-row:2;grid-column:1;padding:28px 12px 10px;gap:6px}
   .hero-style .hero-tag{font-size:10px;padding-block:0}
   .hero-style .hero-pick{gap:10px}.hero-style .hero-cta{font-size:16px}
   .hero-style .seg button{padding:7px 12px;font-size:13px}
@@ -611,14 +611,14 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
     tag.hidden=(k==='original');tag.textContent='AI design concept · Modern';mark(hs,k);};
   const hs=seg(set,k=>!!imgs[k]);hs.setAttribute('aria-label','Primary photo style');
   $('hero-seg').replaceWith(hs);set(start);
-  /* the cover always fills the whole frame; the frame is tall so the whole front shows. On phones the frame follows the photo's shape */
-  const box=document.querySelector('.hero-photo'),pos='50% '+(c.focus??50)+'%';
-  Object.values(imgs).forEach(el=>el.style.objectPosition=pos);
-  function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);
-    const wide=matchMedia('(min-width:701px)').matches;
-    box.style.aspectRatio=(!wide&&first)?String(Math.max(4/3,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
-    /* desktop: tall frame (62% of the width) but never taller than the photo itself, so wide photos show top to bottom */
-    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.75,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
+  /* the cover is never cropped: the frame takes the photo's own width-to-height shape */
+  const box=document.querySelector('.hero-photo'),hero=document.querySelector('.hero');
+  function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);if(!first)return;
+    const ar=first.naturalWidth/first.naturalHeight;box.style.setProperty('--ar',String(ar));
+    const W=hero.clientWidth,avail=Math.max(320,W-Math.min(560,Math.max(300,W*.36)));
+    const maxH=Math.max(420,Math.min(innerHeight-90,900));
+    let h=Math.min(maxH,avail/ar),w=h*ar;
+    box.style.setProperty('--cw',Math.round(w)+'px');box.style.setProperty('--ch',Math.round(h)+'px');}
   Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
   addEventListener('resize',layout);layout();
 })();
