@@ -505,7 +505,7 @@ const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&
 async function handleLead(req, env, ctx) {
   const body = await req.json().catch(() => ({}));
   // bots fill the hidden "website" field or submit instantly
-  if (clip(body.website, 200) || (Number(body.elapsed) >= 0 && Number(body.elapsed) < 2500)) return json({ ok: true });
+  if (clip(body.website, 200) || (Number(body.elapsed) >= 0 && Number(body.elapsed) < 1500)) return json({ ok: true });
   const ip = req.headers.get("cf-connecting-ip") || "?";
   const rk = "leadrate:" + ip;
   const n = parseInt(await env.STATE.get(rk) || "0", 10);

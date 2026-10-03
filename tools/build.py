@@ -77,7 +77,7 @@ def photo_src(pub, v):
     return {"src": f"/{pub}/{s}"}
 
 
-def build_property(d, contact, tpl):
+def build_property(d, contact, tpl, api=""):
     slug = d["slug"]
     pub = public_dir(slug, d)
     P = dict(DEFAULT_PROPERTY)
@@ -118,7 +118,9 @@ def build_property(d, contact, tpl):
         P["street"] = ""
     P.pop("hideStreet", None)
     data = {"property": P, "photos": photos, "calc": calc, "contact": contact,
-            "market": d.get("market") or None, "links": links}
+            "market": d.get("market") or None, "links": links,
+            # lead forms post here; ref is neutral so hidden-address pages don't leak the street
+            "lead": {"api": api.rstrip("/"), "ref": neutral_code(slug)} if api else None}
 
     city = P.get("cityLine") or ""
     street = HIDDEN_STREET if hide else (P.get("street") or "Off-market property")
@@ -176,7 +178,7 @@ def main():
     cards = []
     props = load_properties()
     for d in props:
-        c = build_property(d, contact, tpl)
+        c = build_property(d, contact, tpl, api)
         if d.get("listed", True):
             cards.append(c)
     cards.sort(key=lambda c: -(c.pop("createdAt") or 0))

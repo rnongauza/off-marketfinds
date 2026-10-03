@@ -302,6 +302,37 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   .hero-style .seg button{padding:7px 12px;font-size:13px}
   .metrics{grid-row:3}
 }
+
+/* buyer requests */
+.req .btn.line{background:transparent}
+dialog.lead{border:0;padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--paper);color:var(--ink);box-shadow:0 24px 60px rgba(10,30,40,.35)}
+dialog.lead::backdrop{background:rgba(10,30,40,.55)}
+.lead-hd{background:var(--navy);color:#fff;padding:22px 24px 20px;display:flex;gap:12px;align-items:flex-start}
+.lead-hd h2{font-size:26px;line-height:1.15;color:#fff}
+.lead-hd .eyebrow{color:var(--sky);margin-bottom:8px}
+.lead-hd button{margin-left:auto;border:0;background:transparent;color:#fff;font-size:26px;line-height:1;cursor:pointer;padding:0 0 0 8px}
+.lead form{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px;padding:22px 24px 24px}
+.lead .f{display:grid;gap:6px}
+.lead .f.full{grid-column:1/-1}
+.lead label{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#555}
+.lead input,.lead select,.lead textarea{width:100%;border:1px solid var(--line);background:#fff;padding:11px 12px;font:inherit;font-size:16px;color:var(--ink);border-radius:0}
+.lead textarea{min-height:88px;resize:vertical}
+.lead input:focus,.lead select:focus,.lead textarea:focus{outline:2px solid var(--blue);outline-offset:-1px;border-color:var(--blue)}
+.lead .hint{font-size:12.5px;color:var(--muted);line-height:1.45}
+.lead .trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.lead .actions{grid-column:1/-1;display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.lead .err{grid-column:1/-1;color:#a3311f;font-size:14px}
+.lead .done{padding:28px 24px 30px;display:grid;gap:12px}
+.lead .done p{font-family:var(--serif);font-size:19px}
+@media (max-width:560px){.lead form{grid-template-columns:1fr}.lead-hd h2{font-size:22px}}
+/* phone action bar */
+.mbar{display:none}
+@media (max-width:700px){
+  .mbar{display:grid;grid-template-columns:1fr 1.4fr;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--navy);padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));gap:8px;box-shadow:0 -6px 18px rgba(0,0,0,.18)}
+  .mbar a,.mbar button{display:flex;align-items:center;justify-content:center;min-height:46px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+  .mbar button{background:var(--blue);border-color:var(--blue)}
+  body.has-mbar{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
@@ -474,13 +505,34 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
         <div class="step"><span>Closing requirements</span><p id="o-closing"></p></div>
       </div>
       <div class="req">
-        <a class="btn" id="req-btn">Request complete package</a>
+        <a class="btn" id="req-btn" data-lead="package">Request complete package</a>
+        <button class="btn line" type="button" data-lead="showing" hidden>Request a showing</button>
+        <button class="btn line" type="button" data-lead="offer" hidden>I'm interested / make an offer</button>
         <button class="btn line" type="button" id="copy-email">Copy email</button>
       </div>
       <p class="copyline" style="margin-top:12px">Email <b id="o-email"></b> · Call <b id="o-phone"></b></p>
     </div>
   </div></section>
 </main>
+
+<div class="mbar" id="mbar" hidden><a id="mbar-call">Call Robert</a><button type="button" data-lead="showing">Request a showing</button></div>
+
+<dialog class="lead" id="lead" aria-labelledby="lead-title">
+  <div class="lead-hd"><div><div class="eyebrow" id="lead-eyebrow"></div><h2 id="lead-title"></h2></div><button type="button" id="lead-x" aria-label="Close">&times;</button></div>
+  <form id="lead-form" novalidate>
+    <div class="f"><label for="ld-name">Name</label><input id="ld-name" name="name" autocomplete="name" required maxlength="80"></div>
+    <div class="f"><label for="ld-role">I am a</label><select id="ld-role" name="role"><option value="">Choose one</option><option>Cash buyer / investor</option><option>Agent representing a buyer</option><option>Wholesaler</option><option>Lender</option><option>Other</option></select></div>
+    <div class="f"><label for="ld-email">Email</label><input id="ld-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="120"></div>
+    <div class="f"><label for="ld-phone">Phone</label><input id="ld-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="30"></div>
+    <div class="f full" data-for="showing"><label for="ld-when">Days and times that work for you</label><input id="ld-when" name="when" maxlength="160" placeholder="e.g. Tue or Wed after 3pm"></div>
+    <div class="f full" data-for="offer"><label for="ld-offer">Offer amount (optional)</label><input id="ld-offer" name="offer" inputmode="decimal" maxlength="40" placeholder="$"><span class="hint">Non-binding. This is not an offer to purchase or a contract; Robert will follow up with the proper paperwork.</span></div>
+    <div class="f full"><label for="ld-msg">Message (optional)</label><textarea id="ld-msg" name="message" maxlength="1500"></textarea></div>
+    <div class="trap" aria-hidden="true"><label for="ld-website">Website</label><input id="ld-website" name="website" tabindex="-1" autocomplete="off"></div>
+    <p class="err" id="lead-err" role="alert" hidden></p>
+    <div class="actions"><button class="btn" type="submit" id="lead-send">Send request</button><span class="hint">Robert usually replies the same day. Email or phone required.</span></div>
+  </form>
+  <div class="done" id="lead-done" hidden><p>Thanks — Robert has your request and will be in touch soon.</p><span class="hint">Need him now? Call or text <a id="lead-call"></a>.</span><div><button class="btn line" type="button" id="lead-close">Close</button></div></div>
+</dialog>
 
 <footer><div class="wrap">
   <a class="logo" href="#top" aria-label="Back to top">
@@ -690,6 +742,54 @@ function render(){
   }
 }
 render();
+})();
+</script>
+
+<script>
+/* buyer requests: package / showing / offer -> bot /lead (saved, emailed and texted to Robert) */
+(function(){
+const D=JSON.parse(document.getElementById('site-data').textContent);
+const L=D.lead, C=D.contact||{}, P=D.property||{};
+const $=id=>document.getElementById(id);
+const tel=(C.phone||'').replace(/[^\d+]/g,'');
+const TITLES={package:['Full details','Request the complete package'],showing:['See it in person','Request a showing'],offer:['Next step',"I'm interested / make an offer"]};
+if(tel){$('mbar-call').href='tel:'+tel;$('lead-call').href='tel:'+tel;$('lead-call').textContent=C.phone;}
+if(!L||!L.api||typeof HTMLDialogElement!=='function')return; // keep the email link as the fallback
+document.querySelectorAll('[data-lead][hidden]').forEach(b=>b.hidden=false);
+$('mbar').hidden=false;document.body.classList.add('has-mbar');
+const dlg=$('lead'), form=$('lead-form');let type='package', opened=0;
+function open(t){
+  type=TITLES[t]?t:'package';opened=Date.now();
+  $('lead-eyebrow').textContent=TITLES[type][0];$('lead-title').textContent=TITLES[type][1];
+  form.querySelectorAll('[data-for]').forEach(el=>el.hidden=el.dataset.for!==type);
+  $('lead-err').hidden=true;form.hidden=false;$('lead-done').hidden=true;$('lead-send').disabled=false;$('lead-send').textContent='Send request';
+  dlg.showModal();setTimeout(()=>$('ld-name').focus(),30);
+}
+document.querySelectorAll('[data-lead]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();open(b.dataset.lead);}));
+const close=()=>dlg.close();
+$('lead-x').addEventListener('click',close);$('lead-close').addEventListener('click',close);
+dlg.addEventListener('click',e=>{if(e.target===dlg)close();});
+const bad=m=>{$('lead-err').textContent=m;$('lead-err').hidden=false;};
+form.addEventListener('submit',async e=>{
+  e.preventDefault();$('lead-err').hidden=true;
+  const v=n=>(form.elements[n]&&form.elements[n].value||'').trim();
+  if(!v('name'))return bad('Please add your name.'),$('ld-name').focus();
+  if(v('email')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('email')))return bad("That email doesn't look right."),$('ld-email').focus();
+  if(!v('email')&&v('phone').replace(/\D/g,'').length<10)return bad('Add an email or phone number so Robert can reach you.'),$('ld-email').focus();
+  const body={ref:L.ref,type,name:v('name'),email:v('email'),phone:v('phone'),role:v('role'),message:v('message'),website:v('website'),
+    when:type==='showing'?v('when'):'',offer:type==='offer'?v('offer'):'',page:location.origin+location.pathname,elapsed:Date.now()-opened};
+  $('lead-send').disabled=true;$('lead-send').textContent='Sending…';
+  try{
+    const r=await fetch(L.api+'/lead',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.message||'');
+    form.hidden=true;$('lead-done').hidden=false;$('lead-close').focus();
+    ['message','when','offer'].forEach(n=>form.elements[n].value='');
+  }catch(err){
+    $('lead-send').disabled=false;$('lead-send').textContent='Send request';
+    bad((err.message||"That didn't go through.")+(C.phone?' You can also call or text Robert at '+C.phone+'.':''));
+  }
+});
 })();
 </script>
 </body>

@@ -331,6 +331,25 @@ a.logo{text-decoration:none}
 .crop-h.ne{right:-9px;top:-9px;cursor:nesw-resize}.crop-h.sw{left:-9px;bottom:-9px;cursor:nesw-resize}
 .adj-row{display:grid;grid-template-columns:1fr auto;gap:6px}
 #move-text{width:auto;justify-self:start}
+/* leads */
+.pill{display:inline-block;min-width:18px;padding:0 6px;border-radius:9px;background:#c2410c;color:#fff;font-size:11px;line-height:18px;text-align:center;margin-left:4px}
+.leadfilter{display:inline-flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.leadfilter button{border:0;background:transparent;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px}
+.leadfilter button[aria-checked="true"]{background:var(--ink);color:var(--paper)}
+.leadcard{display:grid;grid-template-columns:1fr auto;gap:6px 16px;margin-bottom:12px}
+.leadcard h3{margin:0;font-size:16px}
+.leadcard .meta{font-size:12.5px;color:var(--muted)}
+.leadcard dl{grid-column:1/-1;display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:6px 0 0;font-size:14px}
+.leadcard dt{color:var(--muted)}
+.leadcard dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.leadcard .ctl{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.leadcard .ctl select{width:auto}
+.leadcard .ctl input{flex:1;min-width:180px}
+.leadcard.closed{opacity:.6}
+#lead-setup{margin-bottom:14px}
+.lstat{align-self:start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:var(--mist);border:1px solid var(--line)}
+.lstat.new{background:#c2410c;border-color:#c2410c;color:#fff}
+.leadcard .ctl select{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px;padding:6px 8px;font-size:13px}
 </style>
 
 </head>
@@ -339,7 +358,7 @@ a.logo{text-decoration:none}
 <header class="site"><div class="wrap">
   <a class="logo" href="#" aria-label="All properties"><svg viewBox="0 0 34 14" aria-hidden="true"><path d="M3 8 17 1l14 7" fill="none" stroke="#2785b8" stroke-width="2.2"/><rect x="14" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="14" y="10.4" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="10.4" width="2.4" height="2.4" fill="#2785b8"/></svg><span class="nm">Nongauza</span><span class="gp">REAL ESTATE GROUP</span><span class="by">By Kendrick Realty Inc.</span></a>
   <span class="badge-admin">Admin</span>
-  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#links" id="nav-links">Short links</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
+  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#leads" id="nav-leads">Leads <span id="nav-leads-n" class="pill" hidden></span></a><a href="#links" id="nav-links">Short links</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
 </div></header>
 
 <main class="wrap" id="main">
@@ -373,6 +392,14 @@ a.logo{text-decoration:none}
         <div class="fld psearch"><label for="p-search" class="sr">Search properties</label><input type="search" id="p-search" placeholder="Search by address or short link"></div></div>
       <div id="plist"><p class="status">Loading…</p></div>
     </section>
+  </section>
+
+  <!-- leads -->
+  <section id="v-leads" hidden>
+    <div class="page-head"><div><div class="eyebrow">Buyer requests</div><h1>Leads</h1><p>Package, showing and offer requests from the property pages. Each one is also emailed to you.</p></div></div>
+    <p class="panel status" id="lead-setup" hidden></p>
+    <div class="leadfilter" role="radiogroup" aria-label="Show"><button type="button" data-f="open" aria-checked="true" role="radio">Open</button><button type="button" data-f="all" aria-checked="false" role="radio">All</button></div>
+    <div id="lead-rows"><p class="status">Loading…</p></div>
   </section>
 
   <!-- short links -->
@@ -596,10 +623,11 @@ async function api(path,opts={}){
 }
 
 /* ---------------- routing ---------------- */
-function show(view){['v-login','v-list','v-links','v-edit'].forEach(v=>$(v).hidden=(v!==view));
+function show(view){['v-login','v-list','v-links','v-leads','v-edit'].forEach(v=>$(v).hidden=(v!==view));
   $('topnav').hidden=(view==='v-login'); $('savebar').hidden=(view!=='v-edit');
   $('nav-props').toggleAttribute('aria-current',view==='v-list'); if(view==='v-list')$('nav-props').setAttribute('aria-current','page');
   $('nav-links').toggleAttribute('aria-current',view==='v-links'); if(view==='v-links')$('nav-links').setAttribute('aria-current','page');
+  $('nav-leads').toggleAttribute('aria-current',view==='v-leads'); if(view==='v-leads')$('nav-leads').setAttribute('aria-current','page');
   window.scrollTo(0,0);}
 let lastHash=location.hash;
 async function route(){
@@ -607,10 +635,11 @@ async function route(){
   if(location.hash!==lastHash){dirty=false;}
   lastHash=location.hash;
   if(!token){show('v-login');$('setup-note').hidden=!!API;return;}
-  if(!me){try{me=await api('/api/me');}catch(e){if(e.code==='login')return;}}
+  if(!me){try{me=await api('/api/me');}catch(e){if(e.code==='login')return;}refreshLeadBadge();}
   const h=decodeURIComponent(location.hash.replace(/^#\/?/,''));
   stopTimers();
   if(h==='links'){show('v-links');loadLinks();}
+  else if(h==='leads'){show('v-leads');loadLeads();}
   else if(/^[a-z0-9][a-z0-9-]+$/.test(h)){show('v-edit');openProperty(h);}
   else{show('v-list');loadList();}
 }
@@ -685,6 +714,46 @@ $('new-form').addEventListener('submit',async e=>{e.preventDefault();
   catch(err){setStatus($('new-status'),err.message,'err');}});
 
 /* ---------------- short links ---------------- */
+/* ---------------- leads ---------------- */
+const LEAD_KIND={package:'Complete package',showing:'Showing',offer:'Interested / offer'};
+let leadFilter='open', leadsCache=[];
+document.querySelectorAll('.leadfilter button').forEach(b=>b.addEventListener('click',()=>{leadFilter=b.dataset.f;document.querySelectorAll('.leadfilter button').forEach(x=>x.setAttribute('aria-checked',String(x===b)));drawLeads();}));
+function leadBadge(){const n=leadsCache.filter(l=>l.status==='new').length;$('nav-leads-n').textContent=n;$('nav-leads-n').hidden=!n;}
+async function refreshLeadBadge(){try{const j=await api('/api/leads');leadsCache=j.leads||[];leadBadge();}catch(_){}}
+async function loadLeads(){
+  try{const j=await api('/api/leads');leadsCache=j.leads||[];leadBadge();
+    const n=$('lead-setup');n.hidden=!!j.email;n.textContent='Email alerts aren’t on yet: add the RESEND_API_KEY secret in GitHub and run the “Deploy text bot” workflow. Leads still show up here.';
+    drawLeads();}
+  catch(e){if(e.code!=='login')$('lead-rows').innerHTML='<p class="status err"></p>',$('lead-rows').firstChild.textContent=e.message;}
+}
+function drawLeads(){
+  const box=$('lead-rows');box.replaceChildren();
+  const list=leadsCache.filter(l=>leadFilter==='all'||l.status!=='closed');
+  if(!list.length){const p=document.createElement('p');p.className='status';p.textContent=leadFilter==='all'?'No requests yet. They appear here as soon as a buyer sends one.':'No open requests.';box.appendChild(p);return;}
+  const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+  list.forEach(l=>{
+    const card=el('div','panel leadcard'+(l.status==='closed'?' closed':''));
+    const left=el('div');const h=el('h3',null,l.name+(l.role?' · '+l.role:''));
+    const meta=el('div','meta',(LEAD_KIND[l.type]||l.type)+' · '+(l.street||'property '+l.ref)+' · '+new Date(l.at).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}));
+    left.append(h,meta);
+    const tag=el('span','lstat'+(l.status==='new'?' new':''),l.status);
+    const dl=el('dl');
+    const row=(k,v,href)=>{if(!v)return;dl.append(el('dt',null,k));const dd=el('dd');if(href){const a=el('a',null,v);a.href=href;dd.append(a);}else dd.textContent=v;dl.append(dd);};
+    row('Email',l.email,l.email?'mailto:'+l.email+'?subject='+encodeURIComponent('Re: '+(l.street||'your request')):'');
+    row('Phone',l.phone,l.phone?'tel:'+l.phone.replace(/[^\d+]/g,''):'');
+    row('Times',l.when);row('Offer',l.offer?l.offer+' (non-binding)':'');row('Message',l.message);row('Page',l.page,l.page);
+    const ctl=el('div','ctl');
+    const sel=el('select');sel.setAttribute('aria-label','Status');['new','contacted','closed'].forEach(s=>{const o=el('option',null,s[0].toUpperCase()+s.slice(1));o.value=s;sel.append(o);});sel.value=l.status;
+    const note=el('input');note.type='text';note.placeholder='Private note';note.value=l.note||'';note.setAttribute('aria-label','Private note');
+    const saveB=el('button','btn small','Save');saveB.type='button';
+    const del=el('button','btn ghost small','Delete');del.type='button';
+    saveB.addEventListener('click',async()=>{saveB.disabled=true;try{const j=await api('/api/leads/'+l.id,{method:'PUT',body:{status:sel.value,note:note.value}});Object.assign(l,j.lead);leadBadge();drawLeads();toast('Saved.');}catch(e){toast(e.message);saveB.disabled=false;}});
+    del.addEventListener('click',async()=>{if(!confirm('Delete this request from '+l.name+'? This can’t be undone.'))return;try{await api('/api/leads/'+l.id,{method:'DELETE'});leadsCache=leadsCache.filter(x=>x.id!==l.id);leadBadge();drawLeads();}catch(e){toast(e.message);}});
+    ctl.append(sel,note,saveB,del);
+    card.append(left,tag,dl,ctl);box.append(card);
+  });
+}
+
 async function loadLinks(){
   const rows=$('link-rows');
   try{
