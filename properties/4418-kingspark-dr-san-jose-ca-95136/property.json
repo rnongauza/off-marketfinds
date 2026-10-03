@@ -3,7 +3,7 @@
   "short": "4418k",
   "listed": true,
   "createdAt": 1790900110922,
-  "updatedAt": 1790990987629,
+  "updatedAt": 1790991095838,
   "createdVia": "admin",
   "property": {
     "street": "4418 Kingspark Dr",
@@ -33,7 +33,7 @@
       "closing": "Confirm with Robert",
       "openHouse": ""
     },
-    "hideStreet": false
+    "hideStreet": true
   },
   "photos": [
     {
