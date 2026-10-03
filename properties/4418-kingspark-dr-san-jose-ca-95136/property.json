@@ -6,7 +6,7 @@
   "updatedAt": 1790990257280,
   "createdVia": "admin",
   "property": {
-    "street": "Undisclosed Address",
+    "street": "4418 Kingspark Dr",
     "cityLine": "San Jose, CA 95136",
     "price": 1047900,
     "arv": 1340000,
@@ -32,7 +32,8 @@
       "emd": "3% of purchase price",
       "closing": "Confirm with Robert",
       "openHouse": ""
-    }
+    },
+    "hideStreet": true
   },
   "photos": [
     {

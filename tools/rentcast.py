@@ -101,6 +101,9 @@ def write_market(site):
         d = json.loads(f.read_text()); P = d.get("property", {}); slug = f.parent.name
         if not P.get("street"):
             continue
+        if P.get("hideStreet"):
+            import hashlib
+            slug = "listing-" + hashlib.sha1(slug.encode()).hexdigest()[:10]
         out = site / slug / "rentcast.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         emb = d.get("market") or {}

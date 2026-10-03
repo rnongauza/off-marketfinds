@@ -11,7 +11,7 @@ Sources (all in this repo):
   site/admin/index.html              owner admin app
   site/config.json                   {"api": "<worker url>"} written by the worker deploy
 """
-import html, json, os, pathlib, shutil, sys
+import hashlib, html, json, os, pathlib, shutil, sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else ROOT / "_site").resolve()
@@ -48,21 +48,38 @@ def load_properties():
     return props
 
 
+HIDDEN_STREET = "Address provided on request"
+
+
+def public_dir(slug, d):
+    """Folder the public page lives in. A property whose street is hidden gets a neutral folder name
+    so the URL doesn't give the address away (the old address URL redirects there)."""
+    if (d.get("property") or {}).get("hideStreet"):
+        return "listing-" + hashlib.sha1(slug.encode()).hexdigest()[:10]
+    return slug
+
+
+def neutral_code(slug, photos=False):
+    """Short code without the house number, used when the street is hidden."""
+    return "h" + hashlib.sha1(slug.encode()).hexdigest()[:6] + ("p" if photos else "")
+
+
 def short_url(code):
     return f"{SITE_URL}/go/{code}" if code else ""
 
 
-def photo_src(slug, v):
+def photo_src(pub, v):
     if not v or not v.get("src"):
         return None
     s = v["src"]
     if s.startswith(("http://", "https://", "/")):
         return {"src": s}
-    return {"src": f"/{slug}/{s}"}
+    return {"src": f"/{pub}/{s}"}
 
 
 def build_property(d, contact, tpl):
     slug = d["slug"]
+    pub = public_dir(slug, d)
     P = dict(DEFAULT_PROPERTY)
     P.update({k: v for k, v in (d.get("property") or {}).items() if not (k in ("eyebrow", "headline", "propertyType") and not v)})
     for k in ("offer", "deal"):
@@ -78,38 +95,46 @@ def build_property(d, contact, tpl):
             if isinstance(ph.get(k), (int, float)):
                 o[k] = max(0, min(100, ph[k]))
         for k in ("original", "modern"):
-            v = photo_src(slug, ph.get(k))
+            v = photo_src(pub, ph.get(k))
             if v: o[k] = v
         if o.get("original") or o.get("modern"):
             photos.append(o)
     calc = dict(DEFAULT_CALC); calc.update({k: v for k, v in (d.get("calc") or {}).items() if k not in ("sellingPct", "listingPct", "buyerBrokerPct")})
     L = d.get("links") or {}
     links = {"more": L.get("more") or "", "showMore": bool(L.get("showMore") and L.get("more")),
-             "moreShortUrl": short_url(L.get("moreShort"))}
+             "moreShortUrl": short_url(neutral_code(slug, True) if (d.get("property") or {}).get("hideStreet") and L.get("moreShort") else L.get("moreShort"))}
+    hide = bool(P.get("hideStreet"))
+    if hide:  # never put the real street in the public page
+        P["street"] = ""
+    P.pop("hideStreet", None)
     data = {"property": P, "photos": photos, "calc": calc, "contact": contact,
             "market": d.get("market") or None, "links": links}
 
-    street = P.get("street") or "Off-market property"
     city = P.get("cityLine") or ""
-    title = street
-    desc = f"Off-market investor opportunity at {street}{', ' + city if city else ''}. See every room as a Modern design concept, RentCast comps, and run your own flip numbers."
+    street = HIDDEN_STREET if hide else (P.get("street") or "Off-market property")
+    title = f"Off-market property in {city}" if hide and city else street
+    desc = f"Off-market investor opportunity {'in ' + city if hide else 'at ' + street + (', ' + city if city else '')}. See every room as a Modern design concept, RentCast comps, and run your own flip numbers."
     cover = photos[0] if photos else None
     og = SITE_URL + (cover.get("modern") or cover.get("original"))["src"] if cover else ""
     page = (tpl.replace("{{TITLE}}", html.escape(title)).replace("{{DESCRIPTION}}", html.escape(desc))
                .replace("{{OG_IMAGE}}", html.escape(og)).replace("/*DATA*/", script_json(data)))
 
-    dest = OUT / slug
+    dest = OUT / pub
     dest.mkdir(parents=True, exist_ok=True)
     (dest / "index.html").write_text(page)
     img = ROOT / "properties" / slug / "img"
     if img.is_dir():
         shutil.copytree(img, dest / "img", dirs_exist_ok=True)
-    (dest / "version.json").write_text(json.dumps({"updatedAt": d.get("updatedAt") or 0,
+    ver = OUT / slug
+    if pub != slug:  # old address URL forwards to the neutral one; version.json stays here for the admin
+        ver.mkdir(parents=True, exist_ok=True)
+        (ver / "index.html").write_text(redirect_page(f"/{pub}/", "", ""))
+    (ver / "version.json").write_text(json.dumps({"updatedAt": d.get("updatedAt") or 0,
                                                     "commit": os.environ.get("GITHUB_SHA", "")}))
     card_img = None
     if cover:
         card_img = (cover.get("modern") or cover.get("original"))["src"]
-    return {"street": street, "city": city, "url": f"/{slug}/", "image": card_img,
+    return {"street": street, "city": city, "url": f"/{pub}/", "image": card_img,
             "aiImage": bool(cover and cover.get("modern")), "label": "Off-market",
             "price": P.get("price") or 0, "arv": P.get("arv") or 0,
             "beds": P.get("beds"), "baths": P.get("baths"), "createdAt": d.get("createdAt") or 0}
@@ -153,9 +178,16 @@ def main():
     links = read_json(ROOT / "links.json", {})
     for d in props:
         if d.get("short"):
-            links.setdefault(d["short"], {"url": f"/{d['slug']}/", "label": (d.get("property") or {}).get("street", d["slug"]),
-                                          "slug": d["slug"], "kind": "property"})
+            prop_url = f"/{public_dir(d['slug'], d)}/"
+            e = links.setdefault(d["short"], {"url": prop_url, "label": (d.get("property") or {}).get("street", d["slug"]),
+                                              "slug": d["slug"], "kind": "property"})
+            if isinstance(e, dict) and e.get("slug") == d["slug"] and e.get("kind", "property") == "property":
+                e["url"] = prop_url
         L = d.get("links") or {}
+        if (d.get("property") or {}).get("hideStreet"):  # address-free short links too
+            links[neutral_code(d["slug"])] = {"url": f"/{public_dir(d['slug'], d)}/", "label": "Property", "slug": d["slug"], "kind": "alias"}
+            if L.get("more"):
+                links[neutral_code(d["slug"], True)] = {"url": L["more"], "label": "More photos", "slug": d["slug"], "kind": "alias"}
         if L.get("moreShort") and L.get("more"):
             links.setdefault(L["moreShort"], {"url": L["more"], "label": "More photos", "slug": d["slug"], "kind": "photos"})
     for code, v in links.items():

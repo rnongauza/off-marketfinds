@@ -490,8 +490,8 @@ const txt=(id,v)=>{$(id).textContent=v;};
 
 /* hero + facts */
 txt('h-eyebrow',P.eyebrow||'Investor opportunity');
-txt('h-headline',P.headline); txt('h-street',P.street||''); txt('h-city',P.cityLine||'');
-document.title=P.street||document.title;
+txt('h-headline',P.headline); txt('h-street',P.street||'Address provided on request'); txt('h-city',P.cityLine||'');
+document.title=P.street||(P.cityLine?'Off-market property in '+P.cityLine:document.title);
 const cover=D.photos[0];
 /* hero style switch is wired after seg() is defined */
 const dash=n=>n?money(n):'—';
@@ -501,7 +501,7 @@ txt('s-sqft',plain(P.sqft)); txt('s-lot',plain(P.lot)); txt('s-year',plain(P.yea
 txt('d-price',dash(P.price)); txt('d-arv',dash(P.arv)); txt('d-spread',P.arv&&P.price?money(P.arv-P.price):'—');
 txt('o-deadline',O.deadline||'Contact Robert for details.'); txt('o-access',O.access||''); txt('o-closing',O.closing||'');
 txt('o-email',C.email); txt('o-phone',C.phone);
-$('req-btn').href='mailto:'+C.email+'?subject='+encodeURIComponent('Complete package: '+(P.street||'property'));
+$('req-btn').href='mailto:'+C.email+'?subject='+encodeURIComponent('Complete package: '+(P.street||('off-market property in '+(P.cityLine||'your area'))));
 $('copy-email').addEventListener('click',e=>{
   const b=e.currentTarget, done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy email',1600);};
   const sel=()=>{const r=document.createRange();r.selectNodeContents($('o-email'));const s=getSelection();s.removeAllRanges();s.addRange(r);};

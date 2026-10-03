@@ -232,7 +232,7 @@ function cleanProperty(input, current) {
   const d = JSON.parse(JSON.stringify(current));
   const P = input.property || {};
   const keep = ["eyebrow", "headline", "street", "cityLine", "price", "arv", "beds", "baths", "sqft", "lot", "yearBuilt",
-    "occupancy", "propertyType", "overview", "offer", "deal"];
+    "occupancy", "propertyType", "overview", "offer", "deal", "hideStreet"];
   for (const k of keep) if (k in P) d.property[k] = P[k];
   if (Array.isArray(input.photos)) {
     d.photos = input.photos.slice(0, 40).map((p, i) => ({

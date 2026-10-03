@@ -256,6 +256,8 @@ a.logo{text-decoration:none}
 /* cover framing slider */
 .pcard input[type=range]{width:100%;accent-color:var(--select-line)}
 .range-ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+
+.fld.full{grid-column:1/-1}
 </style>
 
 </head>
@@ -374,6 +376,7 @@ a.logo{text-decoration:none}
             <div class="fld"><label for="f-headline">Headline</label><input type="text" id="f-headline"></div>
             <div class="fld"><label for="f-street">Street address</label><input type="text" id="f-street"></div>
             <div class="fld"><label for="f-cityLine">City, state, ZIP</label><input type="text" id="f-cityLine"></div>
+            <div class="fld full"><label class="check"><input type="checkbox" id="f-showStreet"><span><b>Show the full street address on the public page.</b> Turn it off to keep the address private: the page shows “Address provided on request” with the city, state and ZIP, and the page link changes to one without the address.</span></label></div>
             <div class="fld"><label for="f-price">Asking price ($)</label><input type="number" id="f-price" min="0" step="1"></div>
             <div class="fld"><label for="f-arv">Market value / ARV ($)</label><input type="number" id="f-arv" min="0" step="1"></div>
             <div class="fld"><label for="f-beds">Bedrooms</label><input type="number" id="f-beds" min="0" step="1"></div>
@@ -622,7 +625,7 @@ function shape(d){return{property:clone(d.property||{}),calc:clone(d.calc||{}),p
 function fillAll(){
   const d=cur.data,P=d.property||{};
   $('e-title').textContent=P.street||cur.slug;document.title=(P.street||'Property')+' · Admin';
-  $('e-public').href=SITE+'/'+cur.slug+'/';
+  $('f-showStreet').checked=!P.hideStreet;setPublicLink();
   const short=SITE+'/go/'+(d.short||'');$('e-short').textContent=d.short?SITE_SHORT+'/go/'+d.short:SITE_SHORT+'/'+cur.slug+'/';
   $('copy-short').onclick=()=>copy(d.short?short:SITE+'/'+cur.slug+'/',$('copy-short'));
   PF.forEach(k=>{const el=$('f-'+k);if(el)el.value=P[k]??'';});
@@ -640,8 +643,14 @@ function fillAll(){
 function showMoreShort(){const c=W.links.moreShort;$('more-short').textContent=c&&W.links.more?('Short link: '+SITE_SHORT+'/go/'+c+(clicks[c]!=null?' · '+clicks[c]+' clicks':'')):'A short off-marketfinds.com/go/… link is made for it when you save.';}
 async function loadClicks(){try{const j=await api('/api/links');clicks=j.clicks||{};const s=cur&&cur.data.short;$('e-clicks').textContent=s&&clicks[s]!=null?(clicks[s]+' click'+(clicks[s]===1?'':'s')+' on the short link'):'';showMoreShort();}catch(_){}}
 
+async function pubDir(slug,hide){if(!hide)return slug;
+  const h=await crypto.subtle.digest('SHA-1',new TextEncoder().encode(slug));
+  return 'listing-'+[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,10);}
+async function setPublicLink(){const s=cur.slug,hide=!!(cur.data.property||{}).hideStreet,p=await pubDir(s,hide);if(!cur||cur.slug!==s)return;$('e-public').href=SITE+'/'+p+'/';
+  if(hide&&cur.data.short){const code='h'+p.slice(8,14);$('e-short').textContent=SITE_SHORT+'/go/'+code;$('copy-short').onclick=()=>copy(SITE+'/go/'+code,$('copy-short'));}}
 function readForms(){
   const P=clone(cur.data.property||{});
+  P.hideStreet=!$('f-showStreet').checked;
   PF.forEach(k=>{const v=$('f-'+k).value.trim();P[k]=NUMF.includes(k)?(v===''?(k==='lot'||k==='beds'||k==='baths'?'':0):+v):v;});
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
