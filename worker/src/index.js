@@ -3,8 +3,9 @@
 //
 // Secrets / vars (set by .github/workflows/deploy-worker.yml from the repo's GitHub secrets):
 //   GH_TOKEN, GH_REPO, GH_BRANCH, ADMIN_PASSWORD, SESSION_SECRET,
-//   TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM, OWNER_PHONES, SITE_URL
-// KV binding: STATE  (text conversations, login throttling, short-link clicks, import status)
+//   TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM, OWNER_PHONES, SITE_URL,
+//   RESEND_API_KEY, LEAD_EMAIL, LEAD_FROM (lead notifications; optional)
+// KV binding: STATE  (text conversations, login throttling, short-link clicks, import status, leads)
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 const MAX_PHOTOS = 10;
@@ -19,6 +20,7 @@ export default {
       let res;
       if (url.pathname === "/sms" && req.method === "POST") res = await handleSms(req, env, url);
       else if (url.pathname.startsWith("/c/") && req.method === "POST") res = await countClick(env, url.pathname.slice(3));
+      else if (url.pathname === "/lead" && req.method === "POST") res = await handleLead(req, env, ctx);
       else if (url.pathname.startsWith("/api/")) res = await handleApi(req, env, url);
       else if (url.pathname === "/") res = new Response("Off-Market Finds bot is running.", { headers: { "content-type": "text/plain" } });
       else res = json({ error: "not_found" }, 404);
@@ -264,6 +266,26 @@ function cleanProperty(input, current) {
   d.updatedAt = Date.now();
   return d;
 }
+// A save from a stale admin tab can carry photo paths the photo tool has since replaced (and deleted).
+// Never let a save point a photo at a file that doesn't exist: fall back to the current version of that photo.
+async function keepRealImages(env, slug, next, current) {
+  const items = await gh(env, `/contents/properties/${slug}/img?ref=${branch(env)}`, { allow404: true }) || [];
+  const exists = new Set(items.map(i => "img/" + i.name));
+  const byId = new Map((current.photos || []).map(p => [p.id, p]));
+  for (const p of next.photos || []) {
+    const was = byId.get(p.id);
+    let fellBack = false;
+    for (const k of ["original", "modern"]) {
+      const src = p[k] && p[k].src;
+      if (!src || !src.startsWith("img/") || exists.has(src)) continue;
+      const alt = was && was[k] && was[k].src;
+      if (alt && (!alt.startsWith("img/") || exists.has(alt))) { p[k] = { src: alt }; fellBack = true; }
+      else delete p[k];
+    }
+    if (fellBack && was) Object.assign(p, photoLook(was), photoLook(p));
+  }
+  next.photos = (next.photos || []).filter(p => (p.original && p.original.src) || (p.modern && p.modern.src));
+}
 function imagePathsInUse(d) {
   const s = new Set();
   for (const p of d.photos || []) for (const k of ["original", "modern"]) if (p[k] && p[k].src && p[k].src.startsWith("img/")) s.add(p[k].src);
@@ -334,6 +356,7 @@ async function handleApi(req, env, url) {
       if (!f.data) throw fail(404, "not_found");
       if (body.sha && body.sha !== f.sha) return json({ error: "conflict", message: "This property changed somewhere else (maybe the photo AI finished). Reload to see the latest, then save again.", data: f.data, sha: f.sha }, 409);
       const next = cleanProperty(body.data || {}, f.data);
+      await keepRealImages(env, slug, next, f.data);
       // remove image files no longer referenced
       const before = imagePathsInUse(f.data), after = imagePathsInUse(next);
       const changes = [{ path, text: JSON.stringify(next, null, 2) + "\n" }];
@@ -417,6 +440,23 @@ async function handleApi(req, env, url) {
     }
   }
 
+  if (parts[0] === "leads") {
+    if (req.method === "GET") return json({ leads: await listLeads(env), email: !!env.RESEND_API_KEY, to: env.LEAD_EMAIL || "" });
+    if (req.method === "PUT" && parts[1]) {
+      const key = "lead:" + parts[1].replace(/[^a-z0-9]/gi, "");
+      const lead = JSON.parse(await env.STATE.get(key) || "null");
+      if (!lead) throw fail(404, "not_found");
+      if (LEAD_STATUSES.includes(body.status)) lead.status = body.status;
+      if (typeof body.note === "string") lead.note = body.note.slice(0, 1000);
+      await env.STATE.put(key, JSON.stringify(lead));
+      return json({ lead });
+    }
+    if (req.method === "DELETE" && parts[1]) {
+      await env.STATE.delete("lead:" + parts[1].replace(/[^a-z0-9]/gi, ""));
+      return json({ ok: true });
+    }
+  }
+
   if (parts[0] === "links") {
     const lf = await readJson(env, "links.json", {});
     if (req.method === "GET") {
@@ -453,6 +493,100 @@ async function countClick(env, code) {
     await env.STATE.put(k, String(n + 1));
   }
   return new Response(null, { status: 204 });
+}
+
+/* ---------------- buyer requests (leads) ---------------- */
+
+const LEAD_TYPES = { package: "Request complete package", showing: "Request a showing", offer: "Interested / make an offer" };
+const LEAD_STATUSES = ["new", "contacted", "closed"];
+const clip = (v, n) => String(v == null ? "" : v).replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, n);
+const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+async function handleLead(req, env, ctx) {
+  const body = await req.json().catch(() => ({}));
+  // bots fill the hidden "website" field or submit instantly
+  if (clip(body.website, 200) || (Number(body.elapsed) >= 0 && Number(body.elapsed) < 2500)) return json({ ok: true });
+  const ip = req.headers.get("cf-connecting-ip") || "?";
+  const rk = "leadrate:" + ip;
+  const n = parseInt(await env.STATE.get(rk) || "0", 10);
+  if (n >= 8) throw fail(429, "slow_down", "Too many requests from this connection. Please call or text Robert instead.");
+  await env.STATE.put(rk, String(n + 1), { expirationTtl: 3600 });
+
+  // pages send a neutral code ("h" + 6 hex of sha1(slug)) so hidden-address pages never expose the street
+  const ref = clip(body.ref, 10).toLowerCase();
+  if (!/^h[0-9a-f]{6}$/.test(ref)) throw fail(400, "bad_property");
+  const prop = await propertyByRef(env, ref).catch(() => null);
+  const type = LEAD_TYPES[body.type] ? body.type : "package";
+  const lead = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    at: Date.now(), status: "new", type, ref,
+    slug: prop ? prop.slug : "", street: prop ? [prop.street, prop.cityLine].filter(Boolean).join(", ") : "",
+    name: clip(body.name, 80), email: clip(body.email, 120).toLowerCase(), phone: clip(body.phone, 30),
+    role: clip(body.role, 40), when: clip(body.when, 160), offer: clip(body.offer, 40), message: clip(body.message, 1500),
+    page: clip(body.page, 300),
+  };
+  if (!lead.name) throw fail(400, "need_name", "Please add your name.");
+  if (lead.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(lead.email)) throw fail(400, "bad_email", "That email doesn't look right.");
+  if (!lead.email && lead.phone.replace(/\D/g, "").length < 10) throw fail(400, "need_contact", "Add an email or phone number so Robert can reach you.");
+  await env.STATE.put("lead:" + lead.id, JSON.stringify(lead));
+  ctx.waitUntil(notifyLead(env, lead).catch(() => {}));
+  return json({ ok: true });
+}
+
+async function propertyByRef(env, ref) {
+  for (const p of await listProperties(env)) {
+    const h = [...new Uint8Array(await crypto.subtle.digest("SHA-1", enc.encode(p.slug)))].map(b => b.toString(16).padStart(2, "0")).join("");
+    if ("h" + h.slice(0, 6) === ref) return p;
+  }
+  return null;
+}
+
+async function listLeads(env) {
+  const out = []; let cursor;
+  do {
+    const page = await env.STATE.list({ prefix: "lead:", cursor });
+    const vals = await Promise.all(page.keys.map(k => env.STATE.get(k.name)));
+    for (const v of vals) { try { if (v) out.push(JSON.parse(v)); } catch {} }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor);
+  return out.sort((a, b) => b.at - a.at);
+}
+
+async function notifyLead(env, lead) {
+  const what = LEAD_TYPES[lead.type];
+  const site = siteUrl(env);
+  const rows = [["Property", lead.street || "ref " + lead.ref], ["Name", lead.name], ["Email", lead.email], ["Phone", lead.phone],
+    ["I am a", lead.role], ["Preferred times", lead.when], ["Offer amount", lead.offer], ["Message", lead.message]].filter(r => r[1]);
+  const jobs = [];
+  if (env.RESEND_API_KEY && env.LEAD_EMAIL) {
+    const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1b2333">
+      <p style="margin:0 0 12px"><b>${escHtml(what)}</b> from off-marketfinds.com</p>
+      <table cellpadding="6" style="border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="color:#667;vertical-align:top">${escHtml(k)}</td><td>${escHtml(v).replace(/\n/g, "<br>")}</td></tr>`).join("")}</table>
+      <p style="margin:16px 0 0">${lead.page ? `<a href="${escHtml(lead.page)}">Property page</a> · ` : ""}<a href="${site}/admin/#leads">All leads</a></p>
+      ${lead.offer ? '<p style="color:#667;font-size:12px">Offer amounts entered on the page are non-binding expressions of interest.</p>' : ""}</div>`;
+    jobs.push(fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        from: env.LEAD_FROM || "Off-Market Finds <leads@off-marketfinds.com>",
+        to: env.LEAD_EMAIL.split(/[,\s]+/).filter(Boolean),
+        reply_to: lead.email || undefined,
+        subject: `${what}: ${lead.street || "property " + lead.ref} — ${lead.name}`,
+        html,
+      }),
+    }));
+  }
+  // text alert to the owner (delivered once A2P 10DLC registration is approved)
+  const to = owners(env)[0];
+  if (env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM && to) {
+    const text = `New lead: ${what}\n${lead.street || "ref " + lead.ref}\n${lead.name}${lead.phone ? " " + lead.phone : ""}${lead.email ? " " + lead.email : ""}${lead.offer ? "\nOffer: " + lead.offer : ""}`.slice(0, 600);
+    jobs.push(fetch(`https://api.twilio.com/2010-04-01/Accounts/${env.TWILIO_SID}/Messages.json`, {
+      method: "POST",
+      headers: { authorization: "Basic " + btoa(env.TWILIO_SID + ":" + env.TWILIO_TOKEN), "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ To: to, From: env.TWILIO_FROM, Body: text }),
+    }));
+  }
+  await Promise.allSettled(jobs);
 }
 
 /* ---------------- text messages (Twilio) ---------------- */
