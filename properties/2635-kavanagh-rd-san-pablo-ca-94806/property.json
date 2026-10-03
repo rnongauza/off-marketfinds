@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": false,
   "createdAt": 1791056151488,
-  "updatedAt": 1791070699904,
+  "updatedAt": 1791070763133,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -104,17 +104,6 @@
       }
     },
     {
-      "id": "ph052883f26c",
-      "caption": "Garage",
-      "room": "garage",
-      "original": {
-        "src": "img/052883f26c.jpg"
-      },
-      "modern": {
-        "src": "img/ph052883f26c-modern-14b2cf56.jpg"
-      }
-    },
-    {
       "id": "ph2ebb2b7632",
       "caption": "Covered patio",
       "room": "backyard",
@@ -142,6 +131,17 @@
       "room": "backyard",
       "original": {
         "src": "img/umut184gl0.jpg"
+      }
+    },
+    {
+      "id": "ph052883f26c",
+      "caption": "Garage",
+      "room": "garage",
+      "original": {
+        "src": "img/052883f26c.jpg"
+      },
+      "modern": {
+        "src": "img/ph052883f26c-modern-14b2cf56.jpg"
       }
     }
   ],
