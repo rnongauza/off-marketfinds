@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": false,
   "createdAt": 1791056151488,
-  "updatedAt": 1791070657941,
+  "updatedAt": 1791070699904,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -139,7 +139,7 @@
     {
       "id": "umut184gl0",
       "caption": "",
-      "room": "",
+      "room": "backyard",
       "original": {
         "src": "img/umut184gl0.jpg"
       }
