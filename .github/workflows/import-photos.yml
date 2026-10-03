@@ -11,7 +11,7 @@ on:
         description: Google Drive / Dropbox / iCloud shared album / Google Photos link (leave empty to just re-sort)
         required: false
       mode:
-        description: replace, add, sort or modern (only create Modern versions)
+        description: replace, add, sort, modern (only create Modern versions) or sharpen (only sharpen the cover)
         required: false
         default: replace
       modern:
@@ -37,7 +37,7 @@ jobs:
       - run: pip install -q requests pillow pillow-heif
       - id: run
         name: Download, sort with Gemini, keep the best
-        if: (github.event.client_payload.mode || inputs.mode) != 'modern'
+        if: (github.event.client_payload.mode || inputs.mode) != 'modern' && (github.event.client_payload.mode || inputs.mode) != 'sharpen'
         env:
           SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
           MODE: ${{ github.event.client_payload.mode || inputs.mode || 'replace' }}
@@ -67,6 +67,14 @@ jobs:
           REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
           REPLICATE_MODEL: ${{ vars.REPLICATE_MODEL }}
         run: python3 tools/modernize.py
+      - id: sharpen
+        name: Sharpen the cover photo so it can fill the page (Real-ESRGAN on Replicate)
+        continue-on-error: true
+        env:
+          SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
+          REPLICATE_API_TOKEN: ${{ secrets.REPLICATE_API_TOKEN }}
+          UPSCALE_MODEL: ${{ vars.UPSCALE_MODEL }}
+        run: python3 tools/upscale.py
       - name: Save to the repo
         env:
           SLUG: ${{ github.event.client_payload.slug || inputs.slug }}
