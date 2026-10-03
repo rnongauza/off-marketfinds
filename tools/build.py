@@ -91,9 +91,16 @@ def build_property(d, contact, tpl):
     photos = []
     for i, ph in enumerate(d.get("photos") or []):
         o = {"id": ph.get("id") or f"p{i+1}", "caption": ph.get("caption") or ""}
-        for k in ("focus", "zoom"):
+        # how the photo sits in its frame (set in the admin photo editor)
+        for k in ("focus", "x", "y", "cx", "cy"):
             if isinstance(ph.get(k), (int, float)):
                 o[k] = max(0, min(100, ph[k]))
+        for k in ("z", "cz"):
+            if isinstance(ph.get(k), (int, float)) and ph[k] > 0:
+                o[k] = min(4, ph[k])
+        fr = ph.get("frame")
+        if fr == "photo" or (isinstance(fr, (int, float)) and 0.3 <= fr <= 3.5):
+            o["frame"] = fr
         for k in ("original", "modern"):
             v = photo_src(pub, ph.get(k))
             if v: o[k] = v

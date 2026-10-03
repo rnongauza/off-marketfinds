@@ -227,6 +227,16 @@ async function createProperty(env, address, price, via) {
   return { slug, short, existed: false, data };
 }
 
+// how a photo sits in its frame, from the admin photo editor
+function photoLook(p) {
+  const o = {}, num = v => v !== "" && v != null && Number.isFinite(+v);
+  for (const k of ["focus", "x", "y", "cx", "cy"]) if (num(p[k])) o[k] = Math.max(0, Math.min(100, Math.round(+p[k] * 10) / 10));
+  for (const k of ["z", "cz"]) if (num(p[k]) && +p[k] > 0) o[k] = Math.min(4, Math.round(+p[k] * 1000) / 1000);
+  if (p.frame === "photo") o.frame = "photo";
+  else if (num(p.frame) && +p.frame >= 0.3 && +p.frame <= 3.5) o.frame = Math.round(+p.frame * 10000) / 10000;
+  return o;
+}
+
 function cleanProperty(input, current) {
   // Keep only the fields the admin edits; never trust the client for slug/short/createdAt.
   const d = JSON.parse(JSON.stringify(current));
@@ -240,8 +250,7 @@ function cleanProperty(input, current) {
       ...(p.original && p.original.src ? { original: { src: String(p.original.src) } } : {}),
       ...(p.modern && p.modern.src ? { modern: { src: String(p.modern.src) } } : {}),
       ...(p.ai ? { ai: p.ai } : {}),
-      ...(Number.isFinite(+p.focus) && p.focus !== "" && p.focus != null ? { focus: Math.max(0, Math.min(100, Math.round(+p.focus))) } : {}),
-      ...(Number.isFinite(+p.zoom) && p.zoom !== "" && p.zoom != null ? { zoom: Math.max(0, Math.min(100, Math.round(+p.zoom))) } : {}),
+      ...photoLook(p),
     }));
   }
   if (input.calc && typeof input.calc === "object") d.calc = input.calc;

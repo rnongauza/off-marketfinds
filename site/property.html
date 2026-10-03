@@ -48,6 +48,7 @@ nav.links a:hover{color:var(--blue)}
 /* hero */
 .hero{position:relative;min-height:560px;display:grid;grid-template-rows:1fr auto auto;color:#fff;background:var(--navy);overflow:hidden}
 .hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-photo{background:#0d2630}
 .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,30,40,.82) 0%,rgba(10,30,40,.55) 38%,rgba(10,30,40,.08) 70%);z-index:1}
 .hero img.bg{opacity:0;transition:opacity .25s ease}.hero img.bg.on{opacity:1}
 .hero .copy{position:relative;z-index:2;align-self:center;padding-block:56px 44px;max-width:none;margin:0;padding-inline:clamp(20px,4vw,56px)}
@@ -570,15 +571,26 @@ function seg(onPick,has){
     const n=bs[(i+(e.key==='ArrowRight'?1:bs.length-1))%bs.length];n.focus();n.click();e.preventDefault();});
   return s;
 }
+/* photo placement (the admin preview uses the same math): z=1 fills the frame, below 1 shows more of the photo
+   (down to the whole photo), above 1 zooms in; x/y 0-100 slide the photo left-right / up-down */
+function placeImg(el,W,H,o){const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h||!W||!H)return;
+  const cover=Math.max(W/w,H/h),fit=Math.min(W/w,H/h),z=Math.max(fit/cover,Math.min(4,+o.z||1)),sc=cover*z,rw=w*sc,rh=h*sc;
+  const fx=(o.x??50)/100,fy=(o.y??50)/100;
+  Object.assign(el.style,{inset:'auto',right:'auto',bottom:'auto',width:rw+'px',height:rh+'px',maxWidth:'none',left:((W-rw)*fx)+'px',top:((H-rh)*fy)+'px',objectFit:'fill',objectPosition:'50% 50%'});}
+function placeAll(box,imgs,o){const go=()=>Object.values(imgs).forEach(el=>placeImg(el,box.clientWidth,box.clientHeight,o));
+  Object.values(imgs).forEach(el=>{if(!el.complete)el.addEventListener('load',go);});
+  if(window.ResizeObserver)new ResizeObserver(go).observe(box);else addEventListener('resize',go);go();}
+const gridOpts=ph=>({x:ph.x,y:ph.y??ph.focus,z:ph.z});
+const coverOpts=ph=>({x:ph.cx,y:ph.cy??ph.focus,z:ph.cz});
 const mark=(s,k)=>s.querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.style===k)));
 D.photos.forEach((ph,i)=>{
   const fig=document.createElement('figure');fig.className='shot';
   const fr=document.createElement('div');fr.className='frame';const imgs={};
-  STY.forEach(([k,label])=>{const v=ph[k];if(!v||!v.src)return;const im=new Image();im.src=v.src;im.decoding='async';if(ph.focus!=null)im.style.objectPosition='50% '+ph.focus+'%';
+  STY.forEach(([k,label])=>{const v=ph[k];if(!v||!v.src)return;const im=new Image();im.src=v.src;im.decoding='async';
     im.alt=(ph.caption||'Photo '+(i+1))+', '+label.toLowerCase();if(k==='original')im.className='on';fr.appendChild(im);imgs[k]=im;});
   const tag=document.createElement('span');tag.className='tag';tag.textContent='Original picture';
   const phl=document.createElement('span');phl.className='phl';phl.hidden=true;phl.textContent='AI design concept';
-  fr.append(tag,phl);
+  fr.append(tag,phl);placeAll(fr,imgs,gridOpts(ph));
   const cap=document.createElement('figcaption');const t=document.createElement('div');t.className='cap';
   const sm=document.createElement('small');sm.textContent=String(i+1).padStart(2,'0');t.append(sm,document.createTextNode(ph.caption||'Photo '+(i+1)));
   const card={set(k){if(!imgs[k])return;Object.entries(imgs).forEach(([kk,im])=>im.classList.toggle('on',kk===k));
@@ -604,23 +616,24 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
 (function(){
   const c=D.photos[0]; if(!c){ $('hero-original').remove(); $('hero-modern').remove(); return; }
   const imgs={};
-  STY.forEach(([k,label])=>{const el=$('hero-'+k);if(c[k]&&c[k].src){el.src=c[k].src;el.style.objectPosition='50% '+(c.focus??50)+'%';el.alt=(c.caption||'Primary photo')+', '+label.toLowerCase();imgs[k]=el;}else el.remove();});
+  STY.forEach(([k,label])=>{const el=$('hero-'+k);if(c[k]&&c[k].src){el.src=c[k].src;el.alt=(c.caption||'Primary photo')+', '+label.toLowerCase();imgs[k]=el;}else el.remove();});
   let start=imgs.modern?'modern':'original';
   const tag=$('hero-tag');
   const set=k=>{Object.entries(imgs).forEach(([kk,el])=>el.classList.toggle('on',kk===k));
     tag.hidden=(k==='original');tag.textContent='AI design concept · Modern';mark(hs,k);};
   const hs=seg(set,k=>!!imgs[k]);hs.setAttribute('aria-label','Primary photo style');
   $('hero-seg').replaceWith(hs);set(start);
-  /* the cover always fills the whole frame; the frame is tall so the whole front shows. On phones the frame follows the photo's shape */
-  const box=document.querySelector('.hero-photo'),pos='50% '+(c.focus??50)+'%';
-  Object.values(imgs).forEach(el=>el.style.objectPosition=pos);
-  function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);
-    const wide=matchMedia('(min-width:701px)').matches;
-    box.style.aspectRatio=(!wide&&first)?String(Math.max(4/3/1.5,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
-    /* desktop: tall frame (62% of the width) but never taller than the photo itself, so wide photos show top to bottom */
-    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.75*1.5,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
-  Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
-  addEventListener('resize',layout);layout();
+  /* cover frame shape: set in the admin (c.frame = width÷height, or 'photo' for the photo's own shape).
+     Default: the photo's own shape, but no taller than 8:9 */
+  const box=document.querySelector('.hero-photo');
+  function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);if(!first)return;
+    const ar=first.naturalWidth/first.naturalHeight,wide=matchMedia('(min-width:701px)').matches;
+    let r=c.frame==='photo'?ar:(+c.frame>0?+c.frame:Math.max(8/9,ar));
+    if(!wide)r=Math.max(.6,Math.min(1.8,r));
+    box.style.aspectRatio=wide?'':String(r);
+    box.style.height=wide?Math.round(Math.max(420,box.clientWidth/r))+'px':'';}
+  Object.values(imgs).forEach(el=>{if(!el.complete)el.addEventListener('load',layout);});
+  addEventListener('resize',layout);layout();placeAll(box,imgs,coverOpts(c));
 })();
 
 /* analyzer */
