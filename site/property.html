@@ -277,7 +277,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
 @media (min-width:701px){
   /* one frame: the photo sits behind the text and is tall enough to show the whole front of the house */
   .hero{grid-template-rows:auto auto auto;min-height:0}
-  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:clamp(560px,52vw,900px);width:100%}
+  .hero-photo{position:relative;inset:auto;grid-row:1;grid-column:1;height:clamp(600px,62vw,1080px);width:100%}
   .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero .copy{grid-row:1;grid-column:1;max-width:620px}
 }
@@ -607,7 +607,10 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
   const box=document.querySelector('.hero-photo'),pos='50% '+(c.focus??37)+'%';
   Object.values(imgs).forEach(el=>el.style.objectPosition=pos);
   function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);
-    box.style.aspectRatio=(!matchMedia('(min-width:701px)').matches&&first)?String(Math.max(.8,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';}
+    const wide=matchMedia('(min-width:701px)').matches;
+    box.style.aspectRatio=(!wide&&first)?String(Math.max(.8,Math.min(1.6,first.naturalWidth/first.naturalHeight))):'';
+    /* desktop: tall frame (62% of the width) but never taller than the photo itself, so wide photos show top to bottom */
+    box.style.height=(wide&&first)?Math.round(Math.max(520,Math.min(box.clientWidth*.62,box.clientWidth*first.naturalHeight/first.naturalWidth)))+'px':'';}
   Object.values(imgs).forEach(el=>{if(el.complete)layout();else el.addEventListener('load',layout);});
   addEventListener('resize',layout);layout();
 })();
