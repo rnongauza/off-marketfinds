@@ -764,7 +764,7 @@ function readForms(){
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
   P.deal={emd:$('f-emd').value.trim(),closing:$('f-dclosing').value.trim(),openHouse:$('f-openHouse').value.trim()};
-  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;if(!calc.level)calc.level='moderate';CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
+  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;if(!calc.level)calc.level='light';CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
   const links=Object.assign({},W.links,{more:$('more-url').value.trim(),showMore:$('more-show').checked&&!!$('more-url').value.trim()});
   return{property:P,calc,photos:clone(W.photos),links,listed:$('listed').checked};
 }
@@ -774,7 +774,7 @@ function setDirty(v){dirty=v;$('save').disabled=!v||saving;$('discard').hidden=!
 function preview(){
   const v=id=>{const n=parseFloat($(id).value);return isFinite(n)?n:0;};
   const price=v('f-price'),arv=v('f-arv'),sqft=v('f-sqft');
-  const lvl=((cur&&cur.data.calc||{}).level)==='light'?'light':'moderate',reno=v('c-'+lvl)*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
+  const lvl=((cur&&cur.data.calc||{}).level)==='moderate'?'moderate':'light',reno=v('c-'+lvl)*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
   const sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
   const total=price+reno+close+hold+sc,profit=arv-total,roi=total?profit/total*100:0,max=(arv-reno-hold-sc-tgt)/(1+v('c-closingPct')/100);
   const pc=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';
