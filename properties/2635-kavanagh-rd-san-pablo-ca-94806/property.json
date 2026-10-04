@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": false,
   "createdAt": 1791056151488,
-  "updatedAt": 1791072510194,
+  "updatedAt": 1791072548086,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -24,14 +24,14 @@
     "eyebrow": "Open House on Sunday, Sep 4, 12-1 PM",
     "headline": "Off Market Opportunity",
     "offer": {
-      "deadline": "",
-      "access": "",
-      "closing": ""
+      "deadline": "TBD",
+      "access": "1 open house Sunday 12-1pm only",
+      "closing": "To follow"
     },
     "deal": {
-      "emd": "",
+      "emd": "3% of purchase price - Due to title within 1 business day",
       "closing": "",
-      "openHouse": "Sunday, Sep 4, 12-1 PM"
+      "openHouse": "Open House Sunday September 4th 12-1pm only"
     },
     "hideStreet": true,
     "heroText": {
