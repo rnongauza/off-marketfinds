@@ -577,11 +577,13 @@ function seg(onPick,has){
 }
 /* photo placement (the admin preview uses the same math): z=1 fills the frame, below 1 shows more of the photo
    (down to the whole photo), above 1 zooms in; x/y 0-100 slide the photo left-right / up-down */
-function placeImg(el,W,H,o){const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h||!W||!H)return;
-  const cover=Math.max(W/w,H/h),fit=Math.min(W/w,H/h),z=Math.max(fit/cover,Math.min(4,+o.z||1)),sc=cover*z,rw=w*sc,rh=h*sc;
-  const fx=(o.x??50)/100,fy=(o.y??50)/100;
-  Object.assign(el.style,{inset:'auto',right:'auto',bottom:'auto',width:rw+'px',height:rh+'px',maxWidth:'none',left:((W-rw)*fx)+'px',top:((H-rh)*fy)+'px',objectFit:'fill',objectPosition:'50% 50%'});}
-function placeAll(box,imgs,o){const go=()=>Object.values(imgs).forEach(el=>placeImg(el,box.clientWidth,box.clientHeight,o));
+function placeImg(el,W,H,o,H0){const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h||!W||!H)return;
+  const D=H0&&H0>H?H0:H;  /* lay out for the designed frame, then keep (near) its top if the window is shorter: the house usually sits above the lawn */
+  const cover=Math.max(W/w,D/h),fit=Math.min(W/w,D/h),z=Math.max(fit/cover,Math.min(4,+o.z||1)),sc=cover*z,rw=w*sc,rh=h*sc;
+  const fx=(o.x??50)/100,fy=(o.y??50)/100;let top=(D-rh)*fy+(H-D)*.1;
+  if(rh>=H)top=Math.max(H-rh,Math.min(0,top));else top=(H-rh)/2;
+  Object.assign(el.style,{inset:'auto',right:'auto',bottom:'auto',width:rw+'px',height:rh+'px',maxWidth:'none',left:((W-rw)*fx)+'px',top:top+'px',objectFit:'fill',objectPosition:'50% 50%'});}
+function placeAll(box,imgs,o){const go=()=>Object.values(imgs).forEach(el=>placeImg(el,box.clientWidth,box.clientHeight,o,+box.dataset.h0||0));
   Object.values(imgs).forEach(el=>{if(!el.complete)el.addEventListener('load',go);});
   if(window.ResizeObserver)new ResizeObserver(go).observe(box);else addEventListener('resize',go);go();}
 const gridOpts=ph=>({x:ph.x,y:ph.y??ph.focus,z:ph.z});
@@ -635,7 +637,10 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
     let r=c.frame==='photo'?ar:(+c.frame>0?+c.frame:Math.max(8/9,ar));
     if(!wide)r=Math.max(.6,Math.min(1.8,r));
     box.style.aspectRatio=wide?'':String(r);
-    box.style.height=wide?Math.round(Math.max(420,box.clientWidth/r))+'px':'';}
+    /* computers: the cover always fits in the window under the header, so nothing needs scrolling */
+    const hdr=document.querySelector('header.site'),fitH=innerHeight-(hdr?hdr.offsetHeight:0);
+    box.dataset.h0=wide?Math.round(Math.max(420,box.clientWidth/r)):'';
+    box.style.height=wide?Math.round(Math.max(420,Math.min(box.clientWidth/r,fitH)))+'px':'';}
   Object.values(imgs).forEach(el=>{if(!el.complete)el.addEventListener('load',layout);});
   addEventListener('resize',layout);layout();placeAll(box,imgs,coverOpts(c));
   /* headline / address block position (set in the admin, computers only): x,y 0-100 across the free space */
