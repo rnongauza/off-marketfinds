@@ -3,7 +3,7 @@
   "short": "2635k",
   "listed": false,
   "createdAt": 1791056151488,
-  "updatedAt": 1791071531175,
+  "updatedAt": 1791072071042,
   "createdVia": "admin",
   "property": {
     "street": "2635 Kavanagh Rd",
@@ -33,7 +33,11 @@
       "closing": "",
       "openHouse": ""
     },
-    "hideStreet": true
+    "hideStreet": true,
+    "heroText": {
+      "x": 0,
+      "y": 49.3
+    }
   },
   "photos": [
     {
