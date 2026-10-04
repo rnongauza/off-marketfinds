@@ -282,6 +282,7 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero .copy{grid-row:1;grid-column:1;max-width:620px;align-self:start;padding-top:clamp(56px,12vh,140px)}
   .hero-style{grid-row:1}
+  .hero{justify-content:center}
   /* headline block moved in the admin: the dark shading follows it */
   .hero.txt-right::before{background:linear-gradient(270deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero.txt-center::before{background:radial-gradient(ellipse at var(--tx,50%) var(--ty,50%),rgba(10,30,40,.62) 0%,rgba(10,30,40,.3) 38%,rgba(10,30,40,0) 70%)}
@@ -629,20 +630,15 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
     tag.hidden=(k==='original');tag.textContent='AI design concept · Modern';mark(hs,k);};
   const hs=seg(set,k=>!!imgs[k]);hs.setAttribute('aria-label','Primary photo style');
   $('hero-seg').replaceWith(hs);set(start);
-  /* cover frame shape: set in the admin (c.frame = width÷height, or 'photo' for the photo's own shape).
-     Default: the photo's own shape, but no taller than 8:9 */
-  const box=document.querySelector('.hero-photo');
-  function layout(){const first=Object.values(imgs).find(e=>e.naturalWidth);if(!first)return;
-    const ar=first.naturalWidth/first.naturalHeight,wide=matchMedia('(min-width:701px)').matches;
-    let r=c.frame==='photo'?ar:(+c.frame>0?+c.frame:Math.max(8/9,ar));
-    if(!wide)r=Math.max(.6,Math.min(1.8,r));
-    box.style.aspectRatio=wide?'':String(r);
-    /* computers: the cover always fits in the window under the header, so nothing needs scrolling */
-    const hdr=document.querySelector('header.site'),fitH=innerHeight-(hdr?hdr.offsetHeight:0);
-    box.dataset.h0=wide?Math.round(Math.max(420,box.clientWidth/r)):'';
-    box.style.height=wide?Math.round(Math.max(420,Math.min(box.clientWidth/r,fitH)))+'px':'';}
-  Object.values(imgs).forEach(el=>{if(!el.complete)el.addEventListener('load',layout);});
-  addEventListener('resize',layout);layout();placeAll(box,imgs,coverOpts(c));
+  /* the cover shows exactly the same view as photo 1 in the photo grid (4:3, same zoom and position),
+     as large as fits in the window under the header, centered */
+  const box=document.querySelector('.hero-photo'),heroBox=document.querySelector('.hero');
+  function layout(){const wide=matchMedia('(min-width:701px)').matches;
+    if(!wide){heroBox.style.gridTemplateColumns='';box.style.height='';box.style.aspectRatio='4/3';return;}
+    const hdr=document.querySelector('header.site'),fitH=Math.max(360,innerHeight-(hdr?hdr.offsetHeight:0));
+    const W=Math.round(Math.min(heroBox.parentElement.clientWidth||innerWidth,fitH*4/3));
+    heroBox.style.gridTemplateColumns=W+'px';box.style.aspectRatio='';box.style.height=Math.round(W*3/4)+'px';}
+  addEventListener('resize',layout);layout();placeAll(box,imgs,gridOpts(c));
   /* headline / address block position (set in the admin, computers only): x,y 0-100 across the free space */
   const ht=P.heroText,copy=document.querySelector('.hero .copy'),heroEl=document.querySelector('.hero');
   function placeText(){const wide=matchMedia('(min-width:701px)').matches;
