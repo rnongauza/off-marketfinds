@@ -996,7 +996,7 @@ document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',(
 function placeImg(el,W,H,o,H0){const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h||!W||!H)return null;
   const D=H0&&H0>H?H0:H;
   const cover=Math.max(W/w,D/h),fit=Math.min(W/w,D/h),min=fit/cover,z=Math.max(min,Math.min(4,+o.z||1)),sc=cover*z,rw=w*sc,rh=h*sc;
-  const fx=(o.x??50)/100,fy=(o.y??50)/100;let top=(D-rh)*fy+(H-D)*.1;
+  const fx=(o.x??50)/100,fy=(o.y??50)/100;let top=(D-rh)*fy+(H-D)*.5;
   if(rh>=H)top=Math.max(H-rh,Math.min(0,top));else top=(H-rh)/2;
   Object.assign(el.style,{inset:'auto',right:'auto',bottom:'auto',width:rw+'px',height:rh+'px',maxWidth:'none',left:((W-rw)*fx)+'px',top:top+'px',objectFit:'fill',objectPosition:'50% 50%'});
   return {W,H:D,rw,rh,min,z};}
@@ -1054,7 +1054,7 @@ function edRender(){
   stage.appendChild(page);
   const fit=()=>{
     ED.h0=0;
-    if(tab==='cover'){const fw=desk?Math.min(LW,822*4/3):390;frame.style.width=fw+'px';frame.style.margin='0 auto';frame.style.height=(fw*3/4)+'px';}
+    if(tab==='cover'){const fw=desk?LW:390;frame.style.width=fw+'px';ED.h0=desk?fw*3/4:0;frame.style.height=(desk?Math.min(fw*3/4,822):fw*3/4)+'px';}
     else frame.style.height=(parseFloat(page.style.width)*3/4)+'px';
     const k=Math.min(1,(stage.clientWidth-2)/parseFloat(page.style.width),Math.max(220,innerHeight*.5)/page.offsetHeight);
     page.style.transform='scale('+k+')';stage.style.height=Math.ceil(page.offsetHeight*k)+'px';

@@ -282,7 +282,6 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
   .hero::before{position:relative;inset:auto;grid-row:1;grid-column:1;background:linear-gradient(90deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero .copy{grid-row:1;grid-column:1;max-width:620px;align-self:start;padding-top:clamp(56px,12vh,140px)}
   .hero-style{grid-row:1}
-  .hero{justify-content:center}
   /* headline block moved in the admin: the dark shading follows it */
   .hero.txt-right::before{background:linear-gradient(270deg,rgba(10,30,40,.8) 0%,rgba(10,30,40,.5) 32%,rgba(10,30,40,.06) 58%,rgba(10,30,40,0) 100%)}
   .hero.txt-center::before{background:radial-gradient(ellipse at var(--tx,50%) var(--ty,50%),rgba(10,30,40,.62) 0%,rgba(10,30,40,.3) 38%,rgba(10,30,40,0) 70%)}
@@ -579,9 +578,9 @@ function seg(onPick,has){
 /* photo placement (the admin preview uses the same math): z=1 fills the frame, below 1 shows more of the photo
    (down to the whole photo), above 1 zooms in; x/y 0-100 slide the photo left-right / up-down */
 function placeImg(el,W,H,o,H0){const w=el.naturalWidth,h=el.naturalHeight;if(!w||!h||!W||!H)return;
-  const D=H0&&H0>H?H0:H;  /* lay out for the designed frame, then keep (near) its top if the window is shorter: the house usually sits above the lawn */
+  const D=H0&&H0>H?H0:H;  /* lay out for the designed frame, then keep its center if the window is shorter */
   const cover=Math.max(W/w,D/h),fit=Math.min(W/w,D/h),z=Math.max(fit/cover,Math.min(4,+o.z||1)),sc=cover*z,rw=w*sc,rh=h*sc;
-  const fx=(o.x??50)/100,fy=(o.y??50)/100;let top=(D-rh)*fy+(H-D)*.1;
+  const fx=(o.x??50)/100,fy=(o.y??50)/100;let top=(D-rh)*fy+(H-D)*.5;
   if(rh>=H)top=Math.max(H-rh,Math.min(0,top));else top=(H-rh)/2;
   Object.assign(el.style,{inset:'auto',right:'auto',bottom:'auto',width:rw+'px',height:rh+'px',maxWidth:'none',left:((W-rw)*fx)+'px',top:top+'px',objectFit:'fill',objectPosition:'50% 50%'});}
 function placeAll(box,imgs,o){const go=()=>Object.values(imgs).forEach(el=>placeImg(el,box.clientWidth,box.clientHeight,o,+box.dataset.h0||0));
@@ -636,9 +635,11 @@ if(!D.photos.length){ document.querySelector('.hero').classList.add('nophoto'); 
   function layout(){const wide=matchMedia('(min-width:701px)').matches;
     if(!wide){heroBox.style.gridTemplateColumns='';box.style.height='';box.style.aspectRatio='4/3';return;}
     const hdr=document.querySelector('header.site'),fitH=Math.max(360,innerHeight-(hdr?hdr.offsetHeight:0));
-    const W=Math.round(Math.min(heroBox.parentElement.clientWidth||innerWidth,fitH*4/3));
-    heroBox.style.gridTemplateColumns=W+'px';box.style.aspectRatio='';box.style.height=Math.round(W*3/4)+'px';}
+    /* full width; when the window is shorter than photo 1's 4:3 view, trim the view's top and bottom evenly */
+    const W=box.clientWidth;heroBox.style.gridTemplateColumns='';box.style.aspectRatio='';
+    box.dataset.h0=Math.round(W*3/4);box.style.height=Math.round(Math.min(W*3/4,fitH))+'px';}
   addEventListener('resize',layout);layout();placeAll(box,imgs,gridOpts(c));
+  if(window.ResizeObserver)new ResizeObserver(()=>{}).observe(box);
   /* headline / address block position (set in the admin, computers only): x,y 0-100 across the free space */
   const ht=P.heroText,copy=document.querySelector('.hero .copy'),heroEl=document.querySelector('.hero');
   function placeText(){const wide=matchMedia('(min-width:701px)').matches;
