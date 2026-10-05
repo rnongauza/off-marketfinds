@@ -5,20 +5,22 @@
   "createdAt": 1791240927192,
   "updatedAt": 1791240927192,
   "createdVia": "admin",
-  "needsEnrich": true,
   "property": {
     "street": "2899 Garden Ave",
     "cityLine": "Concord, CA 94520",
     "price": 384900,
-    "arv": 0,
-    "beds": "",
-    "baths": "",
-    "sqft": 0,
-    "lot": "",
-    "yearBuilt": "",
+    "arv": 610000,
+    "beds": 3,
+    "baths": 1,
+    "sqft": 1200,
+    "lot": 6900,
+    "yearBuilt": "1947",
     "propertyType": "Single Family",
     "occupancy": "",
-    "overview": []
+    "overview": [
+      "A single-family home, 3 bedrooms, 1 bath, 1,200 sq ft, built in 1947.",
+      "Contact Robert for access, disclosures and the full investor package."
+    ]
   },
   "photos": [],
   "calc": {},
@@ -26,5 +28,65 @@
     "more": "",
     "moreShort": "",
     "showMore": true
+  },
+  "market": {
+    "source": "RentCast",
+    "asOf": "2026-10-05T22:55:43.235900+00:00",
+    "value": 610000,
+    "low": 559000,
+    "high": 660000,
+    "rent": 3300,
+    "rentLow": 3050,
+    "rentHigh": 3550,
+    "comps": [
+      {
+        "address": "2678 Mayfair Ave, Concord, CA 94520",
+        "price": 599000,
+        "beds": 3,
+        "baths": 1,
+        "sqft": 1192,
+        "yearBuilt": 1952,
+        "type": "Single Family",
+        "distance": 0.6394,
+        "status": "Off market",
+        "date": "2026-06-05T00:00:00.000Z"
+      },
+      {
+        "address": "1942 N 6th St, Concord, CA 94519",
+        "price": 674888,
+        "beds": 3,
+        "baths": 1,
+        "sqft": 1199,
+        "yearBuilt": 1948,
+        "type": "Single Family",
+        "distance": 0.9797,
+        "status": "Active listing",
+        "date": "2026-09-17T00:00:00.000Z"
+      },
+      {
+        "address": "2040 Esperanza Dr, Concord, CA 94519",
+        "price": 668000,
+        "beds": 3,
+        "baths": 1,
+        "sqft": 1152,
+        "yearBuilt": 1953,
+        "type": "Single Family",
+        "distance": 0.7702,
+        "status": "Active listing",
+        "date": "2026-09-11T00:00:00.000Z"
+      },
+      {
+        "address": "2755 Eastgate Ave, Concord, CA 94520",
+        "price": 649900,
+        "beds": 3,
+        "baths": 1,
+        "sqft": 1089,
+        "yearBuilt": 1951,
+        "type": "Single Family",
+        "distance": 0.596,
+        "status": "Off market",
+        "date": "2026-07-11T00:00:00.000Z"
+      }
+    ]
   }
 }
