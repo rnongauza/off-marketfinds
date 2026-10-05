@@ -1,0 +1,30 @@
+{
+  "slug": "2899-garden-ave-concord-ca-94520",
+  "short": "2899g",
+  "listed": true,
+  "createdAt": 1791240927192,
+  "updatedAt": 1791240927192,
+  "createdVia": "admin",
+  "needsEnrich": true,
+  "property": {
+    "street": "2899 Garden Ave",
+    "cityLine": "Concord, CA 94520",
+    "price": 384900,
+    "arv": 0,
+    "beds": "",
+    "baths": "",
+    "sqft": 0,
+    "lot": "",
+    "yearBuilt": "",
+    "propertyType": "Single Family",
+    "occupancy": "",
+    "overview": []
+  },
+  "photos": [],
+  "calc": {},
+  "links": {
+    "more": "",
+    "moreShort": "",
+    "showMore": true
+  }
+}
