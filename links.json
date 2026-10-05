@@ -40,5 +40,12 @@
     "slug": "2899-garden-ave-concord-ca-94520",
     "kind": "property",
     "createdAt": 1791240927192
+  },
+  "2899gpic": {
+    "url": "https://drive.google.com/drive/folders/1w0OABjXqJoWVKPJ0wUox3q60ojAE-BRo",
+    "label": "More photos: 2899 Garden Ave",
+    "slug": "2899-garden-ave-concord-ca-94520",
+    "kind": "photos",
+    "createdAt": 1791241035633
   }
 }

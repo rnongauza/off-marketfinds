@@ -3,7 +3,7 @@
   "short": "2899g",
   "listed": true,
   "createdAt": 1791240927192,
-  "updatedAt": 1791240927192,
+  "updatedAt": 1791241035340,
   "createdVia": "admin",
   "property": {
     "street": "2899 Garden Ave",
@@ -20,13 +20,35 @@
     "overview": [
       "A single-family home, 3 bedrooms, 1 bath, 1,200 sq ft, built in 1947.",
       "Contact Robert for access, disclosures and the full investor package."
-    ]
+    ],
+    "eyebrow": "",
+    "headline": "",
+    "offer": {
+      "deadline": "",
+      "access": "",
+      "closing": ""
+    },
+    "deal": {
+      "emd": "",
+      "closing": "",
+      "openHouse": ""
+    },
+    "hideStreet": false
   },
   "photos": [],
-  "calc": {},
+  "calc": {
+    "level": "light",
+    "light": 40,
+    "moderate": 65,
+    "closingPct": 2,
+    "months": 3,
+    "holdingMonthly": 2200,
+    "sellerClosingPct": 1,
+    "targetPct": 10
+  },
   "links": {
-    "more": "",
-    "moreShort": "",
+    "more": "https://drive.google.com/drive/folders/1w0OABjXqJoWVKPJ0wUox3q60ojAE-BRo",
+    "moreShort": "2899gpic",
     "showMore": true
   },
   "market": {
