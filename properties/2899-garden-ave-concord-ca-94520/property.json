@@ -3,7 +3,7 @@
   "short": "2899g",
   "listed": true,
   "createdAt": 1791240927192,
-  "updatedAt": 1791241035340,
+  "updatedAt": 1791241214557,
   "createdVia": "admin",
   "property": {
     "street": "2899 Garden Ave",
@@ -16,13 +16,13 @@
     "lot": 6900,
     "yearBuilt": "1947",
     "propertyType": "Single Family",
-    "occupancy": "",
+    "occupancy": "Vacant",
     "overview": [
-      "A single-family home, 3 bedrooms, 1 bath, 1,200 sq ft, built in 1947.",
+      "A Great Investment Opportunity in Concord, CA\n\nProperty Details: A classic single-family house featuring 3 bedrooms, 1 bathroom, and 1,200 sqft of living space on a 6,900 sqft lot with an attached 1-car garage.\n• Roof: Old\n• Furnace: Old\n• AC: Old\n• Plumbing: Old\n• Electrical Panel: Information not available\n• Water Heater: Information not available\n• The property will be delivered vacant at closing",
       "Contact Robert for access, disclosures and the full investor package."
     ],
-    "eyebrow": "",
-    "headline": "",
+    "eyebrow": "Investment Property",
+    "headline": "Off-Market Opportunity",
     "offer": {
       "deadline": "",
       "access": "",
@@ -33,7 +33,7 @@
       "closing": "",
       "openHouse": ""
     },
-    "hideStreet": false
+    "hideStreet": true
   },
   "photos": [],
   "calc": {
