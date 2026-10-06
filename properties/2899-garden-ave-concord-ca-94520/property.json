@@ -3,7 +3,7 @@
   "short": "2899g",
   "listed": true,
   "createdAt": 1791240927192,
-  "updatedAt": 1791241407166,
+  "updatedAt": 1791249352249,
   "createdVia": "admin",
   "property": {
     "street": "2899 Garden Ave",
@@ -35,7 +35,108 @@
     },
     "hideStreet": true
   },
-  "photos": [],
+  "photos": [
+    {
+      "id": "phbe9bec3f5c",
+      "original": {
+        "src": "img/be9bec3f5c.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/phbe9bec3f5c-modern-hd-21c67ba3.jpg"
+      }
+    },
+    {
+      "id": "phad0e0ca30e",
+      "original": {
+        "src": "img/ad0e0ca30e.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/phad0e0ca30e-modern-a19bdab9.jpg"
+      }
+    },
+    {
+      "id": "ph994ec8d369",
+      "original": {
+        "src": "img/994ec8d369.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph994ec8d369-modern-5f0e49bc.jpg"
+      }
+    },
+    {
+      "id": "ph1ccdd8e344",
+      "original": {
+        "src": "img/1ccdd8e344.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph1ccdd8e344-modern-dbcfb496.jpg"
+      }
+    },
+    {
+      "id": "phce0eeffb39",
+      "original": {
+        "src": "img/ce0eeffb39.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/phce0eeffb39-modern-48445dbc.jpg"
+      }
+    },
+    {
+      "id": "ph89e5b13027",
+      "original": {
+        "src": "img/89e5b13027.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph89e5b13027-modern-26de33e6.jpg"
+      }
+    },
+    {
+      "id": "ph894422492b",
+      "original": {
+        "src": "img/894422492b.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph894422492b-modern-9b766e6d.jpg"
+      }
+    },
+    {
+      "id": "ph38dc09877d",
+      "original": {
+        "src": "img/38dc09877d.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph38dc09877d-modern-bd7ada6e.jpg"
+      }
+    },
+    {
+      "id": "ph8de23b8ea7",
+      "original": {
+        "src": "img/8de23b8ea7.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph8de23b8ea7-modern-6e516ee2.jpg"
+      }
+    },
+    {
+      "id": "ph7426600c38",
+      "original": {
+        "src": "img/7426600c38.jpg"
+      },
+      "caption": "",
+      "modern": {
+        "src": "img/ph7426600c38-modern-1a8c90b3.jpg"
+      }
+    }
+  ],
   "calc": {
     "level": "light",
     "light": 40,
