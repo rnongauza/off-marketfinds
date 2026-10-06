@@ -1,12 +1,12 @@
 {
   "state": "done",
-  "at": 1791249316653,
-  "mode": "replace",
-  "found": 78,
-  "kept": 10,
-  "order": "photo, photo, photo, photo, photo, photo, photo, photo, photo, photo",
+  "at": 1791250156457,
+  "mode": "sort",
+  "found": 0,
+  "kept": 8,
+  "order": "be9bec3f5c, ad0e0ca30e, umuw00fft0, umuw00fft1, umuw00fft2, umuw00fft3, umuw00oda0, umuw00oda1",
   "notes": [
     "GEMINI_API_KEY isn't set, so photos are in their original order."
   ],
-  "summary": "10 photos on 2899 Garden Ave. Kept the first 10 of 78 because AI sorting is off. Made 10 Modern versions"
+  "summary": "8 photos on 2899 Garden Ave. Made 6 Modern versions"
 }

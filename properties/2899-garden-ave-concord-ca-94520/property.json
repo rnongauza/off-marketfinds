@@ -3,7 +3,7 @@
   "short": "2899g",
   "listed": true,
   "createdAt": 1791240927192,
-  "updatedAt": 1791250029406,
+  "updatedAt": 1791250156456,
   "createdVia": "admin",
   "property": {
     "street": "2899 Garden Ave",
@@ -38,7 +38,7 @@
   "photos": [
     {
       "id": "phbe9bec3f5c",
-      "caption": "",
+      "caption": "be9bec3f5c",
       "room": "",
       "original": {
         "src": "img/be9bec3f5c.jpg"
@@ -49,7 +49,7 @@
     },
     {
       "id": "phad0e0ca30e",
-      "caption": "",
+      "caption": "ad0e0ca30e",
       "room": "",
       "original": {
         "src": "img/ad0e0ca30e.jpg"
@@ -60,50 +60,68 @@
     },
     {
       "id": "umuw00fft0",
-      "caption": "",
+      "caption": "umuw00fft0",
       "room": "",
       "original": {
         "src": "img/umuw00fft0.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00fft0-modern-09d54e6a.jpg"
       }
     },
     {
       "id": "umuw00fft1",
-      "caption": "",
+      "caption": "umuw00fft1",
       "room": "",
       "original": {
         "src": "img/umuw00fft1.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00fft1-modern-3b93e2f4.jpg"
       }
     },
     {
       "id": "umuw00fft2",
-      "caption": "",
+      "caption": "umuw00fft2",
       "room": "",
       "original": {
         "src": "img/umuw00fft2.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00fft2-modern-83bd09cf.jpg"
       }
     },
     {
       "id": "umuw00fft3",
-      "caption": "",
+      "caption": "umuw00fft3",
       "room": "",
       "original": {
         "src": "img/umuw00fft3.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00fft3-modern-986f8e8e.jpg"
       }
     },
     {
       "id": "umuw00oda0",
-      "caption": "",
+      "caption": "umuw00oda0",
       "room": "",
       "original": {
         "src": "img/umuw00oda0.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00oda0-modern-f7833227.jpg"
       }
     },
     {
       "id": "umuw00oda1",
-      "caption": "",
+      "caption": "umuw00oda1",
       "room": "",
       "original": {
         "src": "img/umuw00oda1.jpg"
+      },
+      "modern": {
+        "src": "img/umuw00oda1-modern-aaaa1853.jpg"
       }
     }
   ],
