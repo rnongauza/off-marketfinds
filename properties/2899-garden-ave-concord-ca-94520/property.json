@@ -3,7 +3,7 @@
   "short": "2899g",
   "listed": true,
   "createdAt": 1791240927192,
-  "updatedAt": 1791250008763,
+  "updatedAt": 1791250017833,
   "createdVia": "admin",
   "property": {
     "street": "2899 Garden Ave",
@@ -56,6 +56,38 @@
       },
       "modern": {
         "src": "img/phad0e0ca30e-modern-a19bdab9.jpg"
+      }
+    },
+    {
+      "id": "umuw00fft0",
+      "caption": "",
+      "room": "",
+      "original": {
+        "src": "img/umuw00fft0.jpg"
+      }
+    },
+    {
+      "id": "umuw00fft1",
+      "caption": "",
+      "room": "",
+      "original": {
+        "src": "img/umuw00fft1.jpg"
+      }
+    },
+    {
+      "id": "umuw00fft2",
+      "caption": "",
+      "room": "",
+      "original": {
+        "src": "img/umuw00fft2.jpg"
+      }
+    },
+    {
+      "id": "umuw00fft3",
+      "caption": "",
+      "room": "",
+      "original": {
+        "src": "img/umuw00fft3.jpg"
       }
     }
   ],
