@@ -1,0 +1,30 @@
+{
+  "slug": "257-sunrise-way-vallejo-ca-94591",
+  "short": "257s",
+  "listed": true,
+  "createdAt": 1791666129995,
+  "updatedAt": 1791666129995,
+  "createdVia": "admin",
+  "needsEnrich": true,
+  "property": {
+    "street": "257 Sunrise Way",
+    "cityLine": "Vallejo, CA 94591",
+    "price": 472900,
+    "arv": 0,
+    "beds": "",
+    "baths": "",
+    "sqft": 0,
+    "lot": "",
+    "yearBuilt": "",
+    "propertyType": "Single Family",
+    "occupancy": "",
+    "overview": []
+  },
+  "photos": [],
+  "calc": {},
+  "links": {
+    "more": "",
+    "moreShort": "",
+    "showMore": true
+  }
+}
