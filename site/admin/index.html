@@ -340,7 +340,7 @@ a.logo{text-decoration:none}
 <header class="site"><div class="wrap">
   <a class="logo" href="#" aria-label="All properties"><svg viewBox="0 0 34 14" aria-hidden="true"><path d="M3 8 17 1l14 7" fill="none" stroke="#2785b8" stroke-width="2.2"/><rect x="14" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="14" y="10.4" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="10.4" width="2.4" height="2.4" fill="#2785b8"/></svg><span class="nm">Nongauza</span><span class="gp">REAL ESTATE GROUP</span><span class="by">By Kendrick Realty Inc.</span></a>
   <span class="badge-admin">Admin</span>
-  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#links" id="nav-links">Short links</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
+  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#links" id="nav-links">Short links</a><a href="#signups" id="nav-signups">Trial sign-ups</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
 </div></header>
 
 <main class="wrap" id="main">
@@ -377,6 +377,11 @@ a.logo{text-decoration:none}
   </section>
 
   <!-- short links -->
+  <section id="v-signups" hidden>
+    <div class="page-head"><div><div class="eyebrow">From off-marketfinds.com/start</div><h1>Trial sign-ups</h1><p>People who asked for a 7-day free trial. Reach out, set them up, then mark where they are.</p></div></div>
+    <div class="panel"><div style="overflow-x:auto"><table class="links"><thead><tr><th>Who</th><th class="hide-sm">Contact</th><th class="hide-sm">Notes</th><th>Status</th></tr></thead><tbody id="su-rows"><tr><td colspan="4" class="status">Loading…</td></tr></tbody></table></div>
+    <p class="status">Texts consent shows whether they checked the text-message box. Only text people who did.</p></div>
+  </section>
   <section id="v-links" hidden>
     <div class="page-head"><div><div class="eyebrow">Link shortener</div><h1>Short links</h1><p>Every link becomes off-marketfinds.com/go/… and counts its clicks.</p></div></div>
     <form class="panel" id="link-form" novalidate style="margin-bottom:22px">
@@ -597,10 +602,11 @@ async function api(path,opts={}){
 }
 
 /* ---------------- routing ---------------- */
-function show(view){['v-login','v-list','v-links','v-edit'].forEach(v=>$(v).hidden=(v!==view));
+function show(view){['v-login','v-list','v-links','v-edit','v-signups'].forEach(v=>$(v).hidden=(v!==view));
   $('topnav').hidden=(view==='v-login'); $('savebar').hidden=(view!=='v-edit');
   $('nav-props').toggleAttribute('aria-current',view==='v-list'); if(view==='v-list')$('nav-props').setAttribute('aria-current','page');
   $('nav-links').toggleAttribute('aria-current',view==='v-links'); if(view==='v-links')$('nav-links').setAttribute('aria-current','page');
+  $('nav-signups').toggleAttribute('aria-current',view==='v-signups'); if(view==='v-signups')$('nav-signups').setAttribute('aria-current','page');
   window.scrollTo(0,0);}
 let lastHash=location.hash;
 async function route(){
@@ -612,6 +618,7 @@ async function route(){
   const h=decodeURIComponent(location.hash.replace(/^#\/?/,''));
   stopTimers();
   if(h==='links'){show('v-links');loadLinks();}
+  else if(h==='signups'){show('v-signups');loadSignups();}
   else if(/^[a-z0-9][a-z0-9-]+$/.test(h)){show('v-edit');openProperty(h);}
   else{show('v-list');loadList();}
 }
@@ -686,6 +693,31 @@ $('new-form').addEventListener('submit',async e=>{e.preventDefault();
   catch(err){setStatus($('new-status'),err.message,'err');}});
 
 /* ---------------- short links ---------------- */
+async function loadSignups(){
+  const rows=$('su-rows');
+  try{
+    const j=await api('/api/signups');rows.replaceChildren();
+    if(!j.signups.length){rows.innerHTML='<tr><td colspan="4" class="status">No sign-ups yet. Share off-marketfinds.com/start to get your first.</td></tr>';return;}
+    j.signups.forEach(s=>{
+      const tr=document.createElement('tr');
+      const td1=document.createElement('td');const b=document.createElement('b');b.textContent=s.name;
+      const sub=document.createElement('div');sub.className='status';sub.textContent=[s.role,s.company].filter(Boolean).join(' · ')+' · '+new Date(s.at).toLocaleString();
+      td1.append(b,sub);
+      const td2=document.createElement('td');td2.className='hide-sm';
+      const em=document.createElement('a');em.href='mailto:'+s.email;em.textContent=s.email;
+      const ph=document.createElement('a');ph.href='tel:'+s.phone.replace(/[^\d+]/g,'');ph.textContent=s.phone;
+      const cs=document.createElement('div');cs.className='status';cs.textContent=s.smsConsent?'Agreed to texts':'No text consent: email only';
+      td2.append(em,document.createElement('br'),ph,cs);
+      const td3=document.createElement('td');td3.className='hide-sm';td3.textContent=s.notes||'';
+      const td4=document.createElement('td');const sel=document.createElement('select');sel.className='small';sel.setAttribute('aria-label','Status for '+s.name);
+      [['new','New'],['contacted','Contacted'],['active','Set up'],['closed','Not a fit']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o);});
+      sel.value=s.status||'new';
+      sel.addEventListener('change',async()=>{try{await api('/api/signups/'+s.id,{method:'PUT',body:{status:sel.value}});toast('Saved.');}catch(e){toast(e.message);}});
+      td4.appendChild(sel);
+      tr.append(td1,td2,td3,td4);rows.appendChild(tr);
+    });
+  }catch(e){if(e.code!=='login')rows.innerHTML='<tr><td colspan="4" class="status">Couldn’t load sign-ups: '+e.message+'</td></tr>';}
+}
 async function loadLinks(){
   const rows=$('link-rows');
   try{
@@ -764,7 +796,7 @@ function readForms(){
   P.overview=[$('f-ov1').value.trim(),$('f-ov2').value.trim()].filter(Boolean);
   P.offer={deadline:$('f-deadline').value.trim(),access:$('f-access').value.trim(),closing:$('f-closing').value.trim()};
   P.deal={emd:$('f-emd').value.trim(),closing:$('f-dclosing').value.trim(),openHouse:$('f-openHouse').value.trim()};
-  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;if(!calc.level)calc.level='light';CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
+  const calc=Object.assign({},cur.data.calc||{});delete calc.sellingPct;delete calc.listingPct;delete calc.buyerBrokerPct;if(!calc.level)calc.level='moderate';CF.forEach(k=>{const v=parseFloat($('c-'+k).value);if(isFinite(v))calc[k]=v;});
   const links=Object.assign({},W.links,{more:$('more-url').value.trim(),showMore:$('more-show').checked&&!!$('more-url').value.trim()});
   return{property:P,calc,photos:clone(W.photos),links,listed:$('listed').checked};
 }
@@ -774,7 +806,7 @@ function setDirty(v){dirty=v;$('save').disabled=!v||saving;$('discard').hidden=!
 function preview(){
   const v=id=>{const n=parseFloat($(id).value);return isFinite(n)?n:0;};
   const price=v('f-price'),arv=v('f-arv'),sqft=v('f-sqft');
-  const lvl=((cur&&cur.data.calc||{}).level)==='moderate'?'moderate':'light',reno=v('c-'+lvl)*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
+  const lvl=((cur&&cur.data.calc||{}).level)==='light'?'light':'moderate',reno=v('c-'+lvl)*sqft,close=price*v('c-closingPct')/100,hold=v('c-months')*v('c-holdingMonthly');
   const sc=arv*v('c-sellerClosingPct')/100,tgt=arv*v('c-targetPct')/100;
   const total=price+reno+close+hold+sc,profit=arv-total,roi=total?profit/total*100:0,max=(arv-reno-hold-sc-tgt)/(1+v('c-closingPct')/100);
   const pc=n=>(+n||0).toLocaleString('en-US',{maximumFractionDigits:2})+'%';

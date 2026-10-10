@@ -147,7 +147,8 @@ def build_property(d, contact, tpl):
     return {"street": street, "city": city, "url": f"/{pub}/", "image": card_img,
             "aiImage": bool(cover and cover.get("modern")), "label": "Off-market",
             "price": P.get("price") or 0, "arv": P.get("arv") or 0,
-            "beds": P.get("beds"), "baths": P.get("baths"), "createdAt": d.get("createdAt") or 0}
+            "beds": P.get("beds"), "baths": P.get("baths"), "sqft": P.get("sqft") or 0, "hidden": hide,
+            "createdAt": d.get("createdAt") or 0}
 
 
 def redirect_page(target, code, api):
@@ -181,8 +182,24 @@ def main():
             cards.append(c)
     cards.sort(key=lambda c: -(c.pop("createdAt") or 0))
 
-    home = (ROOT / "site" / "home.html").read_text().replace("/*PROPERTIES*/[]", script_json(cards))
-    (OUT / "index.html").write_text(home)
+    # marketing site (home, pricing, sign-up, legal) in the "Midnight" look, plus the deal list at /deals/
+    parts = {k: (ROOT / "site" / "partials" / f"{k}.html").read_text() for k in ("head", "header", "footer")}
+    cfg = script_json({"api": api, "site": SITE_URL})
+
+    def marketing(html, active):
+        hdr = parts["header"].replace(f'data-nav="{active}"', f'data-nav="{active}" aria-current="page"')
+        html = html.replace("<!--HEAD-->", parts["head"]).replace("<!--FOOTER-->", parts["footer"])
+        html = html.replace(f"<!--HEADER:{active}-->", hdr).replace("/*CONFIG*/{}", cfg)
+        return html.replace("/*PROPERTIES*/[]", script_json(cards))
+
+    (OUT / "index.html").write_text(marketing((ROOT / "site" / "home.html").read_text(), "home"))
+    (OUT / "deals").mkdir(parents=True, exist_ok=True)
+    (OUT / "deals" / "index.html").write_text((ROOT / "site" / "deals.html").read_text().replace("/*PROPERTIES*/[]", script_json(cards)))
+    for page in sorted((ROOT / "site" / "pages").glob("*.html")):
+        dest = OUT / page.stem
+        dest.mkdir(parents=True, exist_ok=True)
+        (dest / "index.html").write_text(marketing(page.read_text(), page.stem))
+    shutil.copytree(ROOT / "site" / "assets", OUT / "assets", dirs_exist_ok=True)
 
     # short links: every property gets /go/<short>, plus links.json entries
     links = read_json(ROOT / "links.json", {})

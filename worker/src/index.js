@@ -288,6 +288,39 @@ async function checkToken(env, req) {
   try { return JSON.parse(atob(body.replace(/-/g, "+").replace(/_/g, "/"))).exp > Date.now(); } catch { return false; }
 }
 
+async function saveSignup(env, req, b) {
+  const clean = (v, n) => String(v ?? "").replace(/[\u0000-\u001f]+/g, " ").trim().slice(0, n);
+  if (clean(b.website, 100)) return { ok: true };  // bot trap
+  const ip = req.headers.get("cf-connecting-ip") || "?", rl = "su-rate:" + ip;
+  const n = parseInt(await env.STATE.get(rl) || "0", 10);
+  if (n >= 5) throw fail(429, "slow_down", "Too many sign-ups from this connection. Try again in an hour.");
+  const s = {
+    name: clean(b.name, 100), email: clean(b.email, 160).toLowerCase(), phone: clean(b.phone, 30),
+    role: clean(b.role, 40), company: clean(b.company, 120), notes: clean(b.notes, 600),
+    smsConsent: b.smsConsent === true, terms: b.terms === true,
+  };
+  if (!s.name || !/^\S+@\S+\.\S+$/.test(s.email) || s.phone.replace(/\D/g, "").length < 10)
+    throw fail(400, "missing", "Please add your name, a valid email and your mobile number.");
+  if (!s.terms) throw fail(400, "terms", "Please agree to the Terms of use and Privacy policy.");
+  const at = Date.now(), id = at.toString(36) + Math.random().toString(36).slice(2, 7);
+  Object.assign(s, { id, at, status: "new", consentText: s.smsConsent ? "Checked the SMS consent box on off-marketfinds.com/start/" : "",
+    ip, ua: clean(req.headers.get("user-agent"), 200) });
+  await env.STATE.put("signup:" + id, JSON.stringify(s));
+  await env.STATE.put(rl, String(n + 1), { expirationTtl: 3600 });
+  return { ok: true };
+}
+
+async function listSignups(env) {
+  const out = [];
+  let cursor;
+  do {
+    const page = await env.STATE.list({ prefix: "signup:", cursor });
+    for (const k of page.keys) { const v = await env.STATE.get(k.name, "json"); if (v) out.push(v); }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor && out.length < 500);
+  return out.sort((a, b) => b.at - a.at);
+}
+
 async function handleApi(req, env, url) {
   const parts = url.pathname.split("/").filter(Boolean).slice(1); // after "api"
   const body = req.method === "GET" || req.method === "DELETE" ? {} : await req.json().catch(() => ({}));
@@ -303,7 +336,19 @@ async function handleApi(req, env, url) {
     }
     return json({ token: await makeToken(env) });
   }
+  // free-trial sign-ups from off-marketfinds.com/start/ (public; stored privately in KV, never in the public repo)
+  if (parts[0] === "signup" && req.method === "POST") return json(await saveSignup(env, req, body));
+
   if (!(await checkToken(env, req))) throw fail(401, "login_required", "Please log in again.");
+
+  if (parts[0] === "signups" && req.method === "GET") return json({ signups: await listSignups(env) });
+  if (parts[0] === "signups" && parts[1] && req.method === "PUT") {
+    const key = "signup:" + parts[1], cur = await env.STATE.get(key, "json");
+    if (!cur) throw fail(404, "not_found", "That sign-up is gone.");
+    cur.status = ["new", "contacted", "active", "closed"].includes(body.status) ? body.status : cur.status;
+    await env.STATE.put(key, JSON.stringify(cur));
+    return json({ ok: true, signup: cur });
+  }
 
   if (parts[0] === "me") return json({ ok: true, repo: env.GH_REPO, site: siteUrl(env), sms: !!env.TWILIO_FROM, phone: env.TWILIO_FROM || "" });
 

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--HEAD-->
+<title>Start your free trial · Off-Market Finds</title>
+<meta name="description" content="Start a 7-day free trial of Off-Market Finds. No credit card needed.">
+</head>
+<body>
+<div class="band"><!--HEADER:start--></div>
+
+<section style="max-width:900px;margin:0 auto;padding:90px 40px 120px">
+<div style="text-align:center">
+<p class="caps gold" style="margin:0">7 days free · no credit card</p>
+<h1 style="margin:18px 0 0;font-weight:300;font-size:clamp(32px,4.4vw,52px);letter-spacing:.1em;text-transform:uppercase;line-height:1.15">Let’s get your first deal live</h1>
+<p class="muted" style="margin:16px auto 0;max-width:600px">Tell us where to reach you. We’ll set up your account and texting number and send you your login, usually within one business day.</p>
+</div>
+
+<form id="su" novalidate style="margin-top:56px;position:relative">
+<div class="form-grid">
+<label class="fld">NAME<input name="name" type="text" autocomplete="name" required maxlength="100"></label>
+<label class="fld">EMAIL<input name="email" type="email" autocomplete="email" required maxlength="160"></label>
+<label class="fld">MOBILE NUMBER<input name="phone" type="tel" autocomplete="tel" required maxlength="30"><small>The phone you’ll text addresses from.</small></label>
+<label class="fld">I AM A<select name="role"><option>Wholesaler</option><option>Real estate agent</option><option>Investor</option><option>Other</option></select></label>
+<label class="fld full">COMPANY OR BROKERAGE (OPTIONAL)<input name="company" type="text" autocomplete="organization" maxlength="120"></label>
+<label class="fld full">ANYTHING WE SHOULD KNOW? (OPTIONAL)<textarea name="notes" rows="2" maxlength="600" placeholder="Markets you work, how many deals a month…"></textarea></label>
+</div>
+<label class="hp" aria-hidden="true">Leave this empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+<div style="display:flex;flex-direction:column;gap:16px;margin-top:34px">
+<label class="check"><input type="checkbox" name="smsConsent"><span>I agree to receive text messages from Off-Market Finds about my account and the properties I create, at the number above. Message frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to opt out. See <a href="/sms-terms/">SMS terms</a>.</span></label>
+<label class="check"><input type="checkbox" name="terms" required><span>I agree to the <a href="/terms/">Terms of use</a> and <a href="/privacy/">Privacy policy</a>.</span></label>
+</div>
+<div style="margin-top:40px;text-align:center">
+<button class="btn-gold" type="submit" id="su-go">START MY FREE TRIAL</button>
+</div>
+<div class="msg" id="su-msg" role="status" hidden></div>
+</form>
+</section>
+
+<!--FOOTER-->
+
+<script>
+const CONFIG = /*CONFIG*/{};
+const f = document.getElementById("su"), msg = document.getElementById("su-msg"), go = document.getElementById("su-go");
+function say(kind, text) { msg.hidden = false; msg.className = "msg " + kind; msg.textContent = text; }
+f.addEventListener("submit", async e => {
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(f));
+  d.smsConsent = !!f.smsConsent.checked; d.terms = !!f.terms.checked;
+  if (!d.name.trim() || !/^\S+@\S+\.\S+$/.test(d.email) || d.phone.replace(/\D/g, "").length < 10) { say("err", "Please add your name, a valid email and your mobile number."); return; }
+  if (!d.terms) { say("err", "Please agree to the Terms of use and Privacy policy."); return; }
+  go.disabled = true; go.textContent = "SENDING…";
+  try {
+    const r = await fetch((CONFIG.api || "").replace(/\/$/, "") + "/api/signup", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(d) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.message || "Something went wrong. Please try again.");
+    f.querySelectorAll("input,select,textarea,button").forEach(x => x.disabled = true);
+    go.textContent = "RECEIVED";
+    say("ok", "Thanks, " + d.name.trim().split(" ")[0] + "! You’re on the list. We’ll text or email you your login, usually within one business day.");
+  } catch (err) {
+    go.disabled = false; go.textContent = "START MY FREE TRIAL";
+    say("err", err.message + " You can also email robert@kendrickrealtyinc.com.");
+  }
+});
+</script>
+</body>
+</html>
