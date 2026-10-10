@@ -5,20 +5,22 @@
   "createdAt": 1791666129995,
   "updatedAt": 1791666129995,
   "createdVia": "admin",
-  "needsEnrich": true,
   "property": {
     "street": "257 Sunrise Way",
     "cityLine": "Vallejo, CA 94591",
     "price": 472900,
-    "arv": 0,
-    "beds": "",
-    "baths": "",
-    "sqft": 0,
-    "lot": "",
-    "yearBuilt": "",
+    "arv": 674000,
+    "beds": 4,
+    "baths": 2,
+    "sqft": 2159,
+    "lot": 11761,
+    "yearBuilt": "1980",
     "propertyType": "Single Family",
     "occupancy": "",
-    "overview": []
+    "overview": [
+      "A single-family home, 4 bedrooms, 2 baths, 2,159 sq ft, built in 1980.",
+      "Contact Robert for access, disclosures and the full investor package."
+    ]
   },
   "photos": [],
   "calc": {},
@@ -26,5 +28,65 @@
     "more": "",
     "moreShort": "",
     "showMore": true
+  },
+  "market": {
+    "source": "RentCast",
+    "asOf": "2026-10-10T21:02:28.021671+00:00",
+    "value": 674000,
+    "low": 561000,
+    "high": 787000,
+    "rent": 3370,
+    "rentLow": 3140,
+    "rentHigh": 3610,
+    "comps": [
+      {
+        "address": "1844 Vervais Ave, Vallejo, CA 94591",
+        "price": 875000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 2256,
+        "yearBuilt": 1967,
+        "type": "Single Family",
+        "distance": 1.0085,
+        "status": "Off market",
+        "date": "2026-07-22T00:00:00.000Z"
+      },
+      {
+        "address": "6272 Pebble Beach Dr, Vallejo, CA 94591",
+        "price": 709000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 1913,
+        "yearBuilt": 1999,
+        "type": "Single Family",
+        "distance": 0.732,
+        "status": "Off market",
+        "date": "2026-07-21T00:00:00.000Z"
+      },
+      {
+        "address": "139 Claremont Ave, Vallejo, CA 94590",
+        "price": 800000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 2134,
+        "yearBuilt": 1940,
+        "type": "Single Family",
+        "distance": 1.6351,
+        "status": "Off market",
+        "date": "2026-08-05T00:00:00.000Z"
+      },
+      {
+        "address": "335 Skyline Dr, Vallejo, CA 94591",
+        "price": 774000,
+        "beds": 4,
+        "baths": 2,
+        "sqft": 2329,
+        "yearBuilt": 1969,
+        "type": "Single Family",
+        "distance": 1.2164,
+        "status": "Active listing",
+        "date": "2026-08-12T00:00:00.000Z"
+      }
+    ]
   }
 }
