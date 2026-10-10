@@ -3,7 +3,7 @@
   "short": "257s",
   "listed": true,
   "createdAt": 1791666129995,
-  "updatedAt": 1791667365478,
+  "updatedAt": 1791668254719,
   "createdVia": "admin",
   "property": {
     "street": "257 Sunrise Way",
@@ -38,100 +38,88 @@
   "photos": [
     {
       "id": "ph3a14c3b158",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/ph3a14c3b158-original-hd-3488bdf6.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/ph3a14c3b158-modern-hd-d2264ce9.jpg"
       }
     },
     {
-      "id": "ph66631e9383",
-      "original": {
-        "src": "img/66631e9383.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/ph66631e9383-modern-d98c0c82.jpg"
-      }
-    },
-    {
       "id": "ph7c9d3c7721",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/7c9d3c7721.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/ph7c9d3c7721-modern-851bbfbd.jpg"
       }
     },
     {
+      "id": "ph66631e9383",
+      "caption": "",
+      "room": "",
+      "original": {
+        "src": "img/66631e9383.jpg"
+      },
+      "modern": {
+        "src": "img/ph66631e9383-modern-d98c0c82.jpg"
+      }
+    },
+    {
       "id": "phc7a6c7b0a7",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/c7a6c7b0a7.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/phc7a6c7b0a7-modern-1c5e655f.jpg"
       }
     },
     {
       "id": "phcafe6c25ea",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/cafe6c25ea.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/phcafe6c25ea-modern-218a669b.jpg"
       }
     },
     {
-      "id": "phbd11b6e283",
-      "original": {
-        "src": "img/bd11b6e283.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/phbd11b6e283-modern-3b9919f1.jpg"
-      }
-    },
-    {
       "id": "ph8c09800f90",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/8c09800f90.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/ph8c09800f90-modern-92b05713.jpg"
       }
     },
     {
       "id": "ph707cf6c496",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/707cf6c496.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/ph707cf6c496-modern-5675feb7.jpg"
       }
     },
     {
-      "id": "ph68bea6414c",
-      "original": {
-        "src": "img/68bea6414c.jpg"
-      },
-      "caption": "",
-      "modern": {
-        "src": "img/ph68bea6414c-modern-955774da.jpg"
-      }
-    },
-    {
       "id": "ph3fef2fff72",
+      "caption": "",
+      "room": "",
       "original": {
         "src": "img/3fef2fff72.jpg"
       },
-      "caption": "",
       "modern": {
         "src": "img/ph3fef2fff72-modern-f9485ecf.jpg"
       }
