@@ -3,7 +3,7 @@
   "short": "257s",
   "listed": true,
   "createdAt": 1791666129995,
-  "updatedAt": 1791666129995,
+  "updatedAt": 1791666563261,
   "createdVia": "admin",
   "property": {
     "street": "257 Sunrise Way",
@@ -20,13 +20,35 @@
     "overview": [
       "A single-family home, 4 bedrooms, 2 baths, 2,159 sq ft, built in 1980.",
       "Contact Robert for access, disclosures and the full investor package."
-    ]
+    ],
+    "eyebrow": "",
+    "headline": "",
+    "offer": {
+      "deadline": "",
+      "access": "",
+      "closing": "The property will be delivered vacant at closing."
+    },
+    "deal": {
+      "emd": "",
+      "closing": "",
+      "openHouse": ""
+    },
+    "hideStreet": false
   },
   "photos": [],
-  "calc": {},
+  "calc": {
+    "level": "light",
+    "light": 40,
+    "moderate": 65,
+    "closingPct": 2,
+    "months": 3,
+    "holdingMonthly": 2200,
+    "sellerClosingPct": 1,
+    "targetPct": 10
+  },
   "links": {
-    "more": "",
-    "moreShort": "",
+    "more": "https://drive.google.com/drive/folders/1XLNcRx9jzdg6H9VUbxXUy5dNIuqvR7UW",
+    "moreShort": "257spics",
     "showMore": true
   },
   "market": {
