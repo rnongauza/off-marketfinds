@@ -1,0 +1,12 @@
+{
+  "state": "done",
+  "at": 1791666922963,
+  "mode": "replace",
+  "found": 58,
+  "kept": 10,
+  "order": "photo, photo, photo, photo, photo, photo, photo, photo, photo, photo",
+  "notes": [
+    "GEMINI_API_KEY isn't set, so photos are in their original order."
+  ],
+  "summary": "10 photos on 257 Sunrise Way. Kept the first 10 of 58 because AI sorting is off. Made 10 Modern versions"
+}
