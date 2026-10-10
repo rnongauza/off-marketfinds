@@ -230,6 +230,18 @@ nav.links a:hover{color:var(--blue)}
 .copyline{font-size:13px;color:var(--muted)}
 .copyline b{color:#333;font-weight:400;user-select:all}
 @media (max-width:860px){.offer .wrap{grid-template-columns:1fr}}
+.lead{margin-top:34px;padding-top:28px;border-top:1px solid var(--line);display:grid;gap:14px}
+.lead h3{margin:0;font-family:var(--serif);font-weight:400;font-size:24px;color:var(--ink-2)}
+.lead-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.lead-grid label{display:grid;gap:6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lead-grid .full{grid-column:1/-1}
+.lead input,.lead select,.lead textarea{font:inherit;font-size:16px;letter-spacing:0;text-transform:none;color:var(--ink);background:#fff;border:1px solid var(--line);padding:11px 12px;border-radius:0}
+.lead input:focus,.lead select:focus,.lead textarea:focus{outline:2px solid var(--blue);outline-offset:0;border-color:var(--blue)}
+.lead .btn{justify-self:start}
+.lead .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.lead-msg{margin:0;padding:12px 14px;font-size:15px}
+.lead-msg.ok{background:#e6f3ec;color:#1f5e3d}.lead-msg.err{background:#fbe9e5;color:#8a2f1f}
+@media (max-width:560px){.lead-grid{grid-template-columns:1fr}}
 @media (max-width:520px){.step{grid-template-columns:1fr;gap:4px}}
 
 footer{background:var(--white);border-top:1px solid var(--line-2);padding-block:44px 52px}
@@ -478,6 +490,20 @@ footer .legal{grid-column:1/-1;font-size:11px;color:var(--faint);line-height:1.6
         <button class="btn line" type="button" id="copy-email">Copy email</button>
       </div>
       <p class="copyline" style="margin-top:12px">Email <b id="o-email"></b> · Call <b id="o-phone"></b></p>
+      <form class="lead" id="lead" novalidate>
+        <h3>Request info on this property</h3>
+        <p class="copyline">Get the address, disclosures and access details. Robert replies directly.</p>
+        <div class="lead-grid">
+          <label>Name<input name="name" type="text" autocomplete="name" required maxlength="100"></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required maxlength="160"></label>
+          <label>Phone<input name="phone" type="tel" autocomplete="tel" maxlength="30"></label>
+          <label>I am a<select name="kind"><option>Cash buyer / investor</option><option>Agent with a buyer</option><option>Wholesaler</option><option>Other</option></select></label>
+          <label class="full">Message (optional)<textarea name="message" rows="3" maxlength="1000"></textarea></label>
+        </div>
+        <label class="hp" aria-hidden="true">Leave empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        <button class="btn" type="submit" id="lead-go">Send request</button>
+        <p class="lead-msg" id="lead-msg" role="status" hidden></p>
+      </form>
     </div>
   </div></section>
 </main>
@@ -515,6 +541,22 @@ txt('d-price',dash(P.price)); txt('d-arv',dash(P.arv)); txt('d-spread',P.arv&&P.
 txt('o-deadline',O.deadline||'Contact Robert for details.'); txt('o-access',O.access||''); txt('o-closing',O.closing||'');
 txt('o-email',C.email); txt('o-phone',C.phone);
 $('req-btn').href='mailto:'+C.email+'?subject='+encodeURIComponent('Complete package: '+(P.street||('off-market property in '+(P.cityLine||'your area'))));
+(function(){
+  const f=$('lead'),m=$('lead-msg'),go=$('lead-go');if(!f)return;
+  if(!D.api){f.hidden=true;return;}
+  const say=(k,t)=>{m.hidden=false;m.className='lead-msg '+k;m.textContent=t;};
+  f.addEventListener('submit',async e=>{e.preventDefault();
+    const d=Object.fromEntries(new FormData(f));
+    if(!d.name.trim()||!/^\S+@\S+\.\S+$/.test(d.email)){say('err','Please add your name and a valid email.');return;}
+    d.page=location.origin+location.pathname;d.title=(P.street||'')+(P.cityLine?' · '+P.cityLine:'');d.price=P.price||0;
+    go.disabled=true;go.textContent='Sending…';
+    try{const r=await fetch(D.api.replace(/\/$/,'')+'/api/lead',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(d)});
+      const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||'Something went wrong.');
+      f.querySelectorAll('input,select,textarea').forEach(x=>x.disabled=true);go.textContent='Sent';
+      say('ok','Thanks, '+d.name.trim().split(' ')[0]+'. Robert will be in touch shortly.');}
+    catch(err){go.disabled=false;go.textContent='Send request';say('err',err.message+' You can also email '+(C.email||'Robert')+'.');}
+  });
+})();
 $('copy-email').addEventListener('click',e=>{
   const b=e.currentTarget, done=()=>{b.textContent='Copied';setTimeout(()=>b.textContent='Copy email',1600);};
   const sel=()=>{const r=document.createRange();r.selectNodeContents($('o-email'));const s=getSelection();s.removeAllRanges();s.addRange(r);};

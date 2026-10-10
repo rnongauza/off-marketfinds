@@ -79,11 +79,15 @@ jobs:
           TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
           TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
           OWNER_PHONES: ${{ secrets.OWNER_PHONES }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
         run: |
           umask 077
+          RESEND_API_KEY=$(printf '%s' "$RESEND_API_KEY" | tr -d '[:space:]"')
           jq -n --arg gh "$GH_PAT" --arg pw "$ADMIN_PASSWORD" --arg sid "$TWILIO_ACCOUNT_SID" \
                 --arg tok "$TWILIO_AUTH_TOKEN" --arg from "$TWILIO_PHONE_NUMBER" --arg own "$OWNER_PHONES" \
-            '{GH_TOKEN:$gh, ADMIN_PASSWORD:$pw, TWILIO_SID:$sid, TWILIO_TOKEN:$tok, TWILIO_FROM:$from, OWNER_PHONES:$own}
+                --arg rs "$RESEND_API_KEY" --arg ne "$NOTIFY_EMAIL" \
+            '{GH_TOKEN:$gh, ADMIN_PASSWORD:$pw, TWILIO_SID:$sid, TWILIO_TOKEN:$tok, TWILIO_FROM:$from, OWNER_PHONES:$own, RESEND_API_KEY:$rs, NOTIFY_EMAIL:$ne}
              | with_entries(select(.value != ""))' > /tmp/secrets.json
           npx --yes wrangler@4 secret bulk /tmp/secrets.json
           rm -f /tmp/secrets.json

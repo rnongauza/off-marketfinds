@@ -340,7 +340,7 @@ a.logo{text-decoration:none}
 <header class="site"><div class="wrap">
   <a class="logo" href="#" aria-label="All properties"><svg viewBox="0 0 34 14" aria-hidden="true"><path d="M3 8 17 1l14 7" fill="none" stroke="#2785b8" stroke-width="2.2"/><rect x="14" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="7" width="2.4" height="2.4" fill="#2785b8"/><rect x="14" y="10.4" width="2.4" height="2.4" fill="#2785b8"/><rect x="17.4" y="10.4" width="2.4" height="2.4" fill="#2785b8"/></svg><span class="nm">Nongauza</span><span class="gp">REAL ESTATE GROUP</span><span class="by">By Kendrick Realty Inc.</span></a>
   <span class="badge-admin">Admin</span>
-  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#links" id="nav-links">Short links</a><a href="#signups" id="nav-signups">Trial sign-ups</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
+  <nav id="topnav" hidden aria-label="Admin"><a href="#" id="nav-props">Properties</a><a href="#links" id="nav-links">Short links</a><a href="#leads" id="nav-leads">Buyer requests</a><a href="#signups" id="nav-signups">Trial sign-ups</a><a href="/" target="_blank" rel="noopener">Public site ↗</a><button type="button" id="logout">Log out</button></nav>
 </div></header>
 
 <main class="wrap" id="main">
@@ -377,6 +377,11 @@ a.logo{text-decoration:none}
   </section>
 
   <!-- short links -->
+  <section id="v-leads" hidden>
+    <div class="page-head"><div><div class="eyebrow">From the “Request info” form on deal pages</div><h1>Buyer requests</h1><p>Each request is also emailed to you. Reply to the email to answer the buyer directly.</p></div>
+    <div><button class="btn ghost small" type="button" id="test-email">Send me a test email</button></div></div>
+    <div class="panel"><div style="overflow-x:auto"><table class="links"><thead><tr><th>Who</th><th class="hide-sm">Property</th><th class="hide-sm">Message</th><th>Status</th></tr></thead><tbody id="ld-rows"><tr><td colspan="4" class="status">Loading…</td></tr></tbody></table></div></div>
+  </section>
   <section id="v-signups" hidden>
     <div class="page-head"><div><div class="eyebrow">From off-marketfinds.com/start</div><h1>Trial sign-ups</h1><p>People who asked for a 7-day free trial. Reach out, set them up, then mark where they are.</p></div></div>
     <div class="panel"><div style="overflow-x:auto"><table class="links"><thead><tr><th>Who</th><th class="hide-sm">Contact</th><th class="hide-sm">Notes</th><th>Status</th></tr></thead><tbody id="su-rows"><tr><td colspan="4" class="status">Loading…</td></tr></tbody></table></div>
@@ -602,10 +607,11 @@ async function api(path,opts={}){
 }
 
 /* ---------------- routing ---------------- */
-function show(view){['v-login','v-list','v-links','v-edit','v-signups'].forEach(v=>$(v).hidden=(v!==view));
+function show(view){['v-login','v-list','v-links','v-edit','v-signups','v-leads'].forEach(v=>$(v).hidden=(v!==view));
   $('topnav').hidden=(view==='v-login'); $('savebar').hidden=(view!=='v-edit');
   $('nav-props').toggleAttribute('aria-current',view==='v-list'); if(view==='v-list')$('nav-props').setAttribute('aria-current','page');
   $('nav-links').toggleAttribute('aria-current',view==='v-links'); if(view==='v-links')$('nav-links').setAttribute('aria-current','page');
+  $('nav-leads').toggleAttribute('aria-current',view==='v-leads'); if(view==='v-leads')$('nav-leads').setAttribute('aria-current','page');
   $('nav-signups').toggleAttribute('aria-current',view==='v-signups'); if(view==='v-signups')$('nav-signups').setAttribute('aria-current','page');
   window.scrollTo(0,0);}
 let lastHash=location.hash;
@@ -619,6 +625,7 @@ async function route(){
   stopTimers();
   if(h==='links'){show('v-links');loadLinks();}
   else if(h==='signups'){show('v-signups');loadSignups();}
+  else if(h==='leads'){show('v-leads');loadLeads();}
   else if(/^[a-z0-9][a-z0-9-]+$/.test(h)){show('v-edit');openProperty(h);}
   else{show('v-list');loadList();}
 }
@@ -693,6 +700,32 @@ $('new-form').addEventListener('submit',async e=>{e.preventDefault();
   catch(err){setStatus($('new-status'),err.message,'err');}});
 
 /* ---------------- short links ---------------- */
+async function loadLeads(){
+  const rows=$('ld-rows');
+  try{
+    const j=await api('/api/leads');rows.replaceChildren();
+    if(!j.leads.length){rows.innerHTML='<tr><td colspan="4" class="status">No buyer requests yet. They come from the “Request info” form at the bottom of each deal page.</td></tr>';return;}
+    j.leads.forEach(l=>{
+      const tr=document.createElement('tr');
+      const td1=document.createElement('td');const b=document.createElement('b');b.textContent=l.name;
+      const c=document.createElement('div');c.className='status';
+      const em=document.createElement('a');em.href='mailto:'+l.email;em.textContent=l.email;c.append(em);
+      if(l.phone){c.append(' · ');const ph=document.createElement('a');ph.href='tel:'+l.phone.replace(/[^\d+]/g,'');ph.textContent=l.phone;c.append(ph);}
+      const w=document.createElement('div');w.className='status';w.textContent=(l.kind||'')+' · '+new Date(l.at).toLocaleString();
+      td1.append(b,c,w);
+      const td2=document.createElement('td');td2.className='hide-sm';const a=document.createElement('a');a.href=l.page;a.target='_blank';a.rel='noopener';a.textContent=l.title||'Deal page';td2.appendChild(a);
+      const td3=document.createElement('td');td3.className='hide-sm';td3.textContent=l.message||'';td3.style.whiteSpace='pre-wrap';
+      const td4=document.createElement('td');const sel=document.createElement('select');sel.className='small';sel.setAttribute('aria-label','Status for '+l.name);
+      [['new','New'],['contacted','Contacted'],['closed','Closed']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.appendChild(o);});
+      sel.value=l.status||'new';
+      sel.addEventListener('change',async()=>{try{await api('/api/leads/'+l.id,{method:'PUT',body:{status:sel.value}});toast('Saved.');}catch(e){toast(e.message);}});
+      td4.appendChild(sel);tr.append(td1,td2,td3,td4);rows.appendChild(tr);
+    });
+  }catch(e){if(e.code!=='login')rows.innerHTML='<tr><td colspan="4" class="status">Couldn’t load requests: '+e.message+'</td></tr>';}
+}
+$('test-email').addEventListener('click',async()=>{const b=$('test-email');b.disabled=true;
+  try{const r=await api('/api/test-email',{method:'POST',body:{}});toast(r.sent?'Test email sent. Check your inbox (and spam).':'Not sent: '+r.why);}catch(e){toast(e.message);}
+  b.disabled=false;});
 async function loadSignups(){
   const rows=$('su-rows');
   try{

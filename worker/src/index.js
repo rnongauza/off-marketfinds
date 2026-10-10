@@ -3,7 +3,7 @@
 //
 // Secrets / vars (set by .github/workflows/deploy-worker.yml from the repo's GitHub secrets):
 //   GH_TOKEN, GH_REPO, GH_BRANCH, ADMIN_PASSWORD, SESSION_SECRET,
-//   TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM, OWNER_PHONES, SITE_URL
+//   TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM, OWNER_PHONES, SITE_URL, RESEND_API_KEY, NOTIFY_EMAIL
 // KV binding: STATE  (text conversations, login throttling, short-link clicks, import status)
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
@@ -307,7 +307,71 @@ async function saveSignup(env, req, b) {
     ip, ua: clean(req.headers.get("user-agent"), 200) });
   await env.STATE.put("signup:" + id, JSON.stringify(s));
   await env.STATE.put(rl, String(n + 1), { expirationTtl: 3600 });
+  await notify(env, `New free-trial sign-up: ${s.name}`, rows([
+    ["Name", s.name], ["Email", s.email], ["Mobile", s.phone], ["Role", s.role], ["Company", s.company],
+    ["Notes", s.notes], ["Agreed to texts", s.smsConsent ? "Yes" : "No — email only"],
+  ]) + `<p><a href="${siteUrl(env)}/admin/#signups">Open trial sign-ups in the admin</a></p>`, s.email);
   return { ok: true };
+}
+
+async function saveLead(env, req, b) {
+  const clean = (v, n) => String(v ?? "").replace(/[\u0000-\u001f]+/g, " ").trim().slice(0, n);
+  if (clean(b.website, 100)) return { ok: true };  // bot trap
+  const ip = req.headers.get("cf-connecting-ip") || "?", rl = "lead-rate:" + ip;
+  const n = parseInt(await env.STATE.get(rl) || "0", 10);
+  if (n >= 8) throw fail(429, "slow_down", "Too many requests from this connection. Try again in an hour.");
+  const site = siteUrl(env);
+  let page = clean(b.page, 300);
+  if (!page.startsWith(site + "/")) page = site;
+  const l = {
+    name: clean(b.name, 100), email: clean(b.email, 160).toLowerCase(), phone: clean(b.phone, 30),
+    kind: clean(b.kind, 60), message: String(b.message ?? "").trim().slice(0, 1000),
+    title: clean(b.title, 200), price: Number(b.price) || 0, page,
+  };
+  if (!l.name || !/^\S+@\S+\.\S+$/.test(l.email)) throw fail(400, "missing", "Please add your name and a valid email.");
+  const at = Date.now(), id = at.toString(36) + Math.random().toString(36).slice(2, 7);
+  Object.assign(l, { id, at, status: "new", ip });
+  await env.STATE.put("lead:" + id, JSON.stringify(l));
+  await env.STATE.put(rl, String(n + 1), { expirationTtl: 3600 });
+  await notify(env, `New buyer request: ${l.title || "a property"}`, rows([
+    ["Property", l.title], ["Asking", l.price ? "$" + l.price.toLocaleString("en-US") : ""], ["Name", l.name], ["Email", l.email],
+    ["Phone", l.phone], ["They are", l.kind], ["Message", l.message],
+  ]) + `<p><a href="${esc(l.page)}">Open the deal page</a> · <a href="${site}/admin/#leads">All buyer requests</a></p>`, l.email);
+  return { ok: true };
+}
+
+async function listKv(env, prefix) {
+  const out = [];
+  let cursor;
+  do {
+    const page = await env.STATE.list({ prefix, cursor });
+    for (const k of page.keys) { const v = await env.STATE.get(k.name, "json"); if (v) out.push(v); }
+    cursor = page.list_complete ? null : page.cursor;
+  } while (cursor && out.length < 500);
+  return out.sort((a, b) => b.at - a.at);
+}
+
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function rows(list) {
+  return `<table style="border-collapse:collapse;font:15px Arial,sans-serif">` + list.filter(([, v]) => v).map(([k, v]) =>
+    `<tr><td style="padding:6px 14px 6px 0;color:#666;vertical-align:top">${esc(k)}</td><td style="padding:6px 0;white-space:pre-wrap">${esc(v)}</td></tr>`).join("") + `</table>`;
+}
+
+// Email Robert through Resend. Uses the verified off-marketfinds.com domain; until it's verified,
+// falls back to Resend's test sender (which can only deliver to the Resend account's own email).
+async function notify(env, subject, html, replyTo) {
+  if (!env.RESEND_API_KEY) return { sent: false, why: "RESEND_API_KEY isn't set" };
+  const to = (env.NOTIFY_EMAIL || "robert@kendrickrealtyinc.com").split(/[,\s]+/).filter(Boolean);
+  const send = from => fetch("https://api.resend.com/emails", {
+    method: "POST", headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, "content-type": "application/json" },
+    body: JSON.stringify({ from, to, subject, html: `<div style="font:15px Arial,sans-serif;color:#222">${html}</div>`, ...(replyTo ? { reply_to: replyTo } : {}) }),
+  });
+  try {
+    let r = await send("Off-Market Finds <notifications@off-marketfinds.com>");
+    if (r.status === 403 || r.status === 422) r = await send("Off-Market Finds <onboarding@resend.dev>");
+    const j = await r.json().catch(() => ({}));
+    return r.ok ? { sent: true, id: j.id } : { sent: false, why: j.message || ("Resend error " + r.status) };
+  } catch (e) { return { sent: false, why: String(e.message || e) }; }
 }
 
 async function listSignups(env) {
@@ -338,10 +402,24 @@ async function handleApi(req, env, url) {
   }
   // free-trial sign-ups from off-marketfinds.com/start/ (public; stored privately in KV, never in the public repo)
   if (parts[0] === "signup" && req.method === "POST") return json(await saveSignup(env, req, body));
+  // buyer "Request info" form on property pages
+  if (parts[0] === "lead" && req.method === "POST") return json(await saveLead(env, req, body));
 
   if (!(await checkToken(env, req))) throw fail(401, "login_required", "Please log in again.");
 
   if (parts[0] === "signups" && req.method === "GET") return json({ signups: await listSignups(env) });
+  if (parts[0] === "leads" && req.method === "GET") return json({ leads: await listKv(env, "lead:") });
+  if (parts[0] === "leads" && parts[1] && req.method === "PUT") {
+    const key = "lead:" + parts[1], cur = await env.STATE.get(key, "json");
+    if (!cur) throw fail(404, "not_found", "That lead is gone.");
+    cur.status = ["new", "contacted", "closed"].includes(body.status) ? body.status : cur.status;
+    await env.STATE.put(key, JSON.stringify(cur));
+    return json({ ok: true, lead: cur });
+  }
+  if (parts[0] === "test-email" && req.method === "POST") {
+    const r = await notify(env, "Test from Off-Market Finds", "<p>Email from your website is working.</p>");
+    return json(r);
+  }
   if (parts[0] === "signups" && parts[1] && req.method === "PUT") {
     const key = "signup:" + parts[1], cur = await env.STATE.get(key, "json");
     if (!cur) throw fail(404, "not_found", "That sign-up is gone.");

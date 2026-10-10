@@ -77,6 +77,9 @@ def photo_src(pub, v):
     return {"src": f"/{pub}/{s}"}
 
 
+API_URL = ""
+
+
 def build_property(d, contact, tpl):
     slug = d["slug"]
     pub = public_dir(slug, d)
@@ -117,7 +120,7 @@ def build_property(d, contact, tpl):
     if hide:  # never put the real street in the public page
         P["street"] = ""
     P.pop("hideStreet", None)
-    data = {"property": P, "photos": photos, "calc": calc, "contact": contact,
+    data = {"api": API_URL, "property": P, "photos": photos, "calc": calc, "contact": contact,
             "market": d.get("market") or None, "links": links}
 
     city = P.get("cityLine") or ""
@@ -173,6 +176,8 @@ def main():
     config = read_json(ROOT / "site" / "config.json", {})
     api = os.environ.get("API_URL") or config.get("api") or ""
     tpl = (ROOT / "site" / "property.html").read_text()
+    global API_URL
+    API_URL = api
 
     cards = []
     props = load_properties()
