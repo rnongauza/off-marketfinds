@@ -786,7 +786,7 @@ const PF=['eyebrow','headline','street','cityLine','price','arv','beds','baths',
 const NUMF=['price','arv','beds','baths','sqft','lot'];
 const CF=['light','moderate','closingPct','months','holdingMonthly','sellerClosingPct','targetPct'];
 function imgUrl(slug,src){if(!src)return '';if(/^(data|blob):/.test(src))return src;if(CONFIG.imgBase)return CONFIG.imgBase+(src.startsWith('/')?src:'/'+slug+'/'+src);if(/^https?:|^\//.test(src))return src.startsWith('/')&&!location.hostname.endsWith('off-marketfinds.com')?SITE+src:src;
-  return me&&me.repo?'https://raw.githubusercontent.com/'+me.repo+'/main/properties/'+slug+'/'+src:SITE+'/'+slug+'/'+src;}
+  return API?API+'/img/'+slug+'/'+src:SITE+'/'+slug+'/'+src;}
 
 async function openProperty(slug){
   $('e-title').textContent='Loading…';$('photos').replaceChildren();$('imp-box').hidden=true;

@@ -19,6 +19,7 @@ export default {
       let res;
       if (url.pathname === "/sms" && req.method === "POST") res = await handleSms(req, env, url);
       else if (url.pathname.startsWith("/c/") && req.method === "POST") res = await countClick(env, url.pathname.slice(3));
+      else if (url.pathname.startsWith("/img/") && req.method === "GET") return await servePhoto(env, url, ctx);
       else if (url.pathname.startsWith("/api/")) res = await handleApi(req, env, url);
       else if (url.pathname === "/") res = new Response("Off-Market Finds bot is running.", { headers: { "content-type": "text/plain" } });
       else res = json({ error: "not_found" }, 404);
@@ -100,6 +101,25 @@ async function gh(env, path, opts = {}) {
   return r.status === 204 ? null : r.json();
 }
 const branch = env => env.GH_BRANCH || "main";
+
+// Property photos for the admin, read straight from the repo (works when the repo is private).
+// Only image files under properties/<slug>/img/ are served; they are public on the site anyway.
+async function servePhoto(env, url, ctx) {
+  const m = url.pathname.match(/^\/img\/([a-z0-9][a-z0-9-]{1,90})\/(img\/[A-Za-z0-9._-]{1,120}\.(?:jpe?g|png|webp|gif))$/i);
+  if (!m) return new Response("not found", { status: 404 });
+  const cache = caches.default, key = new Request(url.origin + url.pathname);
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const r = await fetch(`https://api.github.com/repos/${env.GH_REPO}/contents/properties/${m[1]}/${m[2]}?ref=${branch(env)}`, {
+    headers: { authorization: `Bearer ${env.GH_TOKEN}`, accept: "application/vnd.github.raw", "user-agent": "off-marketfinds-bot" },
+  });
+  if (!r.ok) return new Response("not found", { status: 404, headers: { "cache-control": "no-store" } });
+  const ext = m[2].split(".").pop().toLowerCase();
+  const type = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" }[ext];
+  const res = new Response(r.body, { headers: { "content-type": type, "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" } });
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
 
 async function readFile(env, path) {
   const d = await gh(env, `/contents/${encodeURI(path)}?ref=${branch(env)}`, { allow404: true });
